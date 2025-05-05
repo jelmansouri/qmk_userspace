@@ -120,11 +120,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-// // Function to handle layer changes and disable drag scrolling when not in AUTO_MOUSE_DEFAULT_LAYER
-// layer_state_t layer_state_set_user(layer_state_t state) {
-//     // Disable set_scrolling if the current layer is not the AUTO_MOUSE_DEFAULT_LAYER
-//     if (get_highest_layer(state) != AUTO_MOUSE_DEFAULT_LAYER) {
-//         set_scrolling = false;
-//     }
-//     return state;
-// }
+// Function to handle layer changes and disable drag scrolling when not in AUTO_MOUSE_DEFAULT_LAYER
+layer_state_t layer_state_set_user(layer_state_t state) {
+    // Disable set_scrolling if the current layer is not the AUTO_MOUSE_DEFAULT_LAYER
+    if (get_highest_layer(state) != AUTO_MOUSE_DEFAULT_LAYER) {
+        set_scrolling = false;
+    }
+    return state;
+}
