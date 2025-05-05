@@ -74,7 +74,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-bool set_scrolling = true;
+bool set_scrolling = false;
 
 // Modify these values to adjust the scrolling speed
 #define SCROLL_DIVISOR_H 8.0
@@ -85,6 +85,7 @@ float scroll_accumulated_h = 0;
 float scroll_accumulated_v = 0;
 
 // Function to handle mouse reports and perform drag scrolling
+//
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     // Check if drag scrolling is active
     if (set_scrolling) {
@@ -112,10 +113,16 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case DRAG_SCROLL:
             // Toggle set_scrolling when DRAG_SCROLL key is pressed or released
-            // set_scrolling = record->event.pressed;
+            set_scrolling = record->event.pressed;
             break;
         default:
             break;
     }
     return true;
+}
+
+// Function to handle layer changes and disable drag scrolling
+layer_state_t layer_state_set_user(layer_state_t state) {
+    set_scrolling = false;
+    return state;
 }
