@@ -74,7 +74,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
-bool set_scrolling = false;
+bool set_scrolling = true;
 
 // Modify these values to adjust the scrolling speed
 #define SCROLL_DIVISOR_H 8.0
@@ -112,7 +112,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case DRAG_SCROLL:
             // Toggle set_scrolling when DRAG_SCROLL key is pressed or released
-            set_scrolling = record->event.pressed;
+            // set_scrolling = record->event.pressed;
             break;
         default:
             break;
