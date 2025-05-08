@@ -128,17 +128,19 @@ void housekeeping_task_kb(void) {
     housekeeping_task_user();
 }
 
-// report_mouse_t pointing_device_task_combined_kb(report_mouse_t left_report, report_mouse_t right_report) {
-//     // Only runs on master
-//     // Fixes the following bug: If master is right and master is NOT a cirque trackpad, the inputs would be inverted.
-//     if(module != hlc_cirque_trackpad && !is_keyboard_left()) {
-//         mouse_xy_report_t x = left_report.x;
-//         mouse_xy_report_t y = left_report.y;
-//         left_report.x = -x;
-//         left_report.y = -y;
-//     }
-//     return pointing_device_task_combined_user(left_report, right_report);
-// }
+#if defined(POINTING_DEVICE_COMBINED)
+report_mouse_t pointing_device_task_combined_kb(report_mouse_t left_report, report_mouse_t right_report) {
+    // Only runs on master
+    // Fixes the following bug: If master is right and master is NOT a cirque trackpad, the inputs would be inverted.
+    if(module != hlc_cirque_trackpad && !is_keyboard_left()) {
+        mouse_xy_report_t x = left_report.x;
+        mouse_xy_report_t y = left_report.y;
+        left_report.x = -x;
+        left_report.y = -y;
+    }
+    return pointing_device_task_combined_user(left_report, right_report);
+}
+#endif // defined(POINTING_DEVICE_COMBINED)
 
 // Kyria
 #if defined(KEYBOARD_splitkb_halcyon_kyria_rev4)
