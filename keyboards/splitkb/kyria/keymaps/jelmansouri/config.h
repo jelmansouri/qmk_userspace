@@ -1,5 +1,10 @@
 #pragma once
 
+#define TAPPING_TERM 280
+#define FLOW_TAP_TERM 150
+#define CHORDAL_HOLD
+#define PERMISSIVE_HOLD
+
 #ifdef RGB_MATRIX_ENABLE
 #    define ENABLE_RGB_MATRIX_SOLID_COLOR               // Static single hue, no speed support
 #    define ENABLE_RGB_MATRIX_ALPHAS_MODS               // Static dual hue, speed is hue for secondary hue
@@ -59,5 +64,7 @@
 #endif // OLED_ENABLE
 
 #ifdef POINTING_DEVICE_ENABLE
-
+#    define SPLIT_POINTING_ENABLE
+#    define POINTING_DEVICE_RIGHT
+#    define POINTING_DEVICE_ROTATION_90
 #endif // POINTING_DEVICE_ENABLE
