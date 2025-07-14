@@ -11,9 +11,9 @@
 
 #define LCTL_R MT(MOD_LCTL, KC_R)
 #define LALT_S MT(MOD_LALT, KC_S)
-#define LGUI_T MT(MOD_LALT, KC_T)
+#define LGUI_T MT(MOD_LGUI, KC_T)
 
-#define LGUI_N MT(MOD_LALT, KC_N)
+#define LGUI_N MT(MOD_LGUI, KC_N)
 #define LALT_E MT(MOD_LALT, KC_E)
 #define LCTL_I MT(MOD_LCTL, KC_I)
 
