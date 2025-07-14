@@ -9,13 +9,13 @@
 #define NAV MO(_NAV)
 #define NAV_3D TO(_NAV_3D)
 
-#define LCTL_R MT(MOD_LCTL, KC_R)
-#define LALT_S MT(MOD_LALT, KC_S)
-#define LGUI_T MT(MOD_LGUI, KC_T)
+#define R_LCTL MT(MOD_LCTL, KC_R)
+#define S_LALT MT(MOD_LALT, KC_S)
+#define T_LGUI MT(MOD_LGUI, KC_T)
 
-#define LGUI_N MT(MOD_LGUI, KC_N)
-#define LALT_E MT(MOD_LALT, KC_E)
-#define LCTL_I MT(MOD_LCTL, KC_I)
+#define N_LGUI MT(MOD_LGUI, KC_N)
+#define E_LALT MT(MOD_LALT, KC_E)
+#define I_LCTL MT(MOD_LCTL, KC_I)
 
 #define DSCROLL DRAG_SCROLL
 
@@ -41,7 +41,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [_BASE] = LAYOUT_split_3x6_5(
        KC_GRV,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                                        KC_J,    KC_L,    KC_U,    KC_Y, KC_MINS,  KC_EQL,
-       KC_TAB,    KC_A,  LCTL_R,  LALT_S,  LGUI_T,    KC_G,                                        KC_M,  LGUI_N,  LALT_E,  LCTL_I,    KC_O, KC_SCLN,
+       KC_TAB,    KC_A,  R_LCTL,  S_LALT,  T_LGUI,    KC_G,                                        KC_M,  N_LGUI,  E_LALT,  I_LCTL,    KC_O, KC_SCLN,
       KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,  KC_ESC,  KC_ENT,   KC_SPC, KC_BSPC,   KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
                                  KC_LGUI, KC_LGUI,      FN,     SYM, KC_LSFT,   KC_LSFT,    NUM,    NAV, CW_TOGG,  KC_DEL
     ),
