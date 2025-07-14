@@ -2,7 +2,9 @@
 #include "keymap.h"
 
 #ifdef OLED_ENABLE
-oled_rotation_t oled_init_user(oled_rotation_t rotation) { return OLED_ROTATION_180; }
+oled_rotation_t oled_init_user(oled_rotation_t rotation) {
+    return OLED_ROTATION_180;
+}
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
@@ -19,15 +21,21 @@ bool oled_task_user(void) {
 
         // Host Keyboard Layer Status
         oled_write_P(PSTR("Layer: "), false);
-        switch (get_highest_layer(layer_state|default_layer_state)) {
+        switch (get_highest_layer(layer_state | default_layer_state)) {
             case _BASE:
                 oled_write_P(PSTR("Base\n"), false);
                 break;
-            case _LOWER:
-                oled_write_P(PSTR("Lower\n"), false);
+            case _FN:
+                oled_write_P(PSTR("Fn\n"), false);
                 break;
-            case _RAISE:
-                oled_write_P(PSTR("Raise\n"), false);
+            case _SYM:
+                oled_write_P(PSTR("Sym\n"), false);
+                break;
+            case _NUM:
+                oled_write_P(PSTR("Num\n"), false);
+                break;
+            case _NAV:
+                oled_write_P(PSTR("Nav\n"), false);
                 break;
             case _NAV_3D:
                 oled_write_P(PSTR("3D Nav\n"), false);
@@ -53,4 +61,3 @@ bool oled_task_user(void) {
     return false;
 }
 #endif
-

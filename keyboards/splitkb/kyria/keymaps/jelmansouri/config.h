@@ -5,6 +5,7 @@
 #define CHORDAL_HOLD
 #define PERMISSIVE_HOLD
 #define QUICK_TAP_TERM 0
+#define CAPS_WORD_INVERT_ON_SHIFT
 
 #ifdef RGB_MATRIX_ENABLE
 #    define ENABLE_RGB_MATRIX_SOLID_COLOR               // Static single hue, no speed support
