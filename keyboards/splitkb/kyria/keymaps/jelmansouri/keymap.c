@@ -7,7 +7,7 @@
 #define A_HRM_L MO(_ALPHA_HRM_L)
 #define NUM MO(_NUM)
 #define NAV MO(_NAV)
-#define SYM MO(SYM)
+#define SYM MO(_SYM)
 #define FN MO(_FN)
 #define NAV_3D TO(_NAV_3D)
 
