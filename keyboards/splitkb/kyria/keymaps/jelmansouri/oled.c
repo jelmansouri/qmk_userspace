@@ -25,17 +25,23 @@ bool oled_task_user(void) {
             case _BASE:
                 oled_write_P(PSTR("Base\n"), false);
                 break;
-            case _FN:
-                oled_write_P(PSTR("Fn\n"), false);
+            case _ALPHA_HRM_R:
+                oled_write_P(PSTR("Hrm-R\n"), false);
                 break;
-            case _SYM:
-                oled_write_P(PSTR("Sym\n"), false);
+            case _ALPHA_HRM_L:
+                oled_write_P(PSTR("Hrm-L\n"), false);
                 break;
             case _NUM:
                 oled_write_P(PSTR("Num\n"), false);
                 break;
             case _NAV:
                 oled_write_P(PSTR("Nav\n"), false);
+                break;
+            case _SYM:
+                oled_write_P(PSTR("Sym\n"), false);
+                break;
+            case _FN:
+                oled_write_P(PSTR("Fn\n"), false);
                 break;
             case _NAV_3D:
                 oled_write_P(PSTR("3D Nav\n"), false);
