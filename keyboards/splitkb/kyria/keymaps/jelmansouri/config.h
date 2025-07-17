@@ -1,10 +1,5 @@
 #pragma once
 
-#define TAPPING_TERM 280
-#define FLOW_TAP_TERM 150
-#define CHORDAL_HOLD
-#define PERMISSIVE_HOLD
-#define QUICK_TAP_TERM 0
 #define CAPS_WORD_INVERT_ON_SHIFT
 
 #ifdef RGB_MATRIX_ENABLE
