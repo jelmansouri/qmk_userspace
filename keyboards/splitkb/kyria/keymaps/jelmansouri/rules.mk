@@ -4,7 +4,6 @@ CONVERT_TO=liatris
 CAPS_WORD_ENABLE = yes
 
 # ifdef CIRQUE_TRACKPAD
-    OLED_ENABLE = no
 	POINTING_DEVICE_ENABLE = yes
 	POINTING_DEVICE_DRIVER = cirque_pinnacle_i2c
 	SRC += trackpad.c
