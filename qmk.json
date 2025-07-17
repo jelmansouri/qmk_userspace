@@ -45,17 +45,8 @@
             "splitkb/kyria/rev3",
             "jelmansouri",
             {
-                "OLED_DISPLAY": "1",
-                "TARGET": "splitkb_kyria_rev3_jelmansouri_oled_display"
+                "TARGET": "splitkb_kyria_rev3_jelmansouri"
             }
         ],
-        [
-            "splitkb/kyria/rev3",
-            "jelmansouri",
-            {
-                "CIRQUE_TRACKPAD": "1",
-                "TARGET": "splitkb_kyria_rev3_jelmansouri_cirque_trackpad"
-            }
-        ]
     ]
 }
