@@ -49,9 +49,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [_BASE] = LAYOUT_split_3x6_5_hlc(
        KC_GRV,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                                        KC_J,    KC_L,    KC_U,    KC_Y, KC_MINS,  KC_EQL,
-       KC_TAB,  A_LALT,  R_LCTL,  S_LGUI,  T_LSFT,    KC_G,                                        KC_M,  N_LSFT,  N_LSFT,  I_LCTL,  O_LALT, KC_SCLN,
+       KC_TAB,  A_LALT,  R_LCTL,  S_LGUI,  T_LSFT,    KC_G,                                        KC_M,  N_LSFT,  E_LGUI,  I_LCTL,  O_LALT, KC_SCLN,
       KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,  KC_ESC,  KC_ENT,   KC_SPC, KC_BSPC,   KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
-                                 KC_LGUI, KC_LGUI,      FN,     SYM, KC_LSFT,   KC_LSFT,    NUM,    NAV, CW_TOGG,  KC_DEL,
+                                 KC_LGUI, KC_LGUI,     NUM,     NAV, KC_LGUI,   CW_TOGG,    SYM,     FN, CW_TOGG,  KC_DEL,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
