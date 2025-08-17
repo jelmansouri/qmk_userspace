@@ -25,12 +25,6 @@ bool oled_task_user(void) {
             case _BASE:
                 oled_write_P(PSTR("Base\n"), false);
                 break;
-            case _ALPHA_HRM_R:
-                oled_write_P(PSTR("Hrm-R\n"), false);
-                break;
-            case _ALPHA_HRM_L:
-                oled_write_P(PSTR("Hrm-L\n"), false);
-                break;
             case _NUM:
                 oled_write_P(PSTR("Num\n"), false);
                 break;
