@@ -2,12 +2,11 @@
 
 #include "keymap.h"
 
-#define BASE TO(_BASE)
 #define NUM MO(_NUM)
 #define NAV MO(_NAV)
 #define SYM MO(_SYM)
 #define FN MO(_FN)
-#define NAV_3D TO(_NAV_3D)
+#define NAV_3D MO(_NAV_3D)
 
 #define A_LALT MT(MOD_LALT, KC_A)
 #define R_LCTL MT(MOD_LCTL, KC_R)
@@ -45,7 +44,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
        KC_GRV,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                                        KC_J,    KC_L,    KC_U,    KC_Y, KC_MINS,  KC_EQL,
        KC_TAB,  A_LALT,  R_LCTL,  S_LGUI,  T_LSFT,    KC_G,                                        KC_M,  N_LSFT,  E_LGUI,  I_LCTL,  O_LALT, KC_SCLN,
       KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,  KC_ESC,  KC_ENT,   KC_SPC, KC_BSPC,   KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
-                                 KC_LGUI, KC_LGUI,     NUM,     NAV, KC_LGUI,   CW_TOGG,    SYM,     FN, KC_LGUI,  KC_DEL
+                                 KC_LGUI, KC_LGUI,     NUM,     NAV,  NAV_3D,   CW_TOGG,    SYM,     FN, KC_LGUI,  KC_DEL
     ),
 
     [_NUM] = LAYOUT_split_3x6_5(
@@ -77,9 +76,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_NAV_3D] = LAYOUT_split_3x6_5(
-         BASE, KC_CAPS,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RGB_TOG, RGB_MOD, RGB_HUI, RGB_VAI, RGB_SPI, RGB_M_K,
+        KC_NO, KC_CAPS,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RGB_TOG, RGB_MOD, RGB_HUI, RGB_VAI, RGB_SPI, RGB_M_K,
         KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     RGB_TOG, RGB_RMOD, RGB_HUD, RGB_VAD, RGB_SPD, RGB_M_X,
-        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,  KC_ESC,  KC_SPC,   KC_NO,   KC_NO, RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_G,
+        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,   KC_NO,   KC_NO,   KC_NO,   KC_NO, RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_G,
                                    KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO
     )
 };
