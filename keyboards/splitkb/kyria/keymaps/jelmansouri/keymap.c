@@ -81,6 +81,30 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case AM_CTL:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(KC_AMPR); // Send KC_DQUO on tap
+                return false;        // Return false to ignore further processing of key
+            }
+            break;
+        case AS_ALT:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(KC_ASTR); // Send KC_DQUO on tap
+                return false;        // Return false to ignore further processing of key
+            }
+            break;
+        case LP_GUI:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(KC_LPRN); // Send KC_DQUO on tap
+                return false;        // Return false to ignore further processing of key
+            }
+            break;
+    }
+    return true;
+}
+
 bool is_flow_tap_key(uint16_t keycode) {
     if ((get_mods() & (MOD_MASK_CG | MOD_BIT_LALT)) != 0) {
         return false; // Disable Flow Tap on hotkeys.
