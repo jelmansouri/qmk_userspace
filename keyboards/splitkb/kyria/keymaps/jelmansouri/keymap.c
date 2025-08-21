@@ -2,21 +2,32 @@
 
 #include "keymap.h"
 
-#define NUM MO(_NUM)
-#define NAV MO(_NAV)
-#define SYM MO(_SYM)
-#define FN MO(_FN)
+#define LOWER MO(_LOWER)
+#define RAISE MO(_RAISE)
 #define NAV_3D MO(_NAV_3D)
 
-#define A_LALT MT(MOD_LALT, KC_A)
-#define R_LCTL MT(MOD_LCTL, KC_R)
-#define S_LGUI MT(MOD_LGUI, KC_S)
-#define T_LSFT MT(MOD_LSFT, KC_T)
+// Base
+#define R_CTL MT(MOD_LCTL, KC_R)
+#define S_ALT MT(MOD_LALT, KC_S)
+#define T_GUI MT(MOD_LGUI, KC_T)
 
-#define N_LSFT MT(MOD_LSFT, KC_N)
-#define E_LGUI MT(MOD_LGUI, KC_E)
-#define I_LCTL MT(MOD_LCTL, KC_I)
-#define O_LALT MT(MOD_LALT, KC_O)
+#define N_GUI MT(MOD_LGUI, KC_N)
+#define E_ALT MT(MOD_LALT, KC_E)
+#define I_CTL MT(MOD_LCTL, KC_I)
+
+// LOWER
+#define F6_CTL MT(MOD_LCTL, KC_F6)
+#define F7_ALT MT(MOD_LALT, KC_F7)
+#define F8_GUI MT(MOD_LGUI, KC_F8)
+
+#define N4_GUI MT(MOD_LGUI, KC_4)
+#define N5_ALT MT(MOD_LALT, KC_5)
+#define N6_CTL MT(MOD_LCTL, KC_6)
+
+// RAISE
+#define AM_CTL MT(MOD_LCTL, KC_AMPR)
+#define AS_ALT MT(MOD_LALT, KC_ASTR)
+#define LP_GUI MT(MOD_LGUI, KC_LPRN)
 
 #define DSCROLL DRAG_SCROLL
 
@@ -42,36 +53,22 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [_BASE] = LAYOUT_split_3x6_5(
        KC_GRV,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                                        KC_J,    KC_L,    KC_U,    KC_Y, KC_MINS,  KC_EQL,
-       KC_TAB,  A_LALT,  R_LCTL,  S_LGUI,  T_LSFT,    KC_G,                                        KC_M,  N_LSFT,  E_LGUI,  I_LCTL,  O_LALT, KC_SCLN,
+       KC_TAB,    KC_A,   R_CTL,   S_ALT,   T_GUI,    KC_G,                                        KC_M,   N_GUI,   E_ALT,   I_CTL,    KC_O, KC_SCLN,
       KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,  KC_ESC,  KC_ENT,   KC_SPC, KC_BSPC,   KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
-                                 KC_LGUI, KC_LGUI,     NUM,     NAV,  NAV_3D,   CW_TOGG,    SYM,     FN, KC_LGUI,  KC_DEL
+                                 KC_LGUI, KC_LGUI,   LOWER, KC_LSFT,  NAV_3D,   CW_TOGG,KC_LSFT,  RAISE, KC_LGUI,  KC_DEL
     ),
 
-    [_NUM] = LAYOUT_split_3x6_5(
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                       KC_NO,    KC_7,    KC_8,    KC_9, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_LALT, KC_LCTL, KC_LGUI, KC_LSFT, KC_TRNS,                                       KC_NO,    KC_4,    KC_5,    KC_6,   KC_NO,   KC_NO,
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,    KC_0,    KC_1,    KC_2,    KC_3, KC_TRNS,   KC_NO,
+    [_LOWER] = LAYOUT_split_3x6_5(
+      KC_TRNS, KC_F9,  KC_F10,  KC_F11,  KC_F12, DSCROLL,                                       KC_NO,    KC_7,    KC_8,    KC_9, KC_TRNS, KC_TRNS,
+      KC_TRNS, KC_F5,  F6_CTL,  F7_ALT,  F8_GUI, MS_BTN1,                                       KC_NO,  N4_GUI,  N5_ALT,  N6_CTL,   KC_NO,   KC_NO,
+      KC_TRNS, KC_F1,   KC_F2,   KC_F3,   KC_F4, MS_BTN2,   KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,  KC_0,    KC_1,    KC_2,    KC_3, KC_TRNS,   KC_NO,
                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
     ),
 
-    [_NAV] = LAYOUT_split_3x6_5(
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                     KC_HOME, KC_PGDN, KC_PGUP,  KC_END, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_LALT, KC_LCTL, KC_LGUI, KC_LSFT, KC_TRNS,                                     KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
-    ),
-
-    [_SYM] = LAYOUT_split_3x6_5(
-      KC_TRNS, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN,                                     KC_TRNS, KC_LSFT, KC_LGUI, KC_LCTL, KC_LALT, KC_TRNS,
+    [_RAISE] = LAYOUT_split_3x6_5(
+      KC_TRNS, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                                     KC_HOME, KC_PGDN, KC_PGUP,  KC_END, KC_TRNS, KC_TRNS,
+      KC_TRNS, KC_CIRC,  AM_CTL,  AS_ALT,  LP_GUI, KC_RPRN,                                     KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, KC_TRNS, KC_TRNS,
       KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LBRC, KC_RBRC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
-    ),
-
-    [_FN] = LAYOUT_split_3x6_5(
-       NAV_3D,   KC_F9,  KC_F10,  KC_F11,  KC_F12, DSCROLL,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-      KC_TRNS,   KC_F5,   KC_F6,   KC_F7,   KC_F8, MS_BTN1,                                     KC_TRNS, KC_LSFT, KC_LGUI, KC_LCTL, KC_LALT, KC_TRNS,
-      KC_TRNS,   KC_F1,   KC_F2,   KC_F3,   KC_F4, MS_BTN2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
     ),
 

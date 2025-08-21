@@ -2,9 +2,7 @@
 
 enum layers {
     _BASE = 0,
-    _NUM,
-    _NAV,
-    _SYM,
-    _FN,
+    _LOWER,
+    _RAISE,
     _NAV_3D,
 };
