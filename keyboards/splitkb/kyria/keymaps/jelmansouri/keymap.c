@@ -3,9 +3,12 @@
 #include "keymap.h"
 
 #define BASE TO(_BASE)
+#define BWOHRM MO(_BASE)
 #define LOWER MO(_LOWER)
 #define RAISE MO(_RAISE)
 #define NAV_3D TO(_NAV_3D)
+
+#define KC_GLO LCTL(LGUI(KC_SPC))
 
 // Base
 #define R_CTL MT(MOD_LCTL, KC_R)
@@ -32,6 +35,10 @@
 
 #define DSCROLL DRAG_SCROLL
 
+// Modify these values to adjust the scrolling speed
+#define SCROLL_DIVISOR_H 32.0
+#define SCROLL_DIVISOR_V 32.0
+
 enum custom_keycodes {
     DRAG_SCROLL = SAFE_RANGE,
 };
@@ -48,45 +55,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |   tab  |  a   |  r   |  s   |  t   |  g   |                              |  m   |  n   |  e   |  i   |  o   |  ;     |
  * |--------+------+------+------+------+------+-------------.  ,-------------+------+------+------+------+------+--------|
  * |    \   |  z   |  x   |  c   |  d   |  v   |LShift|  Esc |  |BSpace|LCtrl |  k   |  h   |  ,   |  .   |  /   |  '     |
- * `----------------------+------+------+------+------+------|  |------+------+------+------+------+----------------------'
- *                        |  Cmd | LAlt |Lower |LCtrl |Enter |  |Space |LShift| Raise| LAlt | Del  |
- *                        `----------------------------------'  `----------------------------------'
- */
-    [_BASE] = LAYOUT_split_3x6_5(
-       KC_GRV,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                                        KC_J,    KC_L,    KC_U,    KC_Y, KC_MINS,  KC_EQL,
-       KC_TAB,    KC_A,   R_CTL,   S_ALT,   T_GUI,    KC_G,                                        KC_M,   N_GUI,   E_ALT,   I_CTL,    KC_O, KC_SCLN,
-      KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,  KC_ESC,  KC_ENT,   KC_SPC, KC_BSPC,   KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
-                                 KC_LGUI, KC_LGUI,   LOWER, KC_LSFT,  NAV_3D,   CW_TOGG,KC_LSFT,  RAISE, KC_LGUI,  KC_DEL
-    ),
-
-    [_LOWER] = LAYOUT_split_3x6_5(
-      KC_TRNS,   KC_F9,  KC_F10,  KC_F11,  KC_F12, DSCROLL,                                       KC_NO,    KC_7,    KC_8,    KC_9, KC_TRNS, KC_TRNS,
-      KC_TRNS,   KC_F5,  F6_CTL,  F7_ALT,  F8_GUI, MS_BTN1,                                       KC_NO,  N4_GUI,  N5_ALT,  N6_CTL,   KC_NO,   KC_NO,
-      KC_TRNS,   KC_F1,   KC_F2,   KC_F3,   KC_F4, MS_BTN2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,    KC_0,    KC_1,    KC_2,    KC_3, KC_TRNS,   KC_NO,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
-    ),
-
-    [_RAISE] = LAYOUT_split_3x6_5(
-      KC_TRNS, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                                     KC_HOME, KC_PGDN, KC_PGUP,  KC_END, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_CIRC,  AM_CTL,  AS_ALT,  LP_GUI, KC_RPRN,                                     KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LBRC, KC_RBRC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS
-    ),
-
-    [_NAV_3D] = LAYOUT_split_3x6_5(
-        KC_NO, KC_CAPS,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RGB_TOG, RGB_MOD, RGB_HUI, RGB_VAI, RGB_SPI, RGB_M_K,
-        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     RGB_TOG, RGB_RMOD, RGB_HUD, RGB_VAD, RGB_SPD, RGB_M_X,
-        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,   KC_TRNS,  KC_SPC,   KC_NO,   KC_NO, RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_G,
-                                   KC_NO,   KC_NO,   KC_NO,   KC_TRNS,    BASE,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO
-    )
-};
-// clang-format on
-
-// Handle new Mod Tap shifted keycodes as they are not supported using the MT macro
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case AM_CTL:
-            if (record->tap.count && record->event.pressed) {
+ *f (record->tap.count && record->event.pressed) {
                 tap_code16(KC_AMPR);
                 return false;
             }
@@ -110,12 +79,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
     return true;
 }
-
-bool set_scrolling = false;
-
-// Modify these values to adjust the scrolling speed
-#define SCROLL_DIVISOR_H 32.0
-#define SCROLL_DIVISOR_V 32.0
 
 // Variables to store accumulated scroll values
 float scroll_accumulated_h = 0;
