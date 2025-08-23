@@ -1,5 +1,3 @@
-#include <arm/types.h>
-#include <stdint.h>
 #include QMK_KEYBOARD_H
 #include "keymap.h"
 
@@ -49,7 +47,7 @@ static const char PROGMEM nav_3d_layer_banner[] = {
 };
 
 #    define ICON_SIZE 32
-#    define HALF_ICON_SIZE (ICON_SIZE >> 2)
+#    define HALF_ICON_SIZE (ICON_SIZE >> 1)
 
 static const char PROGMEM blank_icon[ICON_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
