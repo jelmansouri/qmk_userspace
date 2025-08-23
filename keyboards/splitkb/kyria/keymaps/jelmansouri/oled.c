@@ -1,3 +1,4 @@
+#include <arm/types.h>
 #include <stdint.h>
 #include QMK_KEYBOARD_H
 #include "keymap.h"
@@ -23,30 +24,6 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_180;
 }
 
-static void render_shift(bool pressed) {
-    static const char PROGMEM shift_icon[]         = {0x08, 0x0c, 0xf2, 0x81, 0x81, 0xf2, 0x0c, 0x08};
-    static const char PROGMEM shift_icon_pressed[] = {0xf7, 0xf3, 0x05, 0x7e, 0x7e, 0x05, 0xf3, 0xf7};
-    oled_write_raw_P(pressed ? shift_icon_pressed : shift_icon, 8);
-}
-
-static void render_ctrl(bool pressed) {
-    static const char PROGMEM ctrl_icon[]         = {0x08, 0x04, 0x02, 0x01, 0x01, 0x02, 0x04, 0x08};
-    static const char PROGMEM ctrl_icon_pressed[] = {0xf7, 0xfb, 0xfd, 0xfe, 0xfe, 0xfd, 0xfb, 0xf7};
-    oled_write_raw_P(pressed ? ctrl_icon_pressed : ctrl_icon, 8);
-}
-
-static void render_option(bool pressed) {
-    static const char PROGMEM option_icon[]         = {0x01, 0x01, 0x03, 0x1c, 0x60, 0x81, 0x81, 0x81};
-    static const char PROGMEM option_icon_pressed[] = {0xfe, 0xfe, 0xfc, 0xe3, 0x9f, 0x7e, 0x7e, 0x7e};
-    oled_write_raw_P(pressed ? option_icon_pressed : option_icon, 8);
-}
-
-static void render_cmd(bool pressed) {
-    static const char PROGMEM cmd_icon[]         = {0x66, 0xa5, 0xff, 0x24, 0x24, 0xff, 0xa5, 0x66};
-    static const char PROGMEM cmd_icon_pressed[] = {0x99, 0x5a, 0x00, 0xdb, 0xdb, 0x00, 0x5a, 0x99};
-    oled_write_raw_P(pressed ? cmd_icon_pressed : cmd_icon, 8);
-}
-
 // Banners are 128x32, with each byte reprenting a vertical line
 #    define BANNER_SIZE 512
 static const char PROGMEM base_layer_banner[BANNER_SIZE] = {
@@ -70,6 +47,60 @@ static const char PROGMEM nav_3d_layer_banner[] = {
     32, 112, 32, 36, 254, 36,  32, 112, 32,  0,  128, 64, 64, 224, 32, 32, 32, 32, 32, 32,  32, 32,  32,  32, 160, 96, 96, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0,   0,   128, 128, 128, 128, 128, 128, 0,   0,   0,   0,  0, 0, 0, 0, 0,   128, 128, 128, 128, 128, 128, 128, 128, 0,   0,   0,   0,   0,   0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 0, 0, 0, 0, 0, 0,  0,  0,   0,   128, 128, 0, 0, 0, 0, 0,  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 249, 12, 10, 10, 9, 8, 8, 8, 255, 8, 8, 8, 8, 8, 248, 4, 2, 2, 1, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 1, 193, 193, 193, 193, 225, 227, 191, 62, 12, 0, 0, 0, 0, 255, 255, 255, 1, 1, 1, 1, 1, 1, 3, 3, 7, 14, 254, 248, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 7, 30, 124, 240, 192, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 48, 48, 24, 24, 24, 24, 24, 56, 240, 240, 192, 0, 0, 0, 24, 248, 240, 128, 0, 0, 0, 0, 0, 192, 248, 120, 8, 0, 0, 0,
     0,  0,   0,  0,  0,   255, 0,  128, 128, 64, 32,  16, 16, 15,  8,  8,  8,  8,  8,  255, 8,  136, 136, 72, 40,  24, 24, 15,  0, 0, 0, 0, 0, 0, 0, 0, 192, 192, 128, 128, 128, 128, 128, 192, 193, 255, 127, 28, 0, 0, 0, 0, 255, 255, 255, 128, 128, 128, 128, 128, 128, 192, 192, 224, 112, 127, 31, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 1, 7, 15, 60, 120, 224, 255, 255, 0, 0, 0, 0, 56, 254, 254, 199, 131, 131, 131, 131, 199, 255, 255, 255, 0, 0, 0, 0, 0, 3, 31, 252, 240, 192, 248, 126, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,   3,  2,  2,  2, 2, 2, 2, 2,   2, 2, 2, 2, 2, 3,   1, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,   1,   1,   1,   1,   0,   0,   0,  0,  0, 0, 0, 0, 0,   1,   1,   1, 1, 1, 1, 1, 1, 0, 0, 0, 0,  0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,   1,   0, 0,  0,   0,   0,   0, 0, 0, 0, 1,   1,   0, 0, 0, 0, 0, 0,  0,  1,  1,  1,  1,  1,  0,  0,   1,   1,   0, 0, 0, 0,  0,   0,   0,   0, 1, 1, 1, 0, 0,   0,   0,   0, 0, 0, 0,
 };
+
+#    define ICON_SIZE 32
+#    define HALF_ICON_SIZE (ICON_SIZE >> 2)
+
+static const char PROGMEM blank_icon[ICON_SIZE] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+
+static const char PROGMEM shift_icon[ICON_SIZE] = {
+    0, 0, 192, 224, 176, 152, 12, 6, 6, 12, 152, 176, 224, 192, 0, 0, 0, 0, 0, 0, 31, 63, 48, 48, 48, 48, 63, 31, 0, 0, 0, 0,
+};
+
+static const char PROGMEM shift_pressed_icon[ICON_SIZE] = {
+    0, 0, 96, 112, 216, 204, 6, 3, 3, 6, 204, 216, 112, 96, 0, 0, 0, 0, 0, 128, 207, 223, 216, 216, 216, 216, 223, 207, 128, 0, 0, 0,
+};
+
+static const char PROGMEM caps_word_enabled_icon[ICON_SIZE] = {
+    0, 0, 192, 224, 240, 248, 252, 254, 254, 252, 248, 240, 224, 192, 0, 0, 0, 0, 0, 0, 0, 63, 63, 63, 63, 63, 63, 0, 0, 0, 0, 0,
+};
+
+static const char PROGMEM caps_word_enabled_shift_pressed_icon[ICON_SIZE] = {
+    0, 0, 96, 112, 120, 252, 254, 255, 255, 254, 252, 120, 112, 96, 0, 0, 0, 0, 0, 128, 192, 223, 223, 223, 223, 223, 223, 192, 128, 0, 0, 0,
+};
+
+static const char PROGMEM command_icon[ICON_SIZE] = {
+    0, 28, 50, 50, 254, 252, 48, 48, 48, 48, 252, 254, 50, 50, 28, 0, 0, 28, 38, 38, 63, 31, 6, 6, 6, 6, 31, 63, 38, 38, 28, 0,
+};
+
+static const char PROGMEM command_pressed_icon[ICON_SIZE] = {
+    0, 14, 25, 25, 255, 254, 24, 24, 24, 24, 254, 255, 25, 25, 14, 0, 0, 14, 19, 147, 223, 207, 195, 195, 195, 195, 207, 223, 147, 19, 14, 0,
+};
+
+static const char PROGMEM option_icon[ICON_SIZE] = {
+    0, 12, 12, 12, 12, 28, 120, 224, 128, 0, 12, 12, 12, 12, 12, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7, 30, 56, 48, 48, 48, 48, 0,
+};
+
+static const char PROGMEM option_pressed_icon[ICON_SIZE] = {
+    0, 6, 6, 6, 6, 14, 60, 240, 192, 0, 6, 6, 6, 6, 6, 0, 0, 0, 0, 128, 192, 192, 192, 192, 195, 207, 220, 216, 152, 24, 24, 0,
+};
+
+static const char PROGMEM control_icon[ICON_SIZE] = {
+    0, 0, 128, 192, 96, 48, 24, 12, 12, 24, 48, 96, 192, 128, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0,
+};
+
+static const char PROGMEM control_pressed_icon[ICON_SIZE] = {
+    0, 128, 192, 96, 48, 24, 12, 6, 6, 12, 24, 48, 96, 192, 128, 0, 0, 0, 0, 128, 192, 192, 192, 192, 192, 192, 192, 192, 128, 0, 0, 0,
+};
+
+void oled_write_icon(const char* PROGMEM icon, uint8_t col, uint8_t line) {
+    oled_set_cursor_raw(col, line);
+    oled_write_raw_P(icon, HALF_ICON_SIZE);
+    oled_set_cursor_raw(col, line + 1);
+    oled_write_raw_P(icon + HALF_ICON_SIZE, HALF_ICON_SIZE);
+}
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
@@ -97,20 +128,22 @@ bool oled_task_user(void) {
         }
         oled_write_raw_P(banner, BANNER_SIZE);
 
-        oled_set_cursor_raw(0, 5);
-        uint8_t modifiers = get_mods();
+        uint8_t             modifiers                = get_mods();
+        const char* PROGMEM final_shift_icon         = shift_icon;
+        const char* PROGMEM final_shift_pressed_icon = shift_pressed_icon;
+        if (is_caps_word_on()) {
+            final_shift_icon         = caps_word_enabled_icon;
+            final_shift_pressed_icon = caps_word_enabled_shift_pressed_icon;
+        }
 
-        render_shift(modifiers & MOD_MASK_SHIFT);
         if (is_hrm_disabled) {
-            oled_advance_char();
-            oled_advance_char();
-            render_ctrl(modifiers & MOD_MASK_CTRL);
-            oled_advance_char();
-            oled_advance_char();
-            render_option(modifiers & MOD_MASK_ALT);
-            oled_advance_char();
-            oled_advance_char();
-            render_cmd(modifiers & MOD_MASK_GUI);
+            oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, (oled_rotation_width >> 1) - 8, 6)
+        } else {
+            uint8_t start_x = oled_rotation_width >> 2;
+            oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, start_x, 6);
+            oled_write_icon(modifiers & MOD_MASK_CTRL ? control_pressed_icon : control_icon, start_x + 16, 6);
+            oled_write_icon(modifiers & MOD_MASK_ALT ? option_pressed_icon : option_icon, start_x + 32, 6);
+            oled_write_icon(modifiers & MOD_MASK_GUI ? command_pressed_icon : command_icon, start_x + 48, 6);
         }
     }
     return false;
