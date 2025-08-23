@@ -41,13 +41,19 @@ static const char PROGMEM raise_layer_banner[BANNER_SIZE] = {
     0, 192, 195, 195, 135, 134, 134, 134, 206, 252, 252, 48, 0, 0, 15,  63,  127, 230, 198, 134, 134, 134, 134, 134, 134, 199, 195, 0,  0,  0,  0,  0,   0,   0,   0, 0, 0, 0, 0,   0,   0,   0, 0, 0, 0,   0,   0,   0,  0,  0,  0,   0,   0,   0,   0,   1,   3,   15,  31,  15,  3,   1,  0,  0,  0,  0,  14, 17,  18,  20,  8, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 1, 1, 1,  0,  0,  0,  0,   0,   0,   0,   0,   0,   1,   1,   0,   0,  0,  0,  0,   1,  1,  1,   1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1,  1,   1,   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   1,   1,   1,   1,   1,   1,   1,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0,   0,   0,   0,
 };
 
-static const char PROGMEM nav_3d_layer_banner[] = {
+static const char PROGMEM nav_3d_layer_banner[BANNER_SIZE] = {
     32, 112, 32, 36, 254, 36,  32, 112, 32,  0,  128, 64, 64, 224, 32, 32, 32, 32, 32, 32,  32, 32,  32,  32, 160, 96, 96, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0,   0,   128, 128, 128, 128, 128, 128, 0,   0,   0,   0,  0, 0, 0, 0, 0,   128, 128, 128, 128, 128, 128, 128, 128, 0,   0,   0,   0,   0,   0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 128, 0, 0, 0, 0, 0, 0,  0,  0,   0,   128, 128, 0, 0, 0, 0, 0,  0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0,  0,   0,   0,   0,   0,   0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3, 249, 12, 10, 10, 9, 8, 8, 8, 255, 8, 8, 8, 8, 8, 248, 4, 2, 2, 1, 0, 0, 0, 255, 0, 0, 0, 0, 0, 0, 0, 0, 3, 3, 1, 193, 193, 193, 193, 225, 227, 191, 62, 12, 0, 0, 0, 0, 255, 255, 255, 1, 1, 1, 1, 1, 1, 3, 3, 7, 14, 254, 248, 224, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 7, 30, 124, 240, 192, 0, 0, 0, 0, 255, 255, 0, 0, 0, 0, 0, 48, 48, 24, 24, 24, 24, 24, 56, 240, 240, 192, 0, 0, 0, 24, 248, 240, 128, 0, 0, 0, 0, 0, 192, 248, 120, 8, 0, 0, 0,
     0,  0,   0,  0,  0,   255, 0,  128, 128, 64, 32,  16, 16, 15,  8,  8,  8,  8,  8,  255, 8,  136, 136, 72, 40,  24, 24, 15,  0, 0, 0, 0, 0, 0, 0, 0, 192, 192, 128, 128, 128, 128, 128, 192, 193, 255, 127, 28, 0, 0, 0, 0, 255, 255, 255, 128, 128, 128, 128, 128, 128, 192, 192, 224, 112, 127, 31, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 0, 0, 0, 1, 7, 15, 60, 120, 224, 255, 255, 0, 0, 0, 0, 56, 254, 254, 199, 131, 131, 131, 131, 199, 255, 255, 255, 0, 0, 0, 0, 0, 3, 31, 252, 240, 192, 248, 126, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3,   3,  2,  2,  2, 2, 2, 2, 2,   2, 2, 2, 2, 2, 3,   1, 0, 0, 0, 0, 0, 0, 0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1,   1,   1,   1,   1,   0,   0,   0,  0,  0, 0, 0, 0, 0,   1,   1,   1, 1, 1, 1, 1, 1, 0, 0, 0, 0,  0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,   1,   0, 0,  0,   0,   0,   0, 0, 0, 0, 1,   1,   0, 0, 0, 0, 0, 0,  0,  1,  1,  1,  1,  1,  0,  0,   1,   1,   0, 0, 0, 0,  0,   0,   0,   0, 1, 1, 1, 0, 0,   0,   0,   0, 0, 0, 0,
 };
 
+static const char PROGMEM undefined_layer_banner[BANNER_SIZE] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 192, 240, 240, 240, 56, 56, 56, 56, 56, 120, 112, 240, 224, 224, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0,  0,  0, 0, 0, 0, 0,  0,  0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0,  0,  0, 0, 0, 0, 0,  0,  0, 0, 0, 0,  0,  0, 0, 0, 0, 0,  0,  0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0,  0,  0,  0,  0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  128, 192, 224, 240, 120, 63, 31, 15, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 254, 254, 0, 0, 0, 0, 0, 0, 0, 254, 254, 0, 0, 48, 240, 224, 96, 48, 48, 112, 224, 192, 0, 0, 192, 224, 112, 48, 48, 48, 96, 255, 255, 0, 0, 128, 224, 96, 48, 48, 48, 48, 224, 192, 0, 48, 48, 254, 255, 51, 51, 3, 0, 243, 243, 0, 0, 48, 240, 224, 96, 48, 48, 112, 224, 192, 0, 0, 128, 224, 96, 48, 48, 48, 48, 224, 192, 0, 0, 192, 224, 112, 48, 48, 48, 96, 255, 255, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,   0,   0,   0,   0,  63, 63, 63, 3,  0,   0,   0,   0,   0,   0,   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 15, 28, 56, 48, 48, 48, 56, 28, 15, 3, 0, 0, 0, 63, 63, 0, 0, 0, 0, 63, 63, 0, 0, 7, 31, 56, 48, 48, 48, 24, 63, 63, 0, 0, 7, 31, 31, 51, 51, 51, 51, 27, 27, 0, 0, 0, 63, 63, 0, 0, 0, 0, 63, 63, 0, 0, 0, 63, 63, 0, 0, 0, 0, 63, 63, 0, 0, 7, 31, 27, 51, 51, 51, 51, 27, 27, 0, 0, 7, 31, 56, 48, 48, 48, 24, 63, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 30, 30,  30,  0,   0,   0,   0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,   0,   0, 0, 0, 0, 0, 0, 0, 0,   0,   0, 0, 0,  0,   0,   0,  0,  0,  0,   0,   0,   0, 0, 0,   0,   0,   0,  0,  0,  0,  0,   0,   0, 0, 0,   0,   0,  0,  0,  0,  0,  0,   0,   0, 0,  0,  0,   0,   0,  0,  0, 0, 0,   0,   0, 0, 0,  0,   0,   0,  0,  0,  0,   0,   0,   0, 0, 0,   0,   0,  0,  0,  0,  0,  0,   0,   0, 0, 0,   0,   0,   0,  0,  0,  0,  0,   0,   0, 0, 0, 0,
+};
+
 #    define ICON_SIZE 32
 #    define HALF_ICON_SIZE (ICON_SIZE >> 1)
+#    define ICON_WIDTH 16
 
 static const char PROGMEM blank_icon[ICON_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -104,10 +110,12 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         // Host Keyboard Layer Status
         oled_set_cursor_raw(0, 0);
-        const char* PROGMEM banner          = base_layer_banner;
+        const char* PROGMEM banner          = undefined_layer_banner;
         bool                is_hrm_disabled = false;
         switch (get_highest_layer(layer_state | default_layer_state)) {
             case _BASE:
+                banner = base_layer_banner;
+                break;
             case _BASE_NO_HRM:
                 banner          = base_layer_banner;
                 is_hrm_disabled = true;
@@ -121,8 +129,6 @@ bool oled_task_user(void) {
             case _NAV_3D:
                 banner = nav_3d_layer_banner;
                 break;
-            default:
-                banner = base_layer_banner;
         }
         oled_write_raw_P(banner, BANNER_SIZE);
 
@@ -137,16 +143,16 @@ bool oled_task_user(void) {
         uint8_t start_x = oled_rotation_width >> 2;
         if (is_hrm_disabled) {
             oled_write_icon(blank_icon, start_x, 6);
-            oled_write_icon(blank_icon, start_x + 16, 6);
-            oled_write_icon(blank_icon, start_x + 32, 6);
-            oled_write_icon(blank_icon, start_x + 48, 6);
+            oled_write_icon(blank_icon, start_x + ICON_WIDTH, 6);
+            oled_write_icon(blank_icon, start_x + ICON_WIDTH * 2, 6);
+            oled_write_icon(blank_icon, start_x + ICON_WIDTH * 3), 6);
             oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, (oled_rotation_width >> 1) - 8, 6);
         } else {
             uint8_t start_x = oled_rotation_width >> 2;
             oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, start_x, 6);
-            oled_write_icon(modifiers & MOD_MASK_CTRL ? control_pressed_icon : control_icon, start_x + 16, 6);
-            oled_write_icon(modifiers & MOD_MASK_ALT ? option_pressed_icon : option_icon, start_x + 32, 6);
-            oled_write_icon(modifiers & MOD_MASK_GUI ? command_pressed_icon : command_icon, start_x + 48, 6);
+            oled_write_icon(modifiers & MOD_MASK_CTRL ? control_pressed_icon : control_icon, start_x + ICON_WIDTH, 6);
+            oled_write_icon(modifiers & MOD_MASK_ALT ? option_pressed_icon : option_icon, start_x + ICON_WIDTH * 2, 6);
+            oled_write_icon(modifiers & MOD_MASK_GUI ? command_pressed_icon : command_icon, start_x + ICON_WIDTH * 3, 6);
         }
     }
     return false;
