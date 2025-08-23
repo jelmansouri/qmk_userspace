@@ -134,7 +134,12 @@ bool oled_task_user(void) {
             final_shift_pressed_icon = caps_word_enabled_shift_pressed_icon;
         }
 
+        uint8_t start_x = oled_rotation_width >> 2;
         if (is_hrm_disabled) {
+            oled_write_icon(blank_icon, start_x, 6);
+            oled_write_icon(blank_icon, start_x + 16, 6);
+            oled_write_icon(blank_icon, start_x + 32, 6);
+            oled_write_icon(blank_icon, start_x + 48, 6);
             oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, (oled_rotation_width >> 1) - 8, 6);
         } else {
             uint8_t start_x = oled_rotation_width >> 2;
