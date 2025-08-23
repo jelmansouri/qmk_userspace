@@ -145,7 +145,7 @@ bool oled_task_user(void) {
             oled_write_icon(blank_icon, start_x, 6);
             oled_write_icon(blank_icon, start_x + ICON_WIDTH, 6);
             oled_write_icon(blank_icon, start_x + ICON_WIDTH * 2, 6);
-            oled_write_icon(blank_icon, start_x + ICON_WIDTH * 3), 6);
+            oled_write_icon(blank_icon, start_x + ICON_WIDTH * 3, 6);
             oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, (oled_rotation_width >> 1) - 8, 6);
         } else {
             uint8_t start_x = oled_rotation_width >> 2;
