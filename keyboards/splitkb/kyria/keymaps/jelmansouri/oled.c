@@ -6,6 +6,30 @@ oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_180;
 }
 
+static void render_shift(bool pressed) {
+    static const char PROGMEM shift_icon[]         = {0x08, 0x0c, 0xf2, 0x81, 0x81, 0xf2, 0x0c, 0x08};
+    static const char PROGMEM shift_icon_pressed[] = {0xf7, 0xf3, 0x05, 0x7e, 0x7e, 0x05, 0xf3, 0xf7};
+    oled_write_raw_P(pressed ? shift_icon_pressed : shift_icon, 8);
+}
+
+static void render_ctrl(bool pressed) {
+    static const char PROGMEM ctrl_icon[]         = {0x08, 0x04, 0x02, 0x01, 0x01, 0x02, 0x04, 0x08};
+    static const char PROGMEM ctrl_icon_pressed[] = {0xf7, 0xfb, 0xfd, 0xfe, 0xfe, 0xfd, 0xfb, 0xf7};
+    oled_write_raw_P(pressed ? ctrl_icon_pressed : ctrl_icon, 8);
+}
+
+static void render_option(bool pressed) {
+    static const char PROGMEM option_icon[]         = {0x01, 0x01, 0x03, 0x1c, 0x60, 0x81, 0x81, 0x81};
+    static const char PROGMEM option_icon_pressed[] = {0xfe, 0xfe, 0xfc, 0xe3, 0x9f, 0x7e, 0x7e, 0x7e};
+    oled_write_raw_P(pressed ? option_icon_pressed : option_icon, 8);
+}
+
+static void render_cmd(bool pressed) {
+    static const char PROGMEM cmd_icon[]         = {0x66, 0xa5, 0xff, 0x24, 0x24, 0xff, 0xa5, 0x66};
+    static const char PROGMEM cmd_icon_pressed[] = {0x99, 0x5a, 0x00, 0xdb, 0xdb, 0x00, 0x5a, 0x99};
+    oled_write_raw_P(pressed ? cmd_icon_pressed : cmd_icon, 8);
+}
+
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         // QMK Logo and version information
@@ -40,6 +64,20 @@ bool oled_task_user(void) {
             default:
                 oled_write_P(PSTR("Undefined\n"), false);
         }
+
+        oled_set_cursor(0, 6);
+        uint8_t modifiers = get_mods();
+
+        render_shift(modifiers & MOD_MASK_SHIFT);
+        oled_advance_char();
+        oled_advance_char();
+        render_ctrl(modifiers & MOD_MASK_CTRL);
+        oled_advance_char();
+        oled_advance_char();
+        render_option(modifiers & MOD_MASK_ALT);
+        oled_advance_char();
+        oled_advance_char();
+        render_cmd(modifiers & MOD_MASK_GUI);
     } else {
         // clang-format off
         static const char PROGMEM kyria_logo[] = {
