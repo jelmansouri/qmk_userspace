@@ -131,12 +131,10 @@ bool oled_task_user(void) {
         }
         oled_write_raw_P(banner, BANNER_SIZE);
 
-        uint8_t             modifiers                = get_mods();
-        const char* PROGMEM final_shift_icon         = shift_icon;
-        const char* PROGMEM final_shift_pressed_icon = shift_pressed_icon;
+        uint8_t             modifiers        = get_mods();
+        const char* PROGMEM final_shift_icon = modifiers & MOD_MASK_SHIFT ? shift_pressed_icon : shift_icon;
         if (is_caps_word_on()) {
-            final_shift_icon         = caps_word_enabled_icon;
-            final_shift_pressed_icon = caps_word_enabled_shift_pressed_icon;
+            final_shift_icon = (get_weak_mods() & MOD_MASK_SHIFT) ? caps_word_enabled_shift_pressed_icon : caps_word_enabled_icon;
         }
 
         uint8_t start_x = oled_rotation_width >> 2;
@@ -145,10 +143,10 @@ bool oled_task_user(void) {
             oled_write_icon(blank_icon, start_x + ICON_WIDTH, ICON_ROW);
             oled_write_icon(blank_icon, start_x + ICON_WIDTH * 2, ICON_ROW);
             oled_write_icon(blank_icon, start_x + ICON_WIDTH * 3, ICON_ROW);
-            oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, (oled_rotation_width >> 1) - 8, ICON_ROW);
+            oled_write_icon(final_shift_icon, (oled_rotation_width >> 1) - 8, ICON_ROW);
         } else {
             uint8_t start_x = oled_rotation_width >> 2;
-            oled_write_icon(modifiers & MOD_MASK_SHIFT ? final_shift_pressed_icon : final_shift_icon, start_x, ICON_ROW);
+            oled_write_icon(final_shift_icon, start_x, ICON_ROW);
             oled_write_icon(modifiers & MOD_MASK_CTRL ? control_pressed_icon : control_icon, start_x + ICON_WIDTH, ICON_ROW);
             oled_write_icon(modifiers & MOD_MASK_ALT ? option_pressed_icon : option_icon, start_x + ICON_WIDTH * 2, ICON_ROW);
             oled_write_icon(modifiers & MOD_MASK_GUI ? command_pressed_icon : command_icon, start_x + ICON_WIDTH * 3, ICON_ROW);
