@@ -3,7 +3,7 @@
 #include "keymap.h"
 
 #define BASE TO(_BASE)
-#define BWOHRM MO(_BASE)
+#define BWOHRM MO(_BASE_NO_HRM)
 #define LOWER MO(_LOWER)
 #define RAISE MO(_RAISE)
 #define NAV_3D TO(_NAV_3D)
