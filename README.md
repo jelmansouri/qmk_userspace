@@ -1,6 +1,19 @@
-# Kyria Layout (Timeless, shiftless HRM)
+# QMK Kyria Layout
 
-Layout iteration is deceptively punishing: you only notice real flaws after you’ve practiced enough to be fast, and by then you’ve built muscle memory you might need to unlearn. The only reason this is workable is the ergo community being generous with their notes and over time you start building instincts for what will or won’t scale.
+(for the same functionality on ZMK, see [here](https://github.com/jelmansouri/kyria-zmk))
+
+Layout iteration is deceptively punishing: you only notice real flaws after you’ve practiced enough to be fast, and by then you’ve built muscle memory you might need to unlearn. The only reason this is workable is the ergo keyboard community being generous with their notes and over time you start building instincts for what will or won’t work.
+
+My layout primary goals
+ * Make HRM feel snappy and predictable without timing games.
+ * Preserve all capabilities of a normal keyboard, and improving on many aspects (num layer pad, ...).
+ * Reduce cognitive load of having to do more things to access capabilities (low number of layers, ...).
+ * Provide good ergonomics ans quality of life for my day to day usage (Coding, debugging, writing).
+ * Enjoy typing.
+ 
+## Shiftless and timeless homerow mods
+
+## Layers:
 
 ![Base](assets/keymap_Base.svg)
 ![Lower](assets/keymap_Lower.svg)
