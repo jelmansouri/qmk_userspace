@@ -1,4 +1,13 @@
-# Splitkb QMK Userspace
+# Kyria Layout (Timeless, shiftless HRM)
+
+Layout iteration is deceptively punishing: you only notice real flaws after you’ve practiced enough to be fast, and by then you’ve built muscle memory you might need to unlearn. The only reason this is workable is the ergo community being generous with their notes and over time you start building instincts for what will or won’t scale.
+
+![Base](assets/keymap_Base.svg)
+![Lower](assets/keymap_Lower.svg)
+![Raise](assets/keymap_Raise.svg)
+![Nav3D](assets/keymap_Nav3D.svg)
+
+## Splitkb QMK Userspace
 
 This is the splitkb userspace repository which allows for an external set of QMK keymaps with halcyon modules to be defined and compiled. This is useful for users who want to maintain their own keymaps without having to fork the splitkb QMK or vial repository.
 
@@ -6,7 +15,7 @@ If you want to compile firmware without any modules you can also use the [main q
 
 If the keyboard has not been merged yet to the main branch of QMK you may need to edit the workflow, for that see [Extra info](#extra-info)
 
-## Howto configure your build targets
+### Howto configure your build targets
 
 1. Run the normal `qmk setup` procedure if you haven't already done so -- see [QMK Docs](https://docs.qmk.fm/#/newbs) for details.
 1. Fork this repository
@@ -29,7 +38,7 @@ If the keyboard has not been merged yet to the main branch of QMK you may need t
 1. Commit your changes
 
 
-## Howto build with GitHub
+### Howto build with GitHub
 
 1. In the GitHub Actions tab, enable workflows
 1. Push your changes above to your forked GitHub repository
@@ -38,7 +47,7 @@ If the keyboard has not been merged yet to the main branch of QMK you may need t
 1. Inspect the Releases tab on your repository for the latest firmware build
 
 
-## Howto build locally
+### Howto build locally
 
 1. Run the normal `qmk setup` procedure if you haven't already done so -- see [QMK Docs](https://docs.qmk.fm/#/newbs) for details.
 1. Fork this repository
@@ -51,7 +60,7 @@ If the keyboard has not been merged yet to the main branch of QMK you may need t
 Alternatively, if you configured your build targets above, you can use `qmk userspace-compile` to build all of your userspace targets at once.
 
 
-## Extra info
+### Extra info
 
 If you wish to point GitHub actions to a different repository, a different branch, or even a different keymap name, you can modify `.github/workflows/build_binaries.yml` to suit your needs.
 
@@ -72,9 +81,9 @@ This can also be used to control which fork is used.
 1. Commit your changes to your userspace repository
 
 
-## Adding splitkb fork to an existing fork
+### Adding splitkb fork to an existing fork
 
-### New branch
+#### New branch
 
 If you have already forked the qmk/qmk_userspace repository before you may need to manually add the `halcyon` branch.
 
@@ -83,7 +92,7 @@ If you have already forked the qmk/qmk_userspace repository before you may need 
 1. Create a new branch based on the upstream `git checkout -b halcyon upstream/halcyon`
 1. Make any changes you want and push it to github `git push -u origin halcyon`
 
-### Existing branch
+#### Existing branch
 
 You may also want to just add the files to your own branch if you have already setup a custom userspace before.
 
