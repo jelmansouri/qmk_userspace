@@ -1,0 +1,212 @@
+layout: {qmk_keyboard: splitkb/kyria/rev3, layout_name: LAYOUT_split_3x6_5}
+layers:
+  Base:
+  - ['`', Q, W, F, P, B, J, L, U, Y]
+  - - '-'
+    - '='
+    - TAB
+    - A
+    - {t: R, h: Command}
+    - {t: S, h: Option}
+    - {t: T, h: Command}
+    - G
+    - M
+    - {t: N, h: Command}
+  - - {t: E, h: Option}
+    - {t: I, h: Control}
+    - O
+    - ;
+    - \
+    - Z
+    - X
+    - C
+    - D
+    - V
+  - [ESC, ENT, SPC, BSPC, K, H, ',', ., /, '''']
+  - - GLO
+    - Cmd
+    - Lower
+    - Shift
+    - {t: Nav3D, h: toggle}
+    - CW TOGG
+    - Shift
+    - Raise
+    - BaseNoHRM
+    - DEL
+  BaseNoHRM:
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - R
+    - S
+    - T
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - N
+  - - E
+    - I
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  Lower:
+  - - {t: ▽, type: trans}
+    - F9
+    - F10
+    - F11
+    - F12
+    - DSCROLL
+    - ''
+    - '7'
+    - '8'
+    - '9'
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - F5
+    - {t: F6, h: Command}
+    - {t: F7, h: Option}
+    - {t: F8, h: Command}
+    - MS BTN1
+    - ''
+    - {t: '4', h: Command}
+  - - {t: '5', h: Option}
+    - {t: '6', h: Control}
+    - ''
+    - ''
+    - {t: ▽, type: trans}
+    - F1
+    - F2
+    - F3
+    - F4
+    - MS BTN2
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - '0'
+    - '1'
+    - '2'
+    - '3'
+    - {t: ▽, type: trans}
+    - ''
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  Raise:
+  - - {t: ▽, type: trans}
+    - '!'
+    - '@'
+    - '#'
+    - $
+    - '%'
+    - HOME
+    - PGDN
+    - PGUP
+    - END
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - ^
+    - {t: '&', h: Control}
+    - {t: '*', h: Option}
+    - {t: (, h: Command}
+    - )
+    - LEFT
+    - DOWN
+  - - UP
+    - RGHT
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - '{'
+    - '}'
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - '['
+    - ']'
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  Nav3D:
+  - ['', CAPS, Q, W, E, R, RGB TOG, RGB MOD, RGB HUI, RGB VAI]
+  - [RGB SPI, RGB M K, '', Shift, A, S, D, F, RGB TOG, RGB RMOD]
+  - [RGB HUD, RGB VAD, RGB SPD, RGB M X, '', Control, Z, X, C, V]
+  - - {t: ▽, type: trans}
+    - SPC
+    - ''
+    - ''
+    - RGB M P
+    - RGB M B
+    - RGB M R
+    - RGB M SW
+    - RGB M SN
+    - RGB M G
+  - - Option
+    - Cmd
+    - ''
+    - {t: ▽, type: trans}
+    - {t: Base, h: tobble}
+    - ''
+    - ''
+    - ''
+    - ''
+    - ''
