@@ -137,29 +137,41 @@ parse_config:
     NAV_3D: {t: Nav3D, h: toggle}
     BASE: {t: Base, h: tobble}
     HELD: {type: held}
-    GLO: Globe
-    DSCROLL: Mouse Scroll
-    MS_BTN1: Mouse Right Click
-    MS_BTN2: Mouse Left Click
-    LGUI: Cmd
-    LSFT: Shift
-    LALT: Opt
-    LCTL: Ctl
-    R_CTL: {t: R, h: Control}
-    S_ALT: {t: S, h: Option}
-    T_GUI: {t: T, h: Command}
-    N_GUI: {t: N, h: Command}
-    E_ALT: {t: E, h: Option}
-    I_CTL: {t: I, h: Control}
-    F6_CTL: {t: F6, h: Command}
-    F7_ALT: {t: F7, h: Option}
-    F8_GUI: {t: F8, h: Command}
-    N4_GUI: {t: '4', h: Command}
-    N5_ALT: {t: '5', h: Option}
-    N6_CTL: {t: '6', h: Control}
-    AM_CTL: {t: '&', h: Control}
-    AS_ALT: {t: '*', h: Option}
-    LP_GUI: {t: '(', h: Command}
+    GLO: $$mdi:web$$
+    DSCROLL: $$mdi:mouse-scroll-wheel$$
+    MS_BTN1: $$mdi:mouse-left-click-outline$$
+    MS_BTN2: $$mdi:mouse-right-click-outline$$
+    LGUI: $$mdi:apple-keyboard-command$$
+    LSFT: $$mdi:apple-keyboard-shift$$
+    LALT: $$mdi:apple-keyboard-option$$
+    LCTL: $$mdi:apple-keyboard-control$$
+    R_CTL: {t: R, h: $$mdi:apple-keyboard-control$$}
+    S_ALT: {t: S, h: $$mdi:apple-keyboard-option$$}
+    T_GUI: {t: T, h: $$mdi:apple-keyboard-command$$}
+    N_GUI: {t: N, h: $$mdi:apple-keyboard-command$$}
+    E_ALT: {t: E, h: $$mdi:apple-keyboard-option$$}
+    I_CTL: {t: I, h: $$mdi:apple-keyboard-control$$}
+    F6_CTL: {t: F6, h: $$mdi:apple-keyboard-command$$}
+    F7_ALT: {t: F7, h: $$mdi:apple-keyboard-option$$}
+    F8_GUI: {t: F8, h: $$mdi:apple-keyboard-command$$}
+    N4_GUI: {t: '4', h: $$mdi:apple-keyboard-command$$}
+    N5_ALT: {t: '5', h: $$mdi:apple-keyboard-option$$}
+    N6_CTL: {t: '6', h: $$mdi:apple-keyboard-control$$}
+    AM_CTL: {t: '&', h: $$mdi:apple-keyboard-control$$}
+    AS_ALT: {t: '*', h: $$mdi:apple-keyboard-option$$}
+    LP_GUI: {t: '(', h: $$mdi:apple-keyboard-command$$}
+    SPC: $$mdi:keyboard-space$$"
+    BSPC: $$mdi:backspace$$"
+    DEL: $$mdi:backspace-reverse$$"
+    ENT: $$mdi:keyboard-return$$"
+    SPC: $$mdi:keyboard-space$$"
+    TAB: $$mdi:keyboard-tab$$"
+    ESC: $$mdi:keyboard-esc$$"
+    CW_TOGG: $$mdi:keyboard-caps$$
+    LEFT: $$mdi:arrow-left-thick$$
+    UP: $$mdi:arrow-up-thick$$
+    DOWN: $$mdi:arrow-down-thick$$
+    RGHT: $$mdi:arrow-right-thick$$
   zmk_remove_keycode_prefix: []
   zmk_keycode_map:
     EXCLAMATION: '!'
