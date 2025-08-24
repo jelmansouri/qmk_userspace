@@ -133,13 +133,13 @@ parse_config:
     QUES: '?'
     LOWER: Lower
     RAISE: Raise
-    BWOHRM: BaseNoHRM
+    BWOHRM: No HRM
     NAV_3D: {t: Nav3D, h: toggle}
     BASE: {t: Base, h: tobble}
     LGUI: Cmd
     LSFT: Shift
-    LALT: Option
-    LCTL: Control
+    LALT: Opt
+    LCTL: Ctl
     R_CTL: {t: R, h: Command}
     S_ALT: {t: S, h: Option}
     T_GUI: {t: T, h: Command}

@@ -31,7 +31,7 @@ layers:
     - CW TOGG
     - Shift
     - Raise
-    - BaseNoHRM
+    - No HRM
     - DEL
   BaseNoHRM:
   - - {t: ▽, type: trans}
@@ -189,7 +189,7 @@ layers:
   Nav3D:
   - ['', CAPS, Q, W, E, R, RGB TOG, RGB MOD, RGB HUI, RGB VAI]
   - [RGB SPI, RGB M K, '', Shift, A, S, D, F, RGB TOG, RGB RMOD]
-  - [RGB HUD, RGB VAD, RGB SPD, RGB M X, '', Control, Z, X, C, V]
+  - [RGB HUD, RGB VAD, RGB SPD, RGB M X, '', Ctl, Z, X, C, V]
   - - {t: ▽, type: trans}
     - SPC
     - ''
@@ -200,7 +200,7 @@ layers:
     - RGB M SW
     - RGB M SN
     - RGB M G
-  - - Option
+  - - Opt
     - Cmd
     - ''
     - {t: ▽, type: trans}
