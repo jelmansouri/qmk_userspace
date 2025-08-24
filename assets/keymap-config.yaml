@@ -136,6 +136,10 @@ parse_config:
     BWOHRM: No HRM
     NAV_3D: {t: Nav3D, h: toggle}
     BASE: {t: Base, h: tobble}
+    HELD: {type: held}
+    DSCROLL: Mouse Scroll
+    MS_BTN1: Mouse Right Click
+    MS_BTN2: Mouse Left Click
     LGUI: Cmd
     LSFT: Shift
     LALT: Opt

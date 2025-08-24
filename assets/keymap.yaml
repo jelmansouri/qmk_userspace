@@ -82,7 +82,7 @@ layers:
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+    - {type: held}
     - {t: ▽, type: trans}
   Lower:
   - - {t: ▽, type: trans}
@@ -90,7 +90,7 @@ layers:
     - F10
     - F11
     - F12
-    - DSCROLL
+    - Mouse Scroll
     - ''
     - '7'
     - '8'
@@ -102,7 +102,7 @@ layers:
     - {t: F6, h: Command}
     - {t: F7, h: Option}
     - {t: F8, h: Command}
-    - MS BTN1
+    - Mouse Right Click
     - ''
     - {t: '4', h: Command}
   - - {t: '5', h: Option}
@@ -114,7 +114,7 @@ layers:
     - F2
     - F3
     - F4
-    - MS BTN2
+    - Mouse Left Click
   - - {t: ▽, type: trans}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
@@ -127,7 +127,7 @@ layers:
     - ''
   - - {t: ▽, type: trans}
     - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+    - {type: held}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
@@ -183,7 +183,7 @@ layers:
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+    - {type: held}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
   Nav3D:
