@@ -6,7 +6,7 @@ layers:
     - '='
     - TAB
     - A
-    - {t: R, h: Command}
+    - {t: R, h: Control}
     - {t: S, h: Option}
     - {t: T, h: Command}
     - G
@@ -23,7 +23,7 @@ layers:
     - D
     - V
   - [ESC, ENT, SPC, BSPC, K, H, ',', ., /, '''']
-  - - GLO
+  - - Globe
     - Cmd
     - Lower
     - Shift

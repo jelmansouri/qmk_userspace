@@ -137,6 +137,7 @@ parse_config:
     NAV_3D: {t: Nav3D, h: toggle}
     BASE: {t: Base, h: tobble}
     HELD: {type: held}
+    GLO: Globe
     DSCROLL: Mouse Scroll
     MS_BTN1: Mouse Right Click
     MS_BTN2: Mouse Left Click
@@ -144,7 +145,7 @@ parse_config:
     LSFT: Shift
     LALT: Opt
     LCTL: Ctl
-    R_CTL: {t: R, h: Command}
+    R_CTL: {t: R, h: Control}
     S_ALT: {t: S, h: Option}
     T_GUI: {t: T, h: Command}
     N_GUI: {t: N, h: Command}
