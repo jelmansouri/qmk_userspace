@@ -5,23 +5,44 @@
 
 #include "keymap.h"
 
-#define NUM MO(_NUM)
-#define NAV MO(_NAV)
-#define SYM MO(_SYM)
-#define FN MO(_FN)
-#define NAV_3D MO(_NAV_3D)
+#define BASE TO(_BASE)
+#define BWOHRM MO(_BASE_NO_HRM)
+#define LOWER MO(_LOWER)
+#define RAISE MO(_RAISE)
+#define NAV_3D TO(_NAV_3D)
 
-#define A_LALT MT(MOD_LALT, KC_A)
-#define R_LCTL MT(MOD_LCTL, KC_R)
-#define S_LGUI MT(MOD_LGUI, KC_S)
-#define T_LSFT MT(MOD_LSFT, KC_T)
+#define KC_GLO LCTL(LGUI(KC_SPC))
 
-#define N_LSFT MT(MOD_LSFT, KC_N)
-#define E_LGUI MT(MOD_LGUI, KC_E)
-#define I_LCTL MT(MOD_LCTL, KC_I)
-#define O_LALT MT(MOD_LALT, KC_O)
+#define KC_HELD KC_TRNS
+
+// Base
+#define R_CTL MT(MOD_LCTL, KC_R)
+#define S_ALT MT(MOD_LALT, KC_S)
+#define T_GUI MT(MOD_LGUI, KC_T)
+
+#define N_GUI MT(MOD_LGUI, KC_N)
+#define E_ALT MT(MOD_LALT, KC_E)
+#define I_CTL MT(MOD_LCTL, KC_I)
+
+// LOWER
+#define F6_CTL MT(MOD_LCTL, KC_F6)
+#define F7_ALT MT(MOD_LALT, KC_F7)
+#define F8_GUI MT(MOD_LGUI, KC_F8)
+
+#define N4_GUI MT(MOD_LGUI, KC_4)
+#define N5_ALT MT(MOD_LALT, KC_5)
+#define N6_CTL MT(MOD_LCTL, KC_6)
+
+// RAISE
+#define AM_CTL MT(MOD_LCTL, KC_AMPR)
+#define AS_ALT MT(MOD_LALT, KC_ASTR)
+#define LP_GUI MT(MOD_LGUI, KC_LPRN)
 
 #define DSCROLL DRAG_SCROLL
+
+// Modify these values to adjust the scrolling speed
+#define SCROLL_DIVISOR_H 32.0
+#define SCROLL_DIVISOR_V 32.0
 
 enum custom_keycodes {
     DRAG_SCROLL = SAFE_RANGE,
@@ -48,65 +69,79 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
     [_BASE] = LAYOUT_split_3x6_5_hlc(
        KC_GRV,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                                        KC_J,    KC_L,    KC_U,    KC_Y, KC_MINS,  KC_EQL,
-       KC_TAB,  A_LALT,  R_LCTL,  S_LGUI,  T_LSFT,    KC_G,                                        KC_M,  N_LSFT,  E_LGUI,  I_LCTL,  O_LALT, KC_SCLN,
+       KC_TAB,    KC_A,   R_CTL,   S_ALT,   T_GUI,    KC_G,                                        KC_M,   N_GUI,   E_ALT,   I_CTL,    KC_O, KC_SCLN,
       KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,  KC_ESC,  KC_ENT,   KC_SPC, KC_BSPC,   KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
-                                 KC_LGUI, KC_LGUI,     NUM,     NAV,  NAV_3D,   CW_TOGG,    SYM,     FN, KC_LGUI,  KC_DEL,
+                                  KC_GLO, KC_LGUI,   LOWER, KC_LSFT,  NAV_3D,   CW_TOGG,KC_LSFT,  RAISE,  BWOHRM,  KC_DEL,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
 
-    [_NUM] = LAYOUT_split_3x6_5_hlc(
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, DSCROLL,                                       KC_NO,    KC_7,    KC_8,    KC_9, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_LALT, KC_LCTL, KC_LGUI, KC_LSFT, MS_BTN1,                                       KC_NO,    KC_4,    KC_5,    KC_6,   KC_NO,   KC_NO,
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, MS_BTN2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,    KC_0,    KC_1,    KC_2,    KC_3, KC_TRNS,   KC_NO,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+    [_BASE_NO_HRM] = LAYOUT_split_3x6_5_hlc(
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+      KC_TRNS, KC_TRNS,    KC_R,    KC_S,    KC_T, KC_TRNS,                                     KC_TRNS,    KC_N,    KC_E,    KC_I, KC_TRNS, KC_TRNS,
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_HELD, KC_TRNS,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
 
-    [_NAV] = LAYOUT_split_3x6_5_hlc(
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, DSCROLL,                                     KC_HOME, KC_PGDN, KC_PGUP,  KC_END, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_LALT, KC_LCTL, KC_LGUI, KC_LSFT, MS_BTN1,                                     KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, MS_BTN2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+    [_LOWER] = LAYOUT_split_3x6_5_hlc(
+      KC_TRNS,   KC_F9,  KC_F10,  KC_F11,  KC_F12, DSCROLL,                                       KC_NO,    KC_7,    KC_8,    KC_9, KC_TRNS, KC_TRNS,
+      KC_TRNS,   KC_F5,  F6_CTL,  F7_ALT,  F8_GUI, MS_BTN1,                                       KC_NO,  N4_GUI,  N5_ALT,  N6_CTL,   KC_NO,   KC_NO,
+      KC_TRNS,   KC_F1,   KC_F2,   KC_F3,   KC_F4, MS_BTN2, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,    KC_0,    KC_1,    KC_2,    KC_3, KC_TRNS,   KC_NO,
+                                 KC_TRNS, KC_TRNS, KC_HELD, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
 
-    [_SYM] = LAYOUT_split_3x6_5_hlc(
-      KC_TRNS, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN,                                     KC_TRNS, KC_LSFT, KC_LGUI, KC_LCTL, KC_LALT, KC_TRNS,
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LBRC, KC_RBRC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-
-      _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
-    ),
-
-    [_FN] = LAYOUT_split_3x6_5_hlc(
-       NAV_3D,   KC_F9,  KC_F10,  KC_F11,  KC_F12, KC_TRNS,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-      KC_TRNS,   KC_F5,   KC_F6,   KC_F7,   KC_F8, KC_TRNS,                                     KC_TRNS, KC_LSFT, KC_LGUI, KC_LCTL, KC_LALT, KC_TRNS,
-      KC_TRNS,   KC_F1,   KC_F2,   KC_F3,   KC_F4, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+    [_RAISE] = LAYOUT_split_3x6_5_hlc(
+      KC_TRNS, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                                     KC_HOME, KC_PGDN, KC_PGUP,  KC_END, KC_TRNS, KC_TRNS,
+      KC_TRNS, KC_CIRC,  AM_CTL,  AS_ALT,  LP_GUI, KC_RPRN,                                     KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, KC_TRNS, KC_TRNS,
+      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LCBR, KC_RCBR, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LBRC, KC_RBRC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+                                 KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_HELD, KC_TRNS, KC_TRNS,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
 
     [_NAV_3D] = LAYOUT_split_3x6_5_hlc(
-        KC_NO, KC_CAPS,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RGB_TOG, RGB_MOD, RGB_HUI, RGB_VAI, RGB_SPI, RGB_M_K,
+        KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RGB_TOG, RGB_MOD, RGB_HUI, RGB_VAI, RGB_SPI, RGB_M_K,
         KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     RGB_TOG, RGB_RMOD, RGB_HUD, RGB_VAD, RGB_SPD, RGB_M_X,
-        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,   KC_NO,   KC_NO,   KC_NO,   KC_NO, RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_G,
-                                   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,   KC_TRNS,  KC_SPC,   KC_NO,   KC_NO, RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_G,
+                                 KC_LALT, KC_LGUI,   KC_NO,   KC_TRNS,    BASE,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     )
 };
 // clang-format on
 
-bool set_scrolling = false;
-
-// Modify these values to adjust the scrolling speed
-#define SCROLL_DIVISOR_H 32.0
-#define SCROLL_DIVISOR_V 32.0
+// Handle new Mod Tap shifted keycodes as they are not supported using the MT macro
+bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case AM_CTL:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(KC_AMPR);
+                return false;
+            }
+            break;
+        case AS_ALT:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(KC_ASTR);
+                return false;
+            }
+            break;
+        case LP_GUI:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(KC_LPRN);
+                return false;
+            }
+            break;
+        case DRAG_SCROLL:
+            // Toggle set_scrolling when DRAG_SCROLL key is pressed or released
+            set_scrolling = record->event.pressed;
+            break;
+    }
+    return true;
+}
 
 // Variables to store accumulated scroll values
 float scroll_accumulated_h = 0;
@@ -134,19 +169,6 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
         mouse_report.y = 0;
     }
     return mouse_report;
-}
-
-// Function to handle key events and enable/disable drag scrolling
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    switch (keycode) {
-        case DRAG_SCROLL:
-            // Toggle set_scrolling when DRAG_SCROLL key is pressed or released
-            set_scrolling = record->event.pressed;
-            break;
-        default:
-            break;
-    }
-    return true;
 }
 
 // Function to handle layer changes and disable drag scrolling
