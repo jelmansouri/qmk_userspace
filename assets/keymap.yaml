@@ -4,7 +4,7 @@ layers:
   - ['`', Q, W, F, P, B, J, L, U, Y]
   - - '-'
     - '='
-    - $$mdi:keyboard-tab$$"
+    - $$mdi:keyboard-tab$$
     - A
     - {t: R, h: '$$mdi:apple-keyboard-control$$'}
     - {t: S, h: '$$mdi:apple-keyboard-option$$'}
@@ -22,7 +22,7 @@ layers:
     - C
     - D
     - V
-  - ['$$mdi:keyboard-esc$$"', '$$mdi:keyboard-return$$"', '$$mdi:keyboard-space$$"', '$$mdi:backspace$$"', K, H, ',', ., /, '''']
+  - ['$$mdi:keyboard-esc$$', '$$mdi:keyboard-return$$', '$$mdi:keyboard-space$$', '$$mdi:backspace$$', K, H, ',', ., /, '''']
   - - $$mdi:web$$
     - $$mdi:apple-keyboard-command$$
     - Lower
@@ -32,7 +32,7 @@ layers:
     - $$mdi:apple-keyboard-shift$$
     - Raise
     - No HRM
-    - $$mdi:backspace-reverse$$"
+    - $$mdi:backspace-reverse$$
   BaseNoHRM:
   - - {t: ▽, type: trans}
     - {t: ▽, type: trans}
@@ -187,11 +187,11 @@ layers:
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
   Nav3D:
-  - ['', CAPS, Q, W, E, R, RGB TOG, RGB MOD, RGB HUI, RGB VAI]
+  - ['', '$$mdi:keyboard-tab$$', Q, W, E, R, RGB TOG, RGB MOD, RGB HUI, RGB VAI]
   - [RGB SPI, RGB M K, '', '$$mdi:apple-keyboard-shift$$', A, S, D, F, RGB TOG, RGB RMOD]
   - [RGB HUD, RGB VAD, RGB SPD, RGB M X, '', '$$mdi:apple-keyboard-control$$', Z, X, C, V]
   - - {t: ▽, type: trans}
-    - $$mdi:keyboard-space$$"
+    - $$mdi:keyboard-space$$
     - ''
     - ''
     - RGB M P

@@ -160,13 +160,13 @@ parse_config:
     AM_CTL: {t: '&', h: $$mdi:apple-keyboard-control$$}
     AS_ALT: {t: '*', h: $$mdi:apple-keyboard-option$$}
     LP_GUI: {t: '(', h: $$mdi:apple-keyboard-command$$}
-    SPC: $$mdi:keyboard-space$$"
-    BSPC: $$mdi:backspace$$"
-    DEL: $$mdi:backspace-reverse$$"
-    ENT: $$mdi:keyboard-return$$"
-    SPC: $$mdi:keyboard-space$$"
-    TAB: $$mdi:keyboard-tab$$"
-    ESC: $$mdi:keyboard-esc$$"
+    SPC: $$mdi:keyboard-space$$
+    BSPC: $$mdi:backspace$$
+    DEL: $$mdi:backspace-reverse$$
+    ENT: $$mdi:keyboard-return$$
+    SPC: $$mdi:keyboard-space$$
+    TAB: $$mdi:keyboard-tab$$
+    ESC: $$mdi:keyboard-esc$$
     CW_TOGG: $$mdi:keyboard-caps$$
     LEFT: $$mdi:arrow-left-thick$$
     UP: $$mdi:arrow-up-thick$$
