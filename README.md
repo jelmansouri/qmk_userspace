@@ -27,10 +27,24 @@ The unavoidable challenge with HRM is that it cares about release order as well 
 
 ## Layers:
 
+After wrestling with home-row mods, the next big design decision was how many layers to live with. Putting Shift on the thumb cluster broke the neat modifier-layer logic I had liked in the Kyriel approach, but it wasn’t much of a concession. I prefer a low number of layers anyway—constant layer switching only adds to the cognitive burden while typing. What mattered more was keeping navigation and the numpad anchored on the right half of the split. I’m used to moving lines in code editors by typing a relative line number followed by up or down, so I needed a flow where my left hand triggers the layer, the right hand types the number, and then I can immediately switch to Raise (sometimes while still holding Lower) and hit the direction keys. That interaction dictated the way I built the layers more than anything else.
+
+
 ![Base](assets/keymap_Base.svg)
+
+My base layer is Colemak-DH, with small punctuation tweaks to suit my habits. Underscore and colon are more accessible to the pinky, since I reach for them constantly in code. The outer thumb key is the least reachable spot, so I reserve it for rarely used functions. I also keep a toggle to disable tap-hold keys, which I use whenever I want long-press behavior on vowels. On macOS, that brings up accented characters—a must when I’m writing in French. Technically it’s implemented as a layer, but I think of it less as a layer and more as a “tap-hold off” switch. On the right side I keep a dedicated Command key, so I can trigger shortcuts while my left hand is on the mouse.
+
 ![Lower](assets/keymap_Lower.svg)
+
+The Lower layer is split in personality. On the left, it’s my function row: four per line, with F10–F12 right at the top since those matter most when debugging in Visual Studio. On the right, it becomes a numpad. That’s where I ran into a small annoyance: the 3 key overlaps with the dot on base, forcing an extra switch. I tried adding a dot on the thumb cluster beneath it, but two dots keys just confused me more. It’s a trade-off I still live with.
+
 ![Raise](assets/keymap_Raise.svg)
+
+The Raise layer also divides neatly. On the left, I keep symbols laid out exactly like a US keyboard. I never combine this side with modifiers—it stays “clean,” which matters because I rely on the right side arrow button during long presses and don’t want them tangled with tap-hold logic. On the right, I have brackets alongside my arrow keys, laid out in Vim order but shifted one column to the right. That shift makes them land under my stronger fingers.
+
 ![Nav3D](assets/keymap_Nav3D.svg)
+
+Finally, I keep a dedicated layer for 3D navigation. My day-to-day work involves sometimes testing stuff i develop in 3D editors, and most of those tools cluster navigation shortcuts on the left side, assuming the right hand is busy on the mouse. I mirrored that expectation: this layer uses a conventional layout that matches the defaults in most software, so I never have to remap anything. Switching into it feels natural, and it keeps my muscle memory aligned across all the different 3D packages I touch.
 
 ## Splitkb QMK Userspace
 
