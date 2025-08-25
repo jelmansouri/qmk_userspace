@@ -2,14 +2,14 @@
 
 (for the same functionality on ZMK, see [here](https://github.com/jelmansouri/kyria-zmk))
 
-Layout iteration is deceptively punishing: you only notice real flaws after you’ve practiced enough to be fast, and by then you’ve built muscle memory you might need to unlearn. The only reason this is workable is the ergo keyboard community being generous with their notes and over time you start building instincts for what will or won’t work.
+Layout iteration is deceptively punishing: you only notice real flaws after you’ve practiced enough to be fast, and by then you’ve built muscle memory you might need to unlearn. The reason this is workable, beside the fun of learning is the ergo keyboard community being generous with their notes and over time you start building instincts for what will or won’t work.
 
 My layout primary goals
  * Make HRM feel snappy and predictable without timing games.
- * Preserve all capabilities of a normal keyboard, and improving on many aspects (num layer pad, ...).
+ * Preserve all capabilities of a normal keyboard, and improving on many aspects (numpad layer, ...).
  * Reduce cognitive load of having to do more things to access capabilities (low number of layers, ...).
- * Provide good ergonomics ans quality of life for my day to day usage (Coding, debugging, writing).
- * Enjoy typing.
+ * Provide good ergonomics and quality of life for my day to day usage (Coding, debugging, writing).
+ * Optimize for MacOS
  
 ## Shiftless and timeless homerow mods
 
@@ -21,7 +21,7 @@ A major motivation for moving to the **Kyria** (besides its better stagger, whic
 
 Around that time I saw a write-up about the **[Kyriel](https://github.com/KaiFireborn/kyriel)** design, which implements home-row mods without relying on mod-tap behavior. I gave it a fair two-week trial while on vacation. It introduced more layers so modifiers could sit on the same side as the layer thumb keys, which gave the layout a clean internal logic I really enjoyed. But even with consistent use, it never felt comfortable enough.
 
-That’s when I decided to give tap-hold another shot, this time with **[urob’s “timeless” HRM approach](https://github.com/urob/zmk-config?tab=readme-ov-file#timeless-homerow-mods)**, which I’d seen praised in the community. It directly solved one of my biggest gripe: perceived latency. With flow tap (require-prior-idle on ZMK), false positives dropped to nearly zero, and the layout finally felt snappy. The only remaining issue was false negatives—mostly with Shift. Typing something like AsRef requires you to consciously wait for the flow-tap term/idle before hitting R, which slowed me down. To fix this, I moved Shift back to a dedicated thumb key on both halves, and left only GUI, Alt, and Ctrl on the home row. As a Mac and Vim user, I actually use all three often—far more than on Windows, where Ctrl dominates shortcuts—so keeping the natural Ctrl–Opt–Cmd order from Mac keyboards made sense. I didn’t have to sacrifice one of them to the pinky, and the layout became both consistent and reliable.
+That’s when I decided to give tap-hold another shot, this time with **[urob’s “timeless” HRM approach](https://github.com/urob/zmk-config?tab=readme-ov-file#timeless-homerow-mods)**, which I’d seen praised in the community. It directly solved one of my biggest gripe: perceived latency. With flow tap (require-prior-idle on ZMK), false positives dropped to nearly zero, and the layout finally felt snappy. The only remaining issue was false negatives—mostly with Shift. Typing something like `AsRef` requires you to consciously wait for the flow tap term/require-prior-idle-term before hitting R, which created frustration. To fix this, I moved Shift back to a dedicated thumb key on both halves, and left only GUI, Alt, and Ctrl on the home row. As a Mac and Vim user, I actually use all three often—far more than on Windows, where Ctrl dominates shortcuts—so keeping the natural Ctrl–Opt–Cmd order from Mac keyboards made sense. I didn’t have to sacrifice one of them to the pinky, and the layout became both consistent and reliable.
 
 The unavoidable challenge with HRM is that it cares about release order as well as press order. My muscle memory only ever tracked presses. For example, Ctrl + A could be done as Ctrl down → A down → Ctrl up → A up, or Ctrl down → A down → A up → Ctrl up. With timeless HRM and permissibve hold/balanced settings, only the first produces the intended behavior. Rewiring this took practice: I spent 10 minutes a day slowly drilling the correct up/down order, and after about two weeks I saw a real improvement.
 
@@ -29,18 +29,43 @@ The unavoidable challenge with HRM is that it cares about release order as well 
 
 After wrestling with home-row mods, the next big design decision was how many layers to live with. Putting Shift on the thumb cluster broke the neat modifier-layer logic I had liked in the Kyriel approach, but it wasn’t much of a concession. I prefer a low number of layers anyway—constant layer switching only adds to the cognitive burden while typing. What mattered more was keeping navigation and the numpad anchored on the right half of the split. I’m used to moving lines in code editors by typing a relative line number followed by up or down, so I needed a flow where my left hand triggers the layer, the right hand types the number, and then I can immediately switch to Raise (sometimes while still holding Lower) and hit the direction keys. That interaction dictated the way I built the layers more than anything else.
 
-
 ![Base](assets/keymap_Base.svg)
 
-My base layer is Colemak-DH, with small punctuation tweaks to suit my habits. Underscore and colon are more accessible to the pinky, since I reach for them constantly in code. The outer thumb key is the least reachable spot, so I reserve it for rarely used functions. I also keep a toggle to disable tap-hold keys, which I use whenever I want long-press behavior on vowels. On macOS, that brings up accented characters—a must when I’m writing in French. Technically it’s implemented as a layer, but I think of it less as a layer and more as a “tap-hold off” switch. On the right side I keep a dedicated Command key, so I can trigger shortcuts while my left hand is on the mouse.
+- **Layout**: Colemak-DH, with small punctuation tweaks.  
+  - Underscore and colon moved to be more accessible to the pinky (frequently used in code).  
 
+- **Thumb cluster**:  
+  - Outer thumb key = reserved for rarely used functions (least accessible position).  
+
+- **Tap-hold toggle**:  
+  - Special key to **disable tap-hold** when needed.  
+  - Used mainly for **long-press vowels** on macOS, which brings up accented characters (essential for writing in French).  
+  - Technically implemented as a layer, but functionally just a “tap-hold off” switch.  
+
+- **Dedicated Command key**:  
+  - Placed on the right side.  
+  - Allows triggering shortcuts easily while the left hand is on the mouse.
+ 
 ![Lower](assets/keymap_Lower.svg)
 
-The Lower layer is split in personality. On the left, it’s my function row: four per line, with F10–F12 right at the top since those matter most when debugging in Visual Studio. On the right, it becomes a numpad. That’s where I ran into a small annoyance: the 3 key overlaps with the dot on base, forcing an extra switch. I tried adding a dot on the thumb cluster beneath it, but two dots keys just confused me more. It’s a trade-off I still live with.
+- **Left side (function row)**:  
+  - Arranged as 4 function keys per line.  
+  - F10–F12 placed at the top for quick access (commonly used for debugging in Visual Studio).  
+
+- **Right side (numpad)**:  
+  - Standard numpad layout, with 0 next to the one, found that messing with thr order to privillege moat used used numbers not worth it.
+  - Issue: `3` key overlaps with the dot on base, forcing an extra layer switch when ryping float, tryed added a dot on the thumb cluster beneath it but two dots keys became confusing, so reverted.  
 
 ![Raise](assets/keymap_Raise.svg)
 
-The Raise layer also divides neatly. On the left, I keep symbols laid out exactly like a US keyboard. I never combine this side with modifiers which matters because I rely on the right side arrow button during long presses and don’t want them tangled with tap-hold logic. The arrow keys on the right are laid out in Vim order but shifted one column to the right. That shift makes them land under my stronger fingers. Brakeds which I use in combination with modifiers is on this side as well.
+- **Left side (symbols)**:  
+  - Symbols arranged in the same order as a standard US keyboard.  
+  - This side is **never combined with modifiers**, to avoid conflicts with tap-hold logic on the right side. Option-* is Option-Shift-4 which is accessible on the lower layer.
+
+- **Right side (navigation + brackets)**:  
+  - Arrow keys laid out in Vim order (H, J, K, L).  
+  - Shifted one column to the right so they fall under stronger fingers.  
+  - Brackets placed here as well, since they are often used in combination with modifiers.
 
 ![Nav3D](assets/keymap_Nav3D.svg)
 
