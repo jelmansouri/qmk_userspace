@@ -40,7 +40,7 @@ The Lower layer is split in personality. On the left, it’s my function row: fo
 
 ![Raise](assets/keymap_Raise.svg)
 
-The Raise layer also divides neatly. On the left, I keep symbols laid out exactly like a US keyboard. I never combine this side with modifiers—it stays “clean,” which matters because I rely on the right side arrow button during long presses and don’t want them tangled with tap-hold logic. On the right, I have brackets alongside my arrow keys, laid out in Vim order but shifted one column to the right. That shift makes them land under my stronger fingers.
+The Raise layer also divides neatly. On the left, I keep symbols laid out exactly like a US keyboard. I never combine this side with modifiers which matters because I rely on the right side arrow button during long presses and don’t want them tangled with tap-hold logic. The arrow keys on the right are laid out in Vim order but shifted one column to the right. That shift makes them land under my stronger fingers. Brakeds which I use in combination with modifiers is on this side as well.
 
 ![Nav3D](assets/keymap_Nav3D.svg)
 
