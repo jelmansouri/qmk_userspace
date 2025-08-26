@@ -26,6 +26,9 @@
 
 #include "keymap.h"
 
+#define LCD_WIDTH 135
+#define LCD_HEIGHT 240
+
 typedef struct layer_gfx_definition {
     painter_image_handle_t icon;
     painter_image_handle_t text;
@@ -143,7 +146,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
             }
             if (changed_modifiers & MOD_MASK_SHIFT || caps_word_changed) {
                 modifier_gfx_definition* modifier = current_caps_word_on ? &caps_word : &shift;
-                painter_image_handle_t   status   = current_modifiers & MOD_MASK_SHIFT ? modifier.pressed : modifier.unpressed;
+                painter_image_handle_t   status   = current_modifiers & MOD_MASK_SHIFT ? modifier->pressed : modifier->unpressed;
                 const uint16_t           width    = status->width;
                 const uint16_t           height   = status->height;
                 const uint16_t           x        = (LCD_WIDTH - width) >> 1;
