@@ -17,8 +17,8 @@
 #include "graphics/layers/base_layer_text_colored.qgf.h"
 #include "graphics/layers/lower_layer_icon_colored.qgf.h"
 #include "graphics/layers/lower_layer_text_colored.qgf.h"
-#include "graphics/layers/nav_3d_layer_icon_colored.qgf.h"
-#include "graphics/layers/nav_3d_layer_text_colored.qgf.h"
+#include "graphics/layers/nav3d_layer_icon_colored.qgf.h"
+#include "graphics/layers/nav3d_layer_text_colored.qgf.h"
 #include "graphics/layers/raise_layer_icon_colored.qgf.h"
 #include "graphics/layers/raise_layer_text_colored.qgf.h"
 
