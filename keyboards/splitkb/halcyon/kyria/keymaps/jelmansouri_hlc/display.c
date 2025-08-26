@@ -117,49 +117,49 @@ bool display_module_housekeeping_task_user(bool second_display) {
         bool    caps_word_changed    = current_caps_word_on != last_caps_word_on;
         if (!modifiers_initialized || in_or_out_of_no_hrm || current_modifiers != last_modifiers || caps_word_changed) {
             uint8_t changed_modifiers = last_modifiers ^ current_modifiers;
-            if (changed_modifiers & MOD_MASK_CTRL || in_or_out_of_no_hrm) {
+            if (!modifiers_initialized || changed_modifiers & MOD_MASK_CTRL || in_or_out_of_no_hrm) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_CTRL ? control.pressed : control.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
                 const uint16_t         x      = (LCD_WIDTH - width * 3) >> 1;
-                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height) >> 1);
+                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
                 } else {
                     qp_drawimage(lcd_surface, x, y, status);
                 }
             }
-            if (changed_modifiers & MOD_MASK_ALT || in_or_out_of_no_hrm) {
+            if (!modifiers_initialized || changed_modifiers & MOD_MASK_ALT || in_or_out_of_no_hrm) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_ALT ? option.pressed : option.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
                 const uint16_t         x      = (LCD_WIDTH - width) >> 1;
-                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height) >> 1);
+                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
                 } else {
                     qp_drawimage(lcd_surface, x, y, status);
                 }
             }
-            if (changed_modifiers & MOD_MASK_GUI || in_or_out_of_no_hrm) {
+            if (!modifiers_initialized || changed_modifiers & MOD_MASK_GUI || in_or_out_of_no_hrm) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_GUI ? command.pressed : command.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
                 const uint16_t         x      = (LCD_WIDTH + width) >> 1;
-                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height) >> 1);
+                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
                 } else {
                     qp_drawimage(lcd_surface, x, y, status);
                 }
             }
-            if (changed_modifiers & MOD_MASK_SHIFT || caps_word_changed) {
+            if (!modifiers_initialized || changed_modifiers & MOD_MASK_SHIFT || caps_word_changed) {
                 modifier_gfx_definition* modifier = current_caps_word_on ? &caps_word : &shift;
                 painter_image_handle_t   status   = current_modifiers & MOD_MASK_SHIFT ? modifier->pressed : modifier->unpressed;
                 const uint16_t           width    = status->width;
                 const uint16_t           height   = status->height;
                 const uint16_t           x        = (LCD_WIDTH - width) >> 1;
-                const uint16_t           y        = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
+                const uint16_t           y        = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height) >> 1);
                 qp_drawimage(lcd_surface, x, y, status);
             }
 
