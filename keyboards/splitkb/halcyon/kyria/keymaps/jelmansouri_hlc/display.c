@@ -79,18 +79,6 @@ bool module_post_init_user(void) {
     return false;
 }
 
-// void draw_modifier(painter_image_handle_t status, uint16_t x, uint16_t y, bool force) {
-//     const uint16_t width  = status->width;
-//     const uint16_t height = status->height;
-//     const uint16_t x      = (LCD_WIDTH - width * 3) / 2;
-//     const uint16_t y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height) >> 1);
-//     if (current_layer == _BASE_NO_HRM) {
-//         qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
-//     } else {
-//         qp_drawimage(lcd_surface, x, y, status);
-//     }
-// }
-
 // This function runs after every matrix scan
 bool display_module_housekeeping_task_user(bool second_display) {
     static bool    layer_initialized = false;
@@ -121,7 +109,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_CTRL ? control.pressed : control.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
-                const uint16_t         x      = (LCD_WIDTH - width * 3 - 8) >> 1;
+                const uint16_t         x      = (LCD_WIDTH - width * 3 - 16) >> 1;
                 const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
@@ -145,7 +133,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_GUI ? command.pressed : command.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
-                const uint16_t         x      = (LCD_WIDTH + width + 8) >> 1;
+                const uint16_t         x      = (LCD_WIDTH + width + 16) >> 1;
                 const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
@@ -159,7 +147,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
                 const uint16_t           width    = status->width;
                 const uint16_t           height   = status->height;
                 const uint16_t           x        = (LCD_WIDTH - width) >> 1;
-                const uint16_t           y        = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height - 4) >> 1);
+                const uint16_t           y        = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height - 16) >> 1);
                 qp_drawimage(lcd_surface, x, y, status);
             }
 
