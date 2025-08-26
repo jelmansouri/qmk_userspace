@@ -29,7 +29,7 @@ The unavoidable challenge with HRM is that it cares about release order as well 
 
 After wrestling with home-row mods, the next big design decision was how many layers to live with. Putting Shift on the thumb cluster broke the neat modifier-layer logic I had liked in the Kyriel approach, but it wasn’t much of a concession. I prefer a low number of layers anyway—constant layer switching only adds to the cognitive burden while typing. What mattered more was keeping navigation and the numpad anchored on the right half of the split. I’m used to moving lines in code editors by typing a relative line number followed by up or down, so I needed a flow where my left hand triggers the layer, the right hand types the number, and then I can immediately switch to Raise (sometimes while still holding Lower) and hit the direction keys. That interaction dictated the way I built the layers more than anything else.
 
-![Base](assets/keymap_Base.svg)
+![Base](assets/layout_drawings/generated/keymap_Base.svg)
 
 - **Layout**: Colemak-DH, with small punctuation tweaks.  
   - Underscore and colon moved to be more accessible to the pinky (frequently used in code).  
@@ -46,7 +46,7 @@ After wrestling with home-row mods, the next big design decision was how many la
   - Placed on the right side.  
   - Allows triggering shortcuts easily while the left hand is on the mouse.
  
-![Lower](assets/keymap_Lower.svg)
+![Lower](assets/layout_drawings/generated/keymap_Lower.svg)
 
 - **Left side (function row)**:  
   - Arranged as 4 function keys per line.  
@@ -56,7 +56,7 @@ After wrestling with home-row mods, the next big design decision was how many la
   - Standard numpad layout, with 0 next to the one, found that messing with thr order to privillege moat used used numbers not worth it.
   - Issue: `3` key overlaps with the dot on base, forcing an extra layer switch when ryping float, tryed added a dot on the thumb cluster beneath it but two dots keys became confusing, so reverted.  
 
-![Raise](assets/keymap_Raise.svg)
+![Raise](assets/layout_drawings/generated/keymap_Raise.svg)
 
 - **Left side (symbols)**:  
   - Symbols arranged in the same order as a standard US keyboard.  
@@ -67,7 +67,7 @@ After wrestling with home-row mods, the next big design decision was how many la
   - Shifted one column to the right so they fall under stronger fingers.  
   - Brackets placed here as well, since they are often used in combination with modifiers.
 
-![Nav3D](assets/keymap_Nav3D.svg)
+![Nav3D](assets/layout_drawings/generated/keymap_Nav3D.svg)
 
 Finally, I keep a dedicated layer for 3D navigation. My day-to-day work involves sometimes testing stuff i develop in 3D editors, and most of those tools cluster navigation shortcuts on the left side, assuming the right hand is busy on the mouse. I mirrored that expectation: this layer uses a conventional layout that matches the defaults in most software, so I never have to remap anything. Switching into it feels natural, and it keeps my muscle memory aligned across all the different 3D packages I touch.
 

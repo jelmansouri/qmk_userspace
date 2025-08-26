@@ -1,11 +1,6 @@
 # Use bash with strict flags
 set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 
-# ---------- Config ----------
-# Either set KEYBOARD and KEYMAP (recommended) ...
-#   just KEYBOARD=ferris/sweep KEYMAP=default all
-# ...or point KEYMAP_C at a specific keymap.c (then KEYBOARD/KEYMAP are optional)
-#   just KEYMAP_C=../qmk_firmware/keyboards/ferris/sweep/keymaps/default/keymap.c all
 KEYBOARD := "splitkb/kyria/rev3"
 KEYMAP   := "jelmansouri"
 
@@ -13,39 +8,60 @@ KEYMAP   := "jelmansouri"
 COLS := "10"
 
 # Output directory
-OUT := "assets"
+LAYOUT_DRAWINGS_OUT := "assets/layout_drawings/generated"
+LAYOUT_DRAWINGS_CONFIG := "assets/layout_drawings/keymap-config.yaml"
 
 # Layers to draw (space-separated)
-LAYERS := "Base BaseNoHRM Lower Raise Nav3D"
+LAYER_NAMES := "Base BaseNoHRM Lower Raise Nav3D"
+
+MODIFIERS_ART := "assets/screen_art/modifiers/*.png"
+MODIFIERS_ART_OUT := "keyboards/splitkb/halcyon/kyria/keymaps/jelmansouri_hlc/graphics/modifiers"
+LAYERS_ART := "assets/screen_art/layers/*.png"
+LAYERS_ART_OUT := "keyboards/splitkb/halcyon/kyria/keymaps/jelmansouri_hlc/graphics/layers"
 
 # ---------- Phonies ----------
 default: all
 
-# End-to-end
-all: draw
+all: draw modifiers layers
 
-# 1) keymap.c -> keymap.json
 json:
-    mkdir -p "{{OUT}}"
+    mkdir -p "{{LAYOUT_DRAWINGS_OUT}}"
     # Use --no-cpp by default (fewer surprises). Drop it if you need macros expanded.
-    qmk c2json --no-cpp -kb "{{KEYBOARD}}" -km "{{KEYMAP}}" > "{{OUT}}/keymap.json"
+    qmk c2json --no-cpp -kb "{{KEYBOARD}}" -km "{{KEYMAP}}" > "{{LAYOUT_DRAWINGS_OUT}}/keymap.json"
 
-# 2) keymap.json -> keymap.yaml
 parse: json
     echo "Parsing JSON -> YAML (cols={{COLS}})"
-    keymap -c "{{OUT}}/keymap-config.yaml" parse --layer-names {{LAYERS}} -c {{COLS}} -q "{{OUT}}/keymap.json" > "{{OUT}}/keymap.yaml"
+    keymap -c "{{LAYOUT_DRAWINGS_CONFIG}}" parse --layer-names {{LAYER_NAMES}} -c {{COLS}} -q "{{LAYOUT_DRAWINGS_OUT}}/keymap.json" > "{{LAYOUT_DRAWINGS_OUT}}/keymap.yaml"
 
-# 3) Draw each layer to its own SVG
 draw: parse
     #!/usr/bin/env bash
     set -euo pipefail
-    keymap draw "{{OUT}}/keymap.yaml" -o "{{OUT}}/keymap.svg";
-    for L in {{LAYERS}}; do
+    keymap draw "{{LAYOUT_DRAWINGS_OUT}}/keymap.yaml" -o "{{LAYOUT_DRAWINGS_OUT}}/keymap.svg";
+    for L in {{LAYER_NAMES}}; do
         echo "Drawing layer: $L"
-        keymap draw "{{OUT}}/keymap.yaml" -s "$L" -o "{{OUT}}/keymap_$L.svg";
-        echo "SVG written to {{OUT}}/keymap_$L.svg"
+        keymap draw "{{LAYOUT_DRAWINGS_OUT}}/keymap.yaml" -s "$L" -o "{{LAYOUT_DRAWINGS_OUT}}/keymap_$L.svg";
+        echo "SVG written to {{LAYOUT_DRAWINGS_OUT}}/keymap_$L.svg"
+    done
+
+modifiers:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    shopt -s nullglob dotglob
+    for MA in {{MODIFIERS_ART}}; do
+        echo "Converting graphics for: $MA"
+        qmk painter-convert-graphics -o "{{MODIFIERS_ART_OUT}}" -f mono4 -i "$MA"
+    done
+
+layers:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for LA in {{LAYERS_ART}}; do
+        echo "Converting graphics for: $LA"
+        qmk painter-convert-graphics -o "{{LAYERS_ART_OUT}}" -f pal16 -i "$LA"
     done
 
 # Cleanup
 clean:
-    rm -rf "{{OUT}}"
+    rm "{{LAYOUT_DRAWINGS_OUT}}/*"
+    rm "{{MODIFIERS_ART_OUT}}/*"
+    rm "{{LAYERS_ART_OUT}}/*"
