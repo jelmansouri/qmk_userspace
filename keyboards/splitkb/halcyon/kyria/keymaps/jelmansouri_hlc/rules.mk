@@ -4,6 +4,7 @@ USER_NAME := halcyon_modules
 MOUSEKEY_ENABLE = yes
 CAPS_WORD_ENABLE = yes
 
+ifdef HLC_TFT_DISPLAY
 SRC += display.c
 SRC += graphics/modifiers/caps_word_enabled.qgf.c
 SRC += graphics/modifiers/caps_word_shift_pressed.qgf.c
@@ -35,3 +36,4 @@ SRC += graphics/layers/raise_layer_text_colored.qgf.c
 # SRC += graphics/layers/raise_layer_text.qgf.c
 SRC += graphics/layers/undefined_layer_icon.qgf.c
 SRC += graphics/layers/undefined_layer_text.qgf.c
+endif
