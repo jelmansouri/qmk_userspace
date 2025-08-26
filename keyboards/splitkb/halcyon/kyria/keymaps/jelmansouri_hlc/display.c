@@ -121,7 +121,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_CTRL ? control.pressed : control.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
-                const uint16_t         x      = (LCD_WIDTH - width * 3) >> 1;
+                const uint16_t         x      = (LCD_WIDTH - width * 3 - 8) >> 1;
                 const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
@@ -145,7 +145,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_GUI ? command.pressed : command.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
-                const uint16_t         x      = (LCD_WIDTH + width) >> 1;
+                const uint16_t         x      = (LCD_WIDTH + width + 8) >> 1;
                 const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
@@ -159,7 +159,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
                 const uint16_t           width    = status->width;
                 const uint16_t           height   = status->height;
                 const uint16_t           x        = (LCD_WIDTH - width) >> 1;
-                const uint16_t           y        = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height) >> 1);
+                const uint16_t           y        = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height - 4) >> 1);
                 qp_drawimage(lcd_surface, x, y, status);
             }
 
