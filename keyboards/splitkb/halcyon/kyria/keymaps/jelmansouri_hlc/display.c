@@ -21,6 +21,8 @@
 #include "graphics/layers/nav3d_layer_text_colored.qgf.h"
 #include "graphics/layers/raise_layer_icon_colored.qgf.h"
 #include "graphics/layers/raise_layer_text_colored.qgf.h"
+#include "graphics/layers/undefined_layer_icon.qgf.h"
+#include "graphics/layers/undefined_layer_text.qgf.h"
 
 #include "keymap.h"
 
@@ -84,14 +86,14 @@ bool display_module_housekeeping_task_user(bool second_display) {
 
     static bool    modifiers_initialized = false;
     static uint8_t last_modifiers        = 0;
-    static uint8_t last_caps_word_on     = false;
+    static bool    last_caps_word_on     = false;
 
     if (!second_display) {
         uint8_t current_layer       = get_highest_layer(layer_state | default_layer_state);
         bool    in_or_out_of_no_hrm = false;
         if (!layer_initialized || current_layer != last_layer) {
             in_or_out_of_no_hrm         = (last_layer == _BASE_NO_HRM) || (current_layer == _BASE_NO_HRM);
-            layer_gfx_definition* layer = layer_mapping[current_layer > _UNDEFINED ? _UNDEFINED : current_layer];
+            layer_gfx_definition* layer = &layer_mapping[current_layer > _UNDEFINED ? _UNDEFINED : current_layer];
             qp_drawimage(lcd_surface, (LCD_WIDTH - layer->icon->width) >> 1, ((LCD_HEIGHT >> 1) - layer->icon->height) >> 1, layer->icon);
             qp_drawimage(lcd_surface, (LCD_WIDTH - layer->text->width) >> 1, (LCD_HEIGHT - layer->text->height) >> 1, layer->text);
             layer_initialized = true;
