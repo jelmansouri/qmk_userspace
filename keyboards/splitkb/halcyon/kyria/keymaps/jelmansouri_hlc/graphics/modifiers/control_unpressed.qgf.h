@@ -11,4 +11,4 @@
 #include <qp.h>
 
 extern const uint32_t gfx_control_unpressed_length;
-extern const uint8_t  gfx_control_unpressed[241];
+extern const uint8_t  gfx_control_unpressed[178];

@@ -11,4 +11,4 @@
 #include <qp.h>
 
 extern const uint32_t gfx_command_unpressed_length;
-extern const uint8_t  gfx_command_unpressed[517];
+extern const uint8_t  gfx_command_unpressed[309];

@@ -11,4 +11,4 @@
 #include <qp.h>
 
 extern const uint32_t gfx_option_pressed_length;
-extern const uint8_t  gfx_option_pressed[286];
+extern const uint8_t  gfx_option_pressed[228];

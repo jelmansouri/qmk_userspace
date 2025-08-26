@@ -11,4 +11,4 @@
 #include <qp.h>
 
 extern const uint32_t gfx_caps_word_enabled_length;
-extern const uint8_t  gfx_caps_word_enabled[256];
+extern const uint8_t  gfx_caps_word_enabled[202];

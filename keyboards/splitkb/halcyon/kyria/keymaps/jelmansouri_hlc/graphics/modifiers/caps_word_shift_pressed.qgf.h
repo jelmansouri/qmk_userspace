@@ -11,4 +11,4 @@
 #include <qp.h>
 
 extern const uint32_t gfx_caps_word_shift_pressed_length;
-extern const uint8_t  gfx_caps_word_shift_pressed[274];
+extern const uint8_t  gfx_caps_word_shift_pressed[215];
