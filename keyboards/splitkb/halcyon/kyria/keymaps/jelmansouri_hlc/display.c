@@ -89,52 +89,69 @@ bool display_module_housekeeping_task_user(bool second_display) {
     static bool    last_caps_word_on     = false;
 
     if (!second_display) {
+        // The layers are displayed icon first then text second
+        //               --------
+        //               | Icon |
+        //             --+------+--
+        //             |   Text   |
+        //             +----------+
         uint8_t current_layer       = get_highest_layer(layer_state | default_layer_state);
         bool    in_or_out_of_no_hrm = false;
         if (!layer_initialized || current_layer != last_layer) {
             in_or_out_of_no_hrm         = (last_layer == _BASE_NO_HRM) || (current_layer == _BASE_NO_HRM);
             layer_gfx_definition* layer = &layer_mapping[current_layer > _UNDEFINED ? _UNDEFINED : current_layer];
-            qp_drawimage(lcd_surface, (LCD_WIDTH - layer->icon->width) >> 1, ((LCD_HEIGHT >> 1) - layer->icon->height) >> 1, layer->icon);
-            qp_drawimage(lcd_surface, (LCD_WIDTH - layer->text->width) >> 1, (LCD_HEIGHT - layer->text->height) >> 1, layer->text);
+            qp_drawimage(lcd_surface, (LCD_WIDTH - layer->icon->width) / 2, ((LCD_HEIGHT / 2) - layer->icon->height) / 2, layer->icon);
+            qp_drawimage(lcd_surface, (LCD_WIDTH - layer->text->width) / 2, (LCD_HEIGHT - layer->text->height) / 2, layer->text);
             layer_initialized = true;
             last_layer        = current_layer;
         }
 
-        uint8_t current_modifiers    = get_mods();
-        bool    current_caps_word_on = is_caps_word_on();
-        bool    caps_word_changed    = current_caps_word_on != last_caps_word_on;
-        if (!modifiers_initialized || in_or_out_of_no_hrm || current_modifiers != last_modifiers || caps_word_changed) {
+        // The goal is to position the keys on screen like follows, having them centered on the y axis and having
+        // the line between the first and second row fall at the 3/4 of thes screen:
+        //        ----------------------
+        //        | Ctl  |  Opt | Cmd  |
+        //        +------+------+------+
+        //               | Shft |
+        //               +------+
+        // The first row disappears if we disable home row mod, and Shift is rendered plain if we enable Caps Word
+        // There is an assumption that everything is the same size, but the code is permissive enought to allow
+        // an extra pixel here and there
+        uint8_t current_modifiers      = get_mods();
+        bool    current_caps_word_on   = is_caps_word_on();
+        bool    caps_word_changed      = current_caps_word_on != last_caps_word_on;
+        bool    force_first_raw_update = !modifiers_initialized || in_or_out_of_no_hrm;
+        if (force_first_raw_update || current_modifiers != last_modifiers || caps_word_changed) {
             uint8_t changed_modifiers = last_modifiers ^ current_modifiers;
-            if (!modifiers_initialized || changed_modifiers & MOD_MASK_CTRL || in_or_out_of_no_hrm) {
+            if (force_first_raw_update || changed_modifiers & MOD_MASK_CTRL) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_CTRL ? control.pressed : control.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
-                const uint16_t         x      = (LCD_WIDTH - width * 3 - 16) >> 1;
-                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
+                const uint16_t         x      = (LCD_WIDTH - width * 3 - 16) / 2;
+                const uint16_t         y      = LCD_HEIGHT - ((LCD_HEIGHT / 2 + height) / 2);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
                 } else {
                     qp_drawimage(lcd_surface, x, y, status);
                 }
             }
-            if (!modifiers_initialized || changed_modifiers & MOD_MASK_ALT || in_or_out_of_no_hrm) {
+            if (force_first_raw_update || changed_modifiers & MOD_MASK_ALT) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_ALT ? option.pressed : option.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
-                const uint16_t         x      = (LCD_WIDTH - width) >> 1;
-                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
+                const uint16_t         x      = (LCD_WIDTH - width) / 2;
+                const uint16_t         y      = LCD_HEIGHT - ((LCD_HEIGHT / 2 + height) / 2);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
                 } else {
                     qp_drawimage(lcd_surface, x, y, status);
                 }
             }
-            if (!modifiers_initialized || changed_modifiers & MOD_MASK_GUI || in_or_out_of_no_hrm) {
+            if (force_first_raw_update || changed_modifiers & MOD_MASK_GUI) {
                 painter_image_handle_t status = current_modifiers & MOD_MASK_GUI ? command.pressed : command.unpressed;
                 const uint16_t         width  = status->width;
                 const uint16_t         height = status->height;
-                const uint16_t         x      = (LCD_WIDTH + width + 16) >> 1;
-                const uint16_t         y      = LCD_HEIGHT - (((LCD_HEIGHT >> 1) + height) >> 1);
+                const uint16_t         x      = (LCD_WIDTH + width + 16) / 2;
+                const uint16_t         y      = LCD_HEIGHT - ((LCD_HEIGHT / 2 + height) / 2);
                 if (current_layer == _BASE_NO_HRM) {
                     qp_rect(lcd_surface, x, y, width - 1, height - 1, HSV_BLACK, true);
                 } else {
@@ -146,8 +163,8 @@ bool display_module_housekeeping_task_user(bool second_display) {
                 painter_image_handle_t   status   = current_modifiers & MOD_MASK_SHIFT ? modifier->pressed : modifier->unpressed;
                 const uint16_t           width    = status->width;
                 const uint16_t           height   = status->height;
-                const uint16_t           x        = (LCD_WIDTH - width) >> 1;
-                const uint16_t           y        = LCD_HEIGHT - (((LCD_HEIGHT >> 1) - height - 16) >> 1);
+                const uint16_t           x        = (LCD_WIDTH - width) / 2;
+                const uint16_t           y        = LCD_HEIGHT - ((LCD_HEIGHT / 2 - height - 16) / 2);
                 qp_drawimage(lcd_surface, x, y, status);
             }
 
