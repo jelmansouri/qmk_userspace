@@ -32,3 +32,6 @@
 
 // Timeout configuration
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT HLC_BACKLIGHT_TIMEOUT
+
+// Allowing higher number of images to be loaded at the same time
+#define QUANTUM_PAINTER_NUM_IMAGES 24

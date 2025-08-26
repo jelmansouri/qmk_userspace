@@ -4,14 +4,9 @@ set shell := ["bash", "-eu", "-o", "pipefail", "-c"]
 KEYBOARD := "splitkb/kyria/rev3"
 KEYMAP   := "jelmansouri"
 
-# Column count for keymap-drawer parsing
-COLS := "10"
-
-# Output directory
 LAYOUT_DRAWINGS_OUT := "assets/layout_drawings/generated"
 LAYOUT_DRAWINGS_CONFIG := "assets/layout_drawings/keymap-config.yaml"
 
-# Layers to draw (space-separated)
 LAYER_NAMES := "Base BaseNoHRM Lower Raise Nav3D"
 
 MODIFIERS_ART := "assets/screen_art/modifiers/*.png"
@@ -30,8 +25,7 @@ json:
     qmk c2json --no-cpp -kb "{{KEYBOARD}}" -km "{{KEYMAP}}" > "{{LAYOUT_DRAWINGS_OUT}}/keymap.json"
 
 parse: json
-    echo "Parsing JSON -> YAML (cols={{COLS}})"
-    keymap -c "{{LAYOUT_DRAWINGS_CONFIG}}" parse --layer-names {{LAYER_NAMES}} -c {{COLS}} -q "{{LAYOUT_DRAWINGS_OUT}}/keymap.json" > "{{LAYOUT_DRAWINGS_OUT}}/keymap.yaml"
+    keymap -c "{{LAYOUT_DRAWINGS_CONFIG}}" parse --layer-names {{LAYER_NAMES}} -c 10 -q "{{LAYOUT_DRAWINGS_OUT}}/keymap.json" > "{{LAYOUT_DRAWINGS_OUT}}/keymap.yaml"
 
 draw: parse
     #!/usr/bin/env bash
@@ -49,7 +43,7 @@ modifiers:
     shopt -s nullglob dotglob
     for MA in {{MODIFIERS_ART}}; do
         echo "Converting graphics for: $MA"
-        qmk painter-convert-graphics -o "{{MODIFIERS_ART_OUT}}" -f mono4 -i "$MA"
+        qmk painter-convert-graphics -o "{{MODIFIERS_ART_OUT}}" -f mono16 -i "$MA"
     done
 
 layers:
