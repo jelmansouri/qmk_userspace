@@ -26,9 +26,6 @@
 
 #include "keymap.h"
 
-#define LCD_WIDTH 135
-#define LCD_HEIGHT 240
-
 typedef struct layer_gfx_definition {
     painter_image_handle_t icon;
     painter_image_handle_t text;
