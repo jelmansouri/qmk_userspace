@@ -4,6 +4,7 @@ USER_NAME := halcyon_modules
 MOUSEKEY_ENABLE = yes
 CAPS_WORD_ENABLE = yes
 
+SRC += display.c
 SRC += graphics/modifiers/caps_word_enabled.qgf.c
 SRC += graphics/modifiers/caps_word_shift_pressed.qgf.c
 SRC += graphics/modifiers/command_pressed.qgf.c
