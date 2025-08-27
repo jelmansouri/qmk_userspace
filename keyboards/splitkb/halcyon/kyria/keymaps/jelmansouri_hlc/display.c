@@ -31,30 +31,30 @@ typedef struct gfx_position {
     uint16_t y;
 } gfx_position;
 
-typedef struct layer_gfx_definition {
+typedef struct gfx_layer_definition {
     painter_image_handle_t icon;
     painter_image_handle_t text;
-} layer_gfx_definition;
+} gfx_layer_definition;
 
-typedef struct modifier_gfx_definition {
+typedef struct gfx_modifier_definition {
     painter_image_handle_t pressed;
     painter_image_handle_t unpressed;
     gfx_position           position;
-} modifier_gfx_definition;
+} gfx_modifier_definition;
 
 // Setup painter devices
 extern painter_device_t lcd;
 extern painter_device_t lcd_surface;
 
-static layer_gfx_definition layer_mapping[_COUNT] = {0};
+static gfx_layer_definition layer_mapping[_COUNT] = {0};
 static gfx_position         layer_icon_position   = {0};
 static gfx_position         layer_text_position   = {0};
 
-static modifier_gfx_definition shift;
-static modifier_gfx_definition control;
-static modifier_gfx_definition option;
-static modifier_gfx_definition command;
-static modifier_gfx_definition caps_word;
+static gfx_modifier_definition shift;
+static gfx_modifier_definition control;
+static gfx_modifier_definition option;
+static gfx_modifier_definition command;
+static gfx_modifier_definition caps_word;
 static uint16_t                modifiers_width  = 0;
 static uint16_t                modifiers_height = 0;
 
@@ -175,7 +175,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
 
     if (!second_display) {
         if (!art_valid) {
-            layer_gfx_definition* layer = &layer_mapping[_UNDEFINED];
+            gfx_layer_definition* layer = &layer_mapping[_UNDEFINED];
             if (layer->icon) {
                 qp_drawimage(lcd_surface, layer_icon_position.x, layer_icon_position.y, layer->icon);
                 qp_surface_draw(lcd_surface, lcd, 0, 0, 0);
@@ -188,7 +188,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
         bool    in_or_out_of_no_hrm = false;
         if (!layer_initialized || current_layer != last_layer) {
             in_or_out_of_no_hrm         = (last_layer == _BASE_NO_HRM) || (current_layer == _BASE_NO_HRM);
-            layer_gfx_definition* layer = &layer_mapping[current_layer > _UNDEFINED ? _UNDEFINED : current_layer];
+            gfx_layer_definition* layer = &layer_mapping[current_layer > _UNDEFINED ? _UNDEFINED : current_layer];
             qp_drawimage(lcd_surface, layer_icon_position.x, layer_icon_position.y, layer->icon);
             qp_drawimage(lcd_surface, layer_text_position.x, layer_text_position.y, layer->text);
             layer_initialized = true;
@@ -218,7 +218,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
             }
 
             if (!modifiers_initialized || caps_word_changed || (changed_modifiers & MOD_MASK_SHIFT)) {
-                modifier_gfx_definition* modifier = current_caps_word_on ? &caps_word : &shift;
+                gfx_modifier_definition* modifier = current_caps_word_on ? &caps_word : &shift;
                 qp_drawimage(lcd_surface, modifier->position.x, modifier->position.y, current_modifiers & MOD_MASK_SHIFT ? modifier->pressed : modifier->unpressed);
             }
 
