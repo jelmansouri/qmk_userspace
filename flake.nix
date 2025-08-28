@@ -44,6 +44,7 @@
         # nix develop
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
+            just
             qmk
             qmkWrapped
             cc # C preprocessor for c2json
