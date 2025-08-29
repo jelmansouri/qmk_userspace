@@ -7,7 +7,6 @@ enum layers {
     _RAISE,
     _NAV_3D,
 
-    _UNDEFINED,
     _COUNT
 };
 

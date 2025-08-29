@@ -14,6 +14,7 @@
 
 #    define ENABLE_RGB_MATRIX_SOLID_COLOR // Static single hue, no speed support
 
+// clang-format off
 #    undef ENABLE_RGB_MATRIX_ALPHAS_MODS               // Static dual hue, speed is hue for secondary hue
 #    undef ENABLE_RGB_MATRIX_GRADIENT_UP_DOWN          // Static gradient top to bottom, speed controls how much gradient changes
 #    undef ENABLE_RGB_MATRIX_GRADIENT_LEFT_RIGHT       // Static gradient left to right, speed controls how much gradient changes
@@ -62,7 +63,8 @@
 #    undef ENABLE_RGB_MATRIX_STARLIGHT_DUAL_HUE        // LEDs turn on and off at random at varying brightness, modifies user set hue by +- 30
 #    undef ENABLE_RGB_MATRIX_STARLIGHT_DUAL_SAT        // LEDs turn on and off at random at varying brightness, modifies user set saturation by +- 30
 #    undef ENABLE_RGB_MATRIX_RIVERFLOW                 // Modification to breathing animation, offset's animation depending on key location to simulate a river flowing
-#endif                                                 // RGB_MATRIX_ENABLE
+// clang-format on
+#endif // RGB_MATRIX_ENABLE
 
 #ifdef OLED_ENABLE
 #    define SPLIT_OLED_ENABLE

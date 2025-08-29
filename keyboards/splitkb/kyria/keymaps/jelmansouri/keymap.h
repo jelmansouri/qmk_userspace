@@ -6,6 +6,8 @@ enum layers {
     _LOWER,
     _RAISE,
     _NAV_3D,
+
+    _COUNT
 };
 
 enum custom_keycodes {

@@ -8,6 +8,8 @@ SRC += rgb_matrix.c
 
 ifdef HLC_TFT_DISPLAY
 	SRC += display.c
+	SRC += graphics/modifiers/fallback.qgf.c
+	SRC += graphics/modifiers/fallback.qgf.c
 	SRC += graphics/modifiers/caps_word_enabled.qgf.c
 	SRC += graphics/modifiers/caps_word_shift_pressed.qgf.c
 	SRC += graphics/modifiers/command_pressed.qgf.c
