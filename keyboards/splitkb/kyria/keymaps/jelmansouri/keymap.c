@@ -151,7 +151,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_sethsv_noeeprom(HSV_OFF);
+    rgb_matrix_sethsv_noeeprom(HSV_BLUE);
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
