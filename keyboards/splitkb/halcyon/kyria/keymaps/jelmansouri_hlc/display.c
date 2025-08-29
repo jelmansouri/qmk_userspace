@@ -157,7 +157,7 @@ bool module_post_init_user(void) {
         bool modifier_fallback_needed = false;
         for (int i = 0; i < sizeof(modifier_icons) / sizeof(modifier_icons[0]); ++i) {
             if (*modifier_icons[i] == NULL || (*modifier_icons[i])->width != modifiers_width ||
-                (*modifier_icon[i])->height != modifiers_height) {
+                (*modifier_icons[i])->height != modifiers_height) {
                 *modifier_icons[i]       = modifier_fallback;
                 modifier_fallback_needed = true;
             }
