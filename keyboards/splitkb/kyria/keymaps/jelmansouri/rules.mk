@@ -5,7 +5,8 @@ CAPS_WORD_ENABLE = yes
 
 POINTING_DEVICE_ENABLE = yes
 POINTING_DEVICE_DRIVER = cirque_pinnacle_i2c
-SRC += trackpad.c
 
 # extra sources
-SRC +=  oled.c
+SRC += oled.c
+SRC += rgb_matrix.c
+SRC += trackpad.c

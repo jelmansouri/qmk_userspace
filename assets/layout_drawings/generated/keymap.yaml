@@ -187,19 +187,46 @@ layers:
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
   Nav3D:
-  - ['', '$$mdi:keyboard-tab$$', Q, W, E, R, RGB TOG, RGB MOD, RGB HUI, RGB VAI]
-  - [RGB SPI, RGB M K, '', '$$mdi:apple-keyboard-shift$$', A, S, D, F, RGB TOG, RGB RMOD]
-  - [RGB HUD, RGB VAD, RGB SPD, RGB M X, '', '$$mdi:apple-keyboard-control$$', Z, X, C, V]
+  - - ''
+    - $$mdi:keyboard-tab$$
+    - Q
+    - W
+    - E
+    - R
+    - RM TOGG
+    - RM VALU
+    - RM VALD
+    - {t: ▽, type: trans}
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - ''
+    - $$mdi:apple-keyboard-shift$$
+    - A
+    - S
+    - D
+    - F
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+  - - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - ''
+    - $$mdi:apple-keyboard-control$$
+    - Z
+    - X
+    - C
+    - V
   - - {t: ▽, type: trans}
     - $$mdi:keyboard-space$$
     - ''
     - ''
-    - RGB M P
-    - RGB M B
-    - RGB M R
-    - RGB M SW
-    - RGB M SN
-    - RGB M G
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
+    - {t: ▽, type: trans}
   - - $$mdi:apple-keyboard-option$$
     - $$mdi:apple-keyboard-command$$
     - ''

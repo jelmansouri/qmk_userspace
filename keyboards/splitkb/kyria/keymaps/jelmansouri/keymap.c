@@ -2,45 +2,6 @@
 
 #include "keymap.h"
 
-#define BASE TO(_BASE)
-#define BWOHRM MO(_BASE_NO_HRM)
-#define LOWER MO(_LOWER)
-#define RAISE MO(_RAISE)
-#define NAV_3D TO(_NAV_3D)
-
-#define KC_GLO LCTL(LGUI(KC_SPC))
-
-#define KC_HELD KC_TRNS
-
-// Base
-#define R_CTL MT(MOD_LCTL, KC_R)
-#define S_ALT MT(MOD_LALT, KC_S)
-#define T_GUI MT(MOD_LGUI, KC_T)
-
-#define N_GUI MT(MOD_LGUI, KC_N)
-#define E_ALT MT(MOD_LALT, KC_E)
-#define I_CTL MT(MOD_LCTL, KC_I)
-
-// LOWER
-#define F6_CTL MT(MOD_LCTL, KC_F6)
-#define F7_ALT MT(MOD_LALT, KC_F7)
-#define F8_GUI MT(MOD_LGUI, KC_F8)
-
-#define N4_GUI MT(MOD_LGUI, KC_4)
-#define N5_ALT MT(MOD_LALT, KC_5)
-#define N6_CTL MT(MOD_LCTL, KC_6)
-
-// RAISE
-#define AM_CTL MT(MOD_LCTL, KC_AMPR)
-#define AS_ALT MT(MOD_LALT, KC_ASTR)
-#define LP_GUI MT(MOD_LGUI, KC_LPRN)
-
-#define DSCROLL DRAG_SCROLL
-
-// Modify these values to adjust the scrolling speed
-#define SCROLL_DIVISOR_H 32.0
-#define SCROLL_DIVISOR_V 32.0
-
 enum custom_keycodes {
     DRAG_SCROLL = SAFE_RANGE,
 };
@@ -115,81 +76,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-// Variables to store accumulated scroll values
-float scroll_accumulated_h = 0;
-float scroll_accumulated_v = 0;
-
-// Function to handle mouse reports and perform drag scrolling
-//
-report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
-    // Check if drag scrolling is active
-    if (set_scrolling) {
-        // Calculate and accumulate scroll values based on mouse movement and divisors
-        scroll_accumulated_h += (float)mouse_report.x / SCROLL_DIVISOR_H;
-        scroll_accumulated_v -= (float)mouse_report.y / SCROLL_DIVISOR_V;
-
-        // Assign integer parts of accumulated scroll values to the mouse report
-        mouse_report.h = (int8_t)scroll_accumulated_h;
-        mouse_report.v = (int8_t)scroll_accumulated_v;
-
-        // Update accumulated scroll values by subtracting the integer parts
-        scroll_accumulated_h -= (int8_t)scroll_accumulated_h;
-        scroll_accumulated_v -= (int8_t)scroll_accumulated_v;
-
-        // Clear the X and Y values of the mouse report
-        mouse_report.x = 0;
-        mouse_report.y = 0;
-    }
-    return mouse_report;
-}
-
 // Function to handle layer changes and disable drag scrolling
 layer_state_t layer_state_set_user(layer_state_t state) {
     set_scrolling = false;
     return state;
 }
-
-void keyboard_post_init_user(void) {
-    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_sethsv_noeeprom(HSV_BLUE);
-}
-
-bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    for (uint8_t i = led_min; i < led_max; i++) {
-        switch (get_highest_layer(layer_state | default_layer_state)) {
-            case _BASE:
-            case _BASE_NO_HRM:
-                rgb_matrix_set_color(i, RGB_BLUE);
-                break;
-            case _LOWER:
-                rgb_matrix_set_color(i, RGB_TEAL);
-                break;
-            case _RAISE:
-                rgb_matrix_set_color(i, RGB_TURQUOISE);
-                break;
-            case _NAV_3D:
-                rgb_matrix_set_color(i, RGB_CORAL);
-                break;
-            default:
-                break;
-        }
-    }
-    return false;
-}
-
-// bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-//     if (get_highest_layer(layer_state) > 0) {
-//         uint8_t layer = get_highest_layer(layer_state);
-//
-//         for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
-//             for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
-//                 uint8_t index = g_led_config.matrix_co[row][col];
-//
-//                 if (index >= led_min && index < led_max && index != NO_LED && keymap_key_to_keycode(layer, (keypos_t){col, row}) > KC_TRNS) {
-//                     rgb_matrix_set_color(index, RGB_GREEN);
-//                 }
-//             }
-//         }
-//     }
-//     return false;
-// }
