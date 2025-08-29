@@ -2,10 +2,6 @@
 
 #include "keymap.h"
 
-enum custom_keycodes {
-    DRAG_SCROLL = SAFE_RANGE,
-};
-
 // clang-format off
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_BASE] = LAYOUT_split_3x6_5(

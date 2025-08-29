@@ -1,4 +1,5 @@
-#include QMK_KEYBOARD_H
+#include "quantum.h"
+
 #include "keymap.h"
 
 extern uint8_t* oled_cursor;

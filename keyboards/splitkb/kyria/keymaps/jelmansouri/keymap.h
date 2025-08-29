@@ -8,6 +8,10 @@ enum layers {
     _NAV_3D,
 };
 
+enum custom_keycodes {
+    DRAG_SCROLL = SAFE_RANGE,
+};
+
 #define BASE TO(_BASE)
 #define BWOHRM MO(_BASE_NO_HRM)
 #define LOWER MO(_LOWER)
