@@ -70,16 +70,16 @@ bool module_post_init_user(void) {
     painter_image_handle_t layer_fallback_icon = qp_load_image_mem(gfx_undefined_layer_icon);
     painter_image_handle_t layer_fallback_text = qp_load_image_mem(gfx_undefined_layer_text);
     painter_image_handle_t modifier_fallback   = qp_load_image_mem(gfx_fallback);
-    if (layer_mapping[_UNDEFINED].icon == NULL || layer_mapping[_UNDEFINED].text == NULL || modifier_fallback == NULL) {
+    if (layer_fallback_icon == NULL || layer_fallback_text == NULL || modifier_fallback == NULL) {
         return false;
     }
 
     can_draw = true;
 
-    uint16_t layer_icon_width  = layer_mapping[_UNDEFINED].icon->width;
-    uint16_t layer_icon_height = layer_mapping[_UNDEFINED].icon->height;
-    uint16_t layer_text_width  = layer_mapping[_UNDEFINED].text->width;
-    uint16_t layer_text_height = layer_mapping[_UNDEFINED].text->height;
+    uint16_t layer_icon_width  = layer_fallback_icon->width;
+    uint16_t layer_icon_height = layer_fallback_icon->height;
+    uint16_t layer_text_width  = layer_fallback_text->width;
+    uint16_t layer_text_height = layer_fallback_text->height;
     modifiers_width            = modifier_fallback->width;
     modifiers_height           = modifier_fallback->height;
 
@@ -156,14 +156,14 @@ bool module_post_init_user(void) {
 
         bool modifier_fallback_needed = false;
         for (int i = 0; i < sizeof(modifier_icons) / sizeof(modifier_icon[0]; ++i)) {
-            if (*modifier_icon[i] == NULL || (*modifier_icon[i])->width != modifiers_width ||
+            if (*modifier_icons[i] == NULL || (*modifier_icons[i])->width != modifiers_width ||
                 (*modifier_icon[i])->height != modifiers_height) {
-                *modifier_icon[i]        = modifier_fallback;
+                *modifier_icons[i]       = modifier_fallback;
                 modifier_fallback_needed = true;
             }
         }
         if (!modifier_fallback_needed) {
-            qp_close_imaget(modifier_fallback);
+            qp_close_image(modifier_fallback);
         }
     }
 
@@ -246,7 +246,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
         bool    in_or_out_of_no_hrm = false;
         if (!layer_initialized || current_layer != last_layer) {
             in_or_out_of_no_hrm         = (last_layer == _BASE_NO_HRM) || (current_layer == _BASE_NO_HRM);
-            gfx_layer_definition *layer = current_layer < _COUNT ? &layer_mapping[current_layer] : layer_fallback;
+            gfx_layer_definition *layer = current_layer < _COUNT ? &layer_mapping[current_layer] : &layer_fallback;
             qp_drawimage(lcd_surface, layer_icon_position.x, layer_icon_position.y, layer->icon);
             qp_drawimage(lcd_surface, layer_text_position.x, layer_text_position.y, layer->text);
             layer_initialized = true;
