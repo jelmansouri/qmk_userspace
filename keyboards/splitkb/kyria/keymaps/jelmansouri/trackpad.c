@@ -4,7 +4,7 @@
 #define SCROLL_DIVISOR_H 32.0
 #define SCROLL_DIVISOR_V 32.0
 
-extern bool set_scrolling = false;
+extern bool set_scrolling;
 
 // Variables to store accumulated scroll values
 float scroll_accumulated_h = 0;
