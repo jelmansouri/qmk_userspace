@@ -87,8 +87,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_NAV_3D] = LAYOUT_split_3x6_5_hlc(
-        KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RM_TOGG, RM_NEXT, RM_PREV, RM_SPDU, RM_SPDD, KC_TRNS,
-        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     RM_HUEU, RM_HUED, RM_SATU, RM_SATD, RM_VALU, RM_VADD,
+        KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RM_TOGG, RM_VALU, RM_VALD, KC_TRNS, KD_TRNS, KC_TRNS,
+        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
         KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V, KC_TRNS,  KC_SPC,   KC_NO,   KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
                                  KC_LALT, KC_LGUI,   KC_NO, KC_TRNS,    BASE,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
 
@@ -160,4 +160,9 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 layer_state_t layer_state_set_user(layer_state_t state) {
     set_scrolling = false;
     return state;
+}
+
+void keyboard_post_init_user(void) {
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+    rgb_matrix_sethsv_noeeprom(HSV_BLUE);
 }
