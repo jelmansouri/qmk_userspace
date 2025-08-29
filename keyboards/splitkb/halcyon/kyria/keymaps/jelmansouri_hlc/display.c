@@ -64,8 +64,10 @@ static bool art_valid = false;
 bool module_post_init_user(void) {
     // We start with the undefined icon in case there are too may image loaded so at least we
     // can draw that something is wrong
-    layer_mapping[_UNDEFINED].icon = qp_load_image_mem(gfx_undefined_layer_icon);
-    layer_mapping[_UNDEFINED].text = qp_load_image_mem(gfx_undefined_layer_text);
+    layer_mapping[_UNDEFINED] = (gfx_layer_definition){
+        .icon = qp_load_image_mem(gfx_undefined_layer_icon),
+        .text = qp_load_image_mem(gfx_undefined_layer_text),
+    };
 
     if (layer_mapping[_UNDEFINED].icon == NULL || layer_mapping[_UNDEFINED].text == NULL) {
         return false;
@@ -81,23 +83,39 @@ bool module_post_init_user(void) {
     uint16_t layer_icon_height = layer_mapping[_UNDEFINED].icon->height;
     uint16_t layer_text_width  = layer_mapping[_UNDEFINED].text->width;
     uint16_t layer_text_height = layer_mapping[_UNDEFINED].text->height;
-    layer_icon_position.x      = (LCD_WIDTH - layer_icon_width) / 2;
-    layer_icon_position.y      = ((LCD_HEIGHT / 2) - layer_icon_height) / 2;
-    layer_text_position.x      = (LCD_WIDTH - layer_text_width) / 2;
-    layer_text_position.y      = (LCD_HEIGHT - layer_text_height) / 2;
+    layer_icon_position        = (gfx_position){
+               .x = (uint16_t)((LCD_WIDTH - layer_icon_width) / 2),
+               .y = (uint16_t)(((LCD_HEIGHT / 2) - layer_icon_height) / 2),
+    };
+    layer_text_position = (gfx_position){
+        .x = (uint16_t)((LCD_WIDTH - layer_text_width) / 2),
+        .y = (uint16_t)((LCD_HEIGHT - layer_text_height) / 2),
+    };
 
-    painter_image_handle_t base_layer_icon = qp_load_image_mem(gfx_base_layer_icon_colored);
-    painter_image_handle_t base_layer_text = qp_load_image_mem(gfx_base_layer_text_colored);
-    layer_mapping[_BASE].icon              = base_layer_icon;
-    layer_mapping[_BASE].text              = base_layer_text;
-    layer_mapping[_BASE_NO_HRM].icon       = base_layer_icon;
-    layer_mapping[_BASE_NO_HRM].text       = base_layer_text;
-    layer_mapping[_LOWER].icon             = qp_load_image_mem(gfx_lower_layer_icon_colored);
-    layer_mapping[_LOWER].text             = qp_load_image_mem(gfx_lower_layer_text_colored);
-    layer_mapping[_RAISE].icon             = qp_load_image_mem(gfx_raise_layer_icon_colored);
-    layer_mapping[_RAISE].text             = qp_load_image_mem(gfx_raise_layer_text_colored);
-    layer_mapping[_NAV_3D].icon            = qp_load_image_mem(gfx_nav3d_layer_icon_colored);
-    layer_mapping[_NAV_3D].text            = qp_load_image_mem(gfx_nav3d_layer_text_colored);
+    layer_mapping[_BASE] = (gfx_layer_definition){
+        .icon = qp_load_image_mem(gfx_base_layer_icon_colored),
+        .text = qp_load_image_mem(gfx_base_layer_text_colored),
+    };
+
+    layer_mapping[_BASE_NO_HRM] = (gfx_layer_definition){
+        .icon = layer_mapping[_BASE].icon,
+        .text = layer_mapping[_BASE].text,
+    };
+
+    layer_mapping[_LOWER] = (gfx_layer_definition){
+        .icon = qp_load_image_mem(gfx_lower_layer_icon_colored),
+        .text = qp_load_image_mem(gfx_lower_layer_text_colored),
+    };
+
+    layer_mapping[_RAISE] = (gfx_layer_definition){
+        .icon = qp_load_image_mem(gfx_raise_layer_icon_colored),
+        .text = qp_load_image_mem(gfx_raise_layer_text_colored),
+    };
+
+    layer_mapping[_NAV_3D] = (gfx_layer_definition){
+        .icon = qp_load_image_mem(gfx_nav3d_layer_icon_colored),
+        .text = qp_load_image_mem(gfx_nav3d_layer_text_colored),
+    };
 
     bool layers_ok = true;
     {
@@ -110,32 +128,13 @@ bool module_post_init_user(void) {
         }
     }
 
-    bool modifiers_ok = true;
-    shift.pressed     = qp_load_image_mem(gfx_shift_pressed);
-    if (shift.pressed == NULL) {
+    bool                   modifiers_ok  = true;
+    painter_image_handle_t shift_pressed = qp_load_image_mem(gfx_shift_pressed);
+    if (shift_pressed == NULL) {
         return false;
     }
-    modifiers_width  = shift.pressed->width;
-    modifiers_height = shift.pressed->height;
-
-    shift.unpressed     = qp_load_image_mem(gfx_shift_unpressed);
-    modifiers_ok        = shift.unpressed != NULL && shift.unpressed->width == modifiers_width && shift.unpressed->height == modifiers_height;
-    control.pressed     = qp_load_image_mem(gfx_control_pressed);
-    modifiers_ok        = modifiers_ok && control.pressed != NULL && control.pressed->width == modifiers_width && control.pressed->height == modifiers_height;
-    control.unpressed   = qp_load_image_mem(gfx_control_unpressed);
-    modifiers_ok        = modifiers_ok && control.unpressed != NULL && control.unpressed->width == modifiers_width && control.unpressed->height == modifiers_height;
-    option.pressed      = qp_load_image_mem(gfx_option_pressed);
-    modifiers_ok        = modifiers_ok && option.pressed != NULL && option.pressed->width == modifiers_width && option.pressed->height == modifiers_height;
-    option.unpressed    = qp_load_image_mem(gfx_option_unpressed);
-    modifiers_ok        = modifiers_ok && option.unpressed != NULL && option.unpressed->width == modifiers_width && option.unpressed->height == modifiers_height;
-    command.pressed     = qp_load_image_mem(gfx_command_pressed);
-    modifiers_ok        = modifiers_ok && command.pressed != NULL && command.pressed->width == modifiers_width && command.pressed->height == modifiers_height;
-    command.unpressed   = qp_load_image_mem(gfx_command_unpressed);
-    modifiers_ok        = modifiers_ok && command.unpressed != NULL && command.unpressed->width == modifiers_width && command.unpressed->height == modifiers_height;
-    caps_word.pressed   = qp_load_image_mem(gfx_caps_word_shift_pressed);
-    modifiers_ok        = modifiers_ok && caps_word.pressed != NULL && caps_word.pressed->width == modifiers_width && caps_word.pressed->height == modifiers_height;
-    caps_word.unpressed = qp_load_image_mem(gfx_caps_word_enabled);
-    modifiers_ok        = modifiers_ok && caps_word.unpressed != NULL && caps_word.unpressed->width == modifiers_width && caps_word.unpressed->height == modifiers_height;
+    modifiers_width  = shift_pressed->width;
+    modifiers_height = shift_pressed->height;
 
     // The goal is to position the keys on screen like follows, having them centered on the y axis and having
     // the line between the first and second row fall at the 3/4 of thes screen:
@@ -145,20 +144,71 @@ bool module_post_init_user(void) {
     //               | Shft |
     //               +------+
     // The first row disappears if we disable home row mod, and Shift is rendered plain if we enable Caps Word
-    const uint16_t spacing      = 16;
-    const uint16_t first_row_y  = LCD_HEIGHT - ((LCD_HEIGHT / 2 + modifiers_height) / 2);
-    const uint16_t second_row_y = LCD_HEIGHT - ((LCD_HEIGHT / 2 - modifiers_height - spacing) / 2);
-    const uint16_t center_row_x = (LCD_WIDTH - modifiers_width) / 2;
-    control.position.x          = (LCD_WIDTH - modifiers_width * 3 - spacing) / 2;
-    control.position.y          = first_row_y;
-    option.position.x           = center_row_x;
-    option.position.y           = first_row_y;
-    command.position.x          = (LCD_WIDTH + modifiers_width + spacing) / 2;
-    command.position.y          = first_row_y;
-    shift.position.x            = center_row_x;
-    shift.position.y            = second_row_y;
-    caps_word.position.x        = center_row_x;
-    caps_word.position.y        = second_row_y;
+    const uint16_t spacing         = 16;
+    const uint16_t first_row_y     = LCD_HEIGHT - ((LCD_HEIGHT / 2 + modifiers_height) / 2);
+    const uint16_t second_row_y    = LCD_HEIGHT - ((LCD_HEIGHT / 2 - modifiers_height - spacing) / 2);
+    const uint16_t center_column_x = (LCD_WIDTH - modifiers_width) / 2;
+    const uint16_t left_column_x   = (uint16_t)((LCD_WIDTH - modifiers_width * 3 - spacing) / 2);
+    const uint16_t right_column_x  = (uint16_t)((LCD_WIDTH + modifiers_width + spacing) / 2);
+
+    control = (gfx_modifier_definition){
+        .pressed   = qp_load_image_mem(gfx_control_pressed),
+        .unpressed = qp_load_image_mem(gfx_control_unpressed),
+        .position =
+            (gfx_position){
+                .x = left_column_x,
+                .y = first_row_y,
+            },
+    };
+    modifiers_ok = modifiers_ok && control.pressed != NULL && control.pressed->width == modifiers_width && control.pressed->height == modifiers_height;
+    modifiers_ok = modifiers_ok && control.unpressed != NULL && control.unpressed->width == modifiers_width && control.unpressed->height == modifiers_height;
+
+    option = (gfx_modifier_definition){
+        .pressed   = qp_load_image_mem(gfx_option_pressed),
+        .unpressed = qp_load_image_mem(gfx_option_unpressed),
+        .position =
+            (gfx_position){
+                .x = center_column_x,
+                .y = first_row_y,
+            },
+    };
+    modifiers_ok = modifiers_ok && option.pressed != NULL && option.pressed->width == modifiers_width && option.pressed->height == modifiers_height;
+    modifiers_ok = modifiers_ok && option.unpressed != NULL && option.unpressed->width == modifiers_width && option.unpressed->height == modifiers_height;
+
+    command = (gfx_modifier_definition){
+        .pressed   = qp_load_image_mem(gfx_command_pressed),
+        .unpressed = qp_load_image_mem(gfx_command_unpressed),
+        .position =
+            (gfx_position){
+                .x = right_column_x,
+                .y = first_row_y,
+            },
+    };
+    modifiers_ok = modifiers_ok && command.pressed != NULL && command.pressed->width == modifiers_width && command.pressed->height == modifiers_height;
+    modifiers_ok = modifiers_ok && command.unpressed != NULL && command.unpressed->width == modifiers_width && command.unpressed->height == modifiers_height;
+
+    shift = (gfx_modifier_definition){
+        .pressed   = shift_pressed,
+        .unpressed = qp_load_image_mem(gfx_shift_unpressed),
+        .position =
+            (gfx_position){
+                .x = center_column_x,
+                .y = second_row_y,
+            },
+    };
+    modifiers_ok = shift.unpressed != NULL && shift.unpressed->width == modifiers_width && shift.unpressed->height == modifiers_height;
+
+    caps_word = (gfx_modifier_definition){
+        .pressed   = qp_load_image_mem(gfx_caps_word_shift_pressed),
+        .unpressed = qp_load_image_mem(gfx_caps_word_enabled),
+        .position =
+            (gfx_position){
+                .x = center_column_x,
+                .y = second_row_y,
+            },
+    };
+    modifiers_ok = modifiers_ok && caps_word.pressed != NULL && caps_word.pressed->width == modifiers_width && caps_word.pressed->height == modifiers_height;
+    modifiers_ok = modifiers_ok && caps_word.unpressed != NULL && caps_word.unpressed->width == modifiers_width && caps_word.unpressed->height == modifiers_height;
 
     art_valid = layers_ok && modifiers_ok;
     return false;
