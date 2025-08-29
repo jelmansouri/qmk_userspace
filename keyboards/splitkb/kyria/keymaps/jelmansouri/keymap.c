@@ -76,10 +76,10 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [_NAV_3D] = LAYOUT_split_3x6_5(
-        KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RGB_TOG, RGB_MOD, RGB_HUI, RGB_VAI, RGB_SPI, RGB_M_K,
-        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     RGB_TOG, RGB_RMOD, RGB_HUD, RGB_VAD, RGB_SPD, RGB_M_X,
-        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,   KC_TRNS,  KC_SPC,   KC_NO,   KC_NO, RGB_M_P, RGB_M_B, RGB_M_R, RGB_M_SW, RGB_M_SN, RGB_M_G,
-                                 KC_LALT, KC_LGUI,   KC_NO,   KC_TRNS,    BASE,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO
+        KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RM_TOGG, RM_VALU, RM_VADD, KC_TRNS, KD_TRNS, KC_TRNS,
+        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V, KC_TRNS,  KC_SPC,   KC_NO,   KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+                                 KC_LALT, KC_LGUI,   KC_NO, KC_TRNS,    BASE,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO
     )
 };
 // clang-format on
@@ -148,3 +148,48 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     set_scrolling = false;
     return state;
 }
+
+void keyboard_post_init_user(void) {
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
+    rgb_matrix_sethsv_noeeprom(HSV_OFF);
+}
+
+bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    for (uint8_t i = led_min; i < led_max; i++) {
+        switch (get_highest_layer(layer_state | default_layer_state)) {
+            case _BASE:
+            case _BASE_NO_HRM:
+                rgb_matrix_set_color(i, RGB_BLUE);
+                break;
+            case _LOWER:
+                rgb_matrix_set_color(i, RGB_TEAL);
+                break;
+            case _RAISE:
+                rgb_matrix_set_color(i, RGB_TURQUOISE);
+                break;
+            case _NAV_3D:
+                rgb_matrix_set_color(i, RGB_CORAL);
+                break;
+            default:
+                break;
+        }
+    }
+    return false;
+}
+
+// bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+//     if (get_highest_layer(layer_state) > 0) {
+//         uint8_t layer = get_highest_layer(layer_state);
+//
+//         for (uint8_t row = 0; row < MATRIX_ROWS; ++row) {
+//             for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
+//                 uint8_t index = g_led_config.matrix_co[row][col];
+//
+//                 if (index >= led_min && index < led_max && index != NO_LED && keymap_key_to_keycode(layer, (keypos_t){col, row}) > KC_TRNS) {
+//                     rgb_matrix_set_color(index, RGB_GREEN);
+//                 }
+//             }
+//         }
+//     }
+//     return false;
+// }
