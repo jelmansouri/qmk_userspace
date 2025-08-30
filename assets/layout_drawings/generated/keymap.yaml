@@ -161,9 +161,9 @@ layers:
     - ''
     - ''
     - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+    - ''
+    - ''
+    - ''
     - '{'
     - '}'
   - - {t: ▽, type: trans}
@@ -187,50 +187,14 @@ layers:
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
   Nav3D:
-  - - ''
-    - $$mdi:keyboard-tab$$
-    - Q
-    - W
-    - E
-    - R
-    - RM TOGG
-    - RM VALU
-    - RM VALD
-    - {t: ▽, type: trans}
-  - - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - ''
-    - $$mdi:apple-keyboard-shift$$
-    - A
-    - S
-    - D
-    - F
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-  - - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - ''
-    - $$mdi:apple-keyboard-control$$
-    - Z
-    - X
-    - C
-    - V
-  - - {t: ▽, type: trans}
-    - $$mdi:keyboard-space$$
-    - ''
-    - ''
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+  - ['', '$$mdi:keyboard-tab$$', Q, W, E, R, RM TOGG, RM VALU, RM VALD, '']
+  - ['', '', '', '$$mdi:apple-keyboard-shift$$', A, S, D, F, '', '']
+  - ['', '', '', '', '', '$$mdi:apple-keyboard-control$$', Z, X, C, V]
+  - ['$$mdi:keyboard-esc$$', '$$mdi:keyboard-space$$', '', '', '', '', '', '', '', '']
   - - $$mdi:apple-keyboard-option$$
     - $$mdi:apple-keyboard-command$$
     - ''
-    - {t: ▽, type: trans}
+    - ''
     - {t: Base, h: tobble}
     - ''
     - ''
