@@ -147,7 +147,7 @@ static const uint8_t thumb_keys[][2] = {
     {7, 5},
     {7, 1},
     {7, 2},
-    {3, 4}};
+    {7, 4}};
 //
 #define NUM_THUMB_KEYS (sizeof(thumb_keys) / sizeof(thumb_keys[0]))
 
