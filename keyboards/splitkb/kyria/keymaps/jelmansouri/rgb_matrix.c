@@ -311,14 +311,23 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             uint8_t          key_type     = layer_led_type(info);
             uint8_t          target_layer = layer_led_layer(info);
 
-            if (key_type == LAYER_LED_TO_LAYER && target_layer < LAYER_COUNT) {
-                color = palette[target_layer].primary;
-            } else if (key_type == LAYER_LED_MOD) {
-                color = (hsv_t){HSV_THUMB_SECONDARY};
-            } else {
-                color = (hsv_t){HSV_THUMB_PRIMARY};
+            switch (key_type) {
+                case LAYER_LED_NONE:
+                    break;
+                case LAYER_LED_TO_LAYER:
+                    if (target_layer < LAYER_COUNT) {
+                        color   = palette[target_layer].primary;
+                        color.v = brightness;
+                    }
+                    break;
+                case LAYER_LED_MOD:
+                    color   = (hsv_t){HSV_THUMB_SECONDARY};
+                    color.v = brightness;
+                    break;
+                default:
+                    color   = (hsv_t){HSV_THUMB_PRIMARY};
+                    color.v = brightness;
             }
-            color.v = brightness;
         }
         // ZONE: NORMAL
         else {
