@@ -8,8 +8,7 @@ typedef struct layer_palette_t {
 
 // clang-format off
 // --------- Global brightness knob (one place to dim/boost everything)
-#define VDEF 255
-#endif
+#define VDEF_MAX 255
 
 // --------- Choose a palette style
 #define PALETTE_STYLE_NEO    1  // vivid/modern
@@ -26,25 +25,25 @@ typedef struct layer_palette_t {
 #if PALETTE_STYLE == PALETTE_STYLE_NEO
 
 // Layer colors
-#define HSV_TEAL_NEO          110,240,VDEF
-#define HSV_TANGERINE_NEO      20,255,VDEF
-#define HSV_VIOLET_NEO        200,255,VDEF
+#define HSV_TEAL_NEO          110,240,VDEF_MAX
+#define HSV_TANGERINE_NEO      20,255,VDEF_MAX
+#define HSV_VIOLET_NEO        200,255,VDEF_MAX
 
-#define HSV_FUCHSIA_NEO       222,255,VDEF
-#define HSV_CHARTREUSE_NEO     64,255,VDEF
-#define HSV_AQUA_NEO          140,230,VDEF
+#define HSV_FUCHSIA_NEO       222,255,VDEF_MAX
+#define HSV_CHARTREUSE_NEO     64,255,VDEF_MAX
+#define HSV_AQUA_NEO          140,230,VDEF_MAX
 
-#define HSV_ELECTRIC_BLUE_NEO 170,255,VDEF
-#define HSV_ULTRAVIOLET_NEO   196,255,VDEF
-#define HSV_AMBER_NEO          32,255,VDEF
+#define HSV_ELECTRIC_BLUE_NEO 170,255,VDEF_MAX
+#define HSV_ULTRAVIOLET_NEO   196,255,VDEF_MAX
+#define HSV_AMBER_NEO          32,255,VDEF_MAX
 
-#define HSV_NEON_GREEN_NEO     90,255,VDEF
-#define HSV_HOT_PINK_NEO      234,230,VDEF
-#define HSV_CRIMSON_NEO       248,255,VDEF
+#define HSV_NEON_GREEN_NEO     90,255,VDEF_MAX
+#define HSV_HOT_PINK_NEO      234,230,VDEF_MAX
+#define HSV_CRIMSON_NEO       248,255,VDEF_MAX
 
 // High-contrast thumbs (well away from all primaries)
-#define HSV_THUMB_PRIMARY     4,255,VDEF   // TOMATO
-#define HSV_THUMB_SECONDARY  32,255,VDEF   // GOLD
+#define HSV_THUMB_PRIMARY     4,255,VDEF_MAX   // TOMATO
+#define HSV_THUMB_SECONDARY  32,255,VDEF_MAX   // GOLD
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}, {HSV_VIOLET_NEO}},
@@ -61,25 +60,25 @@ static const layer_palette_t palette[LAYER_COUNT] = {
 // =======================================================
 #if PALETTE_STYLE == PALETTE_STYLE_NOIR
 
-#define HSV_TEAL_NOIR          110,200,VDEF
-#define HSV_COPPER_NOIR         18,210,VDEF
-#define HSV_ROYAL_PURPLE_NOIR  195,230,VDEF
+#define HSV_TEAL_NOIR          110,200,VDEF_MAX
+#define HSV_COPPER_NOIR         18,210,VDEF_MAX
+#define HSV_ROYAL_PURPLE_NOIR  195,230,VDEF_MAX
 
-#define HSV_PLUM_NOIR          206,220,VDEF
-#define HSV_OLIVE_GOLD_NOIR     52,170,VDEF
-#define HSV_SMOKE_AQUA_NOIR    140,170,VDEF
+#define HSV_PLUM_NOIR          206,220,VDEF_MAX
+#define HSV_OLIVE_GOLD_NOIR     52,170,VDEF_MAX
+#define HSV_SMOKE_AQUA_NOIR    140,170,VDEF_MAX
 
-#define HSV_COBALT_NOIR        170,230,VDEF
-#define HSV_STEEL_BLUE_NOIR    160,160,VDEF
-#define HSV_AMBER_NOIR          30,230,VDEF
+#define HSV_COBALT_NOIR        170,230,VDEF_MAX
+#define HSV_STEEL_BLUE_NOIR    160,160,VDEF_MAX
+#define HSV_AMBER_NOIR          30,230,VDEF_MAX
 
-#define HSV_FOREST_NOIR         92,220,VDEF
-#define HSV_RASPBERRY_NOIR     236,210,VDEF
-#define HSV_RUBY_NOIR            0,230,VDEF
+#define HSV_FOREST_NOIR         92,220,VDEF_MAX
+#define HSV_RASPBERRY_NOIR     236,210,VDEF_MAX
+#define HSV_RUBY_NOIR            0,230,VDEF_MAX
 
 // High-contrast thumbs
-#define HSV_THUMB_PRIMARY     248,220,VDEF   // BURGUNDY
-#define HSV_THUMB_SECONDARY    28,200,VDEF   // BRONZE
+#define HSV_THUMB_PRIMARY     248,220,VDEF_MAX   // BURGUNDY
+#define HSV_THUMB_SECONDARY    28,200,VDEF_MAX   // BRONZE
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_TEAL_NOIR},   {HSV_COPPER_NOIR},      {HSV_ROYAL_PURPLE_NOIR}},
@@ -96,25 +95,25 @@ static const layer_palette_t palette[LAYER_COUNT] = {
 // =======================================================
 #if PALETTE_STYLE == PALETTE_STYLE_PASTEL
 
-#define HSV_MINT_PASTEL         115,  90,VDEF
-#define HSV_PEACH_PASTEL         22, 120,VDEF
-#define HSV_LILAC_PASTEL        200, 110,VDEF
+#define HSV_MINT_PASTEL         115,  90,VDEF_MAX
+#define HSV_PEACH_PASTEL         22, 120,VDEF_MAX
+#define HSV_LILAC_PASTEL        200, 110,VDEF_MAX
 
-#define HSV_BABY_PINK_PASTEL    238,  80,VDEF
-#define HSV_PASTEL_LIME          58, 110,VDEF
-#define HSV_SKY_PASTEL          160, 110,VDEF
+#define HSV_BABY_PINK_PASTEL    238,  80,VDEF_MAX
+#define HSV_PASTEL_LIME          58, 110,VDEF_MAX
+#define HSV_SKY_PASTEL          160, 110,VDEF_MAX
 
-#define HSV_APRICOT_PASTEL       28, 120,VDEF
-#define HSV_POWDER_BLUE_PASTEL  170, 100,VDEF
-#define HSV_PERIWINKLE_PASTEL   185, 120,VDEF
+#define HSV_APRICOT_PASTEL       28, 120,VDEF_MAX
+#define HSV_POWDER_BLUE_PASTEL  170, 100,VDEF_MAX
+#define HSV_PERIWINKLE_PASTEL   185, 120,VDEF_MAX
 
-#define HSV_SAGE_PASTEL          90,  80,VDEF
-#define HSV_DUSTY_ROSE_PASTEL   244,  90,VDEF
-#define HSV_SOFT_RED_PASTEL       5, 110,VDEF
+#define HSV_SAGE_PASTEL          90,  80,VDEF_MAX
+#define HSV_DUSTY_ROSE_PASTEL   244,  90,VDEF_MAX
+#define HSV_SOFT_RED_PASTEL       5, 110,VDEF_MAX
 
 // High-contrast thumbs (far from all primaries: 115,238,28,90)
-#define HSV_THUMB_PRIMARY      196,  95,VDEF   // INDIGO
-#define HSV_THUMB_SECONDARY    170,  95,VDEF   // CERULEAN
+#define HSV_THUMB_PRIMARY      196,  95,VDEF_MAX   // INDIGO
+#define HSV_THUMB_SECONDARY    170,  95,VDEF_MAX   // CERULEAN
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_MINT_PASTEL},   {HSV_PEACH_PASTEL},      {HSV_LILAC_PASTEL}},
@@ -126,9 +125,6 @@ static const layer_palette_t palette[LAYER_COUNT] = {
 
 #endif // PASTEL
 // clang-format on
-
-#define THUMB_COLOR_PRIMARY HSV_RED
-#define THUMB_COLOR_SECONDARY HSV_YELLOW
 
 // Thumb key positions (row, col) - based on LAYOUT_split_3x6_5
 static const uint8_t thumb_keys[][2] = {
