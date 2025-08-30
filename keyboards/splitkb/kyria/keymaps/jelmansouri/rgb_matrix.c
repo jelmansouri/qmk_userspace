@@ -314,9 +314,9 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             if (key_type == LAYER_LED_TO_LAYER && target_layer < LAYER_COUNT) {
                 color = palette[target_layer].primary;
             } else if (key_type == LAYER_LED_MOD) {
-                color = (hsv_t){THUMB_COLOR_SECONDARY};
+                color = (hsv_t){HSV_THUMB_SECONDARY};
             } else {
-                color = (hsv_t){THUMB_COLOR_PRIMARY};
+                color = (hsv_t){HSV_THUMB_PRIMARY};
             }
             color.v = brightness;
         }
