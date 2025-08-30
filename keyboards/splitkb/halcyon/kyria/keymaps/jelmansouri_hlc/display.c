@@ -49,9 +49,9 @@ extern painter_device_t lcd;
 extern painter_device_t lcd_surface;
 
 static gfx_layer_definition layer_fallback;
-static gfx_layer_definition layer_mapping[_COUNT] = {0};
-static gfx_position         layer_icon_position   = {0};
-static gfx_position         layer_text_position   = {0};
+static gfx_layer_definition layer_mapping[LAYER_COUNT] = {0};
+static gfx_position         layer_icon_position        = {0};
+static gfx_position         layer_text_position        = {0};
 
 static gfx_modifier_definition shift;
 static gfx_modifier_definition control;
@@ -102,32 +102,32 @@ bool module_post_init_user(void) {
         .text = layer_fallback_text,
     };
 
-    layer_mapping[_BASE] = (gfx_layer_definition){
+    layer_mapping[LAYER_BASE] = (gfx_layer_definition){
         .icon = qp_load_image_mem(gfx_base_layer_icon_colored),
         .text = qp_load_image_mem(gfx_base_layer_text_colored),
     };
 
-    layer_mapping[_BASE_NO_HRM] = (gfx_layer_definition){
-        .icon = layer_mapping[_BASE].icon,
-        .text = layer_mapping[_BASE].text,
+    layer_mapping[LAYER_BASE_NO_HRM] = (gfx_layer_definition){
+        .icon = layer_mapping[LAYER_BASE].icon,
+        .text = layer_mapping[LAYER_BASE].text,
     };
 
-    layer_mapping[_LOWER] = (gfx_layer_definition){
+    layer_mapping[LAYER_LOWER] = (gfx_layer_definition){
         .icon = qp_load_image_mem(gfx_lower_layer_icon_colored),
         .text = qp_load_image_mem(gfx_lower_layer_text_colored),
     };
 
-    layer_mapping[_RAISE] = (gfx_layer_definition){
+    layer_mapping[LAYER_RAISE] = (gfx_layer_definition){
         .icon = qp_load_image_mem(gfx_raise_layer_icon_colored),
         .text = qp_load_image_mem(gfx_raise_layer_text_colored),
     };
 
-    layer_mapping[_NAV_3D] = (gfx_layer_definition){
+    layer_mapping[LAYER_NAV_3D] = (gfx_layer_definition){
         .icon = qp_load_image_mem(gfx_nav3d_layer_icon_colored),
         .text = qp_load_image_mem(gfx_nav3d_layer_text_colored),
     };
 
-    for (int i = 0; i < _COUNT; ++i) {
+    for (int i = 0; i < LAYER_COUNT; ++i) {
         if (layer_mapping[i].icon == NULL || layer_mapping[i].icon->width != layer_icon_width ||
             layer_mapping[i].icon->height != layer_icon_height) {
             layer_mapping[i].icon = layer_fallback_icon;
@@ -245,8 +245,8 @@ bool display_module_housekeeping_task_user(bool second_display) {
         uint8_t current_layer       = get_highest_layer(layer_state | default_layer_state);
         bool    in_or_out_of_no_hrm = false;
         if (!layer_initialized || current_layer != last_layer) {
-            in_or_out_of_no_hrm         = (last_layer == _BASE_NO_HRM) || (current_layer == _BASE_NO_HRM);
-            gfx_layer_definition *layer = current_layer < _COUNT ? &layer_mapping[current_layer] : &layer_fallback;
+            in_or_out_of_no_hrm         = (last_layer == LAYER_BASE_NO_HRM) || (current_layer == LAYER_BASE_NO_HRM);
+            gfx_layer_definition *layer = current_layer < LAYER_COUNT ? &layer_mapping[current_layer] : &layer_fallback;
             qp_drawimage(lcd_surface, layer_icon_position.x, layer_icon_position.y, layer->icon);
             qp_drawimage(lcd_surface, layer_text_position.x, layer_text_position.y, layer->text);
             layer_initialized = true;
@@ -258,7 +258,7 @@ bool display_module_housekeeping_task_user(bool second_display) {
         bool    caps_word_changed    = current_caps_word_on != last_caps_word_on;
         if (!modifiers_initialized || in_or_out_of_no_hrm || current_modifiers != last_modifiers || caps_word_changed) {
             uint8_t changed_modifiers = last_modifiers ^ current_modifiers;
-            if (in_or_out_of_no_hrm && current_layer == _BASE_NO_HRM) {
+            if (in_or_out_of_no_hrm && current_layer == LAYER_BASE_NO_HRM) {
                 qp_rect(lcd_surface, control.position.x, control.position.y, modifiers_width - 1, modifiers_height - 1,
                         HSV_BLACK, true);
                 qp_rect(lcd_surface, option.position.x, option.position.y, modifiers_width - 1, modifiers_height - 1,

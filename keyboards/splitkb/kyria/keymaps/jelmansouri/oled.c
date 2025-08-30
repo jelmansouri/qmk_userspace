@@ -224,20 +224,20 @@ bool oled_task_user(void) {
         const char* PROGMEM banner          = undefined_layer_banner;
         bool                is_hrm_disabled = false;
         switch (get_highest_layer(layer_state | default_layer_state)) {
-            case _BASE:
+            case LAYER_BASE:
                 banner = base_layer_banner;
                 break;
-            case _BASE_NO_HRM:
+            case LAYER_BASE_NO_HRM:
                 banner          = base_layer_banner;
                 is_hrm_disabled = true;
                 break;
-            case _LOWER:
+            case LAYER_LOWER:
                 banner = lower_layer_banner;
                 break;
-            case _RAISE:
+            case LAYER_RAISE:
                 banner = raise_layer_banner;
                 break;
-            case _NAV_3D:
+            case LAYER_NAV_3D:
                 banner = nav_3d_layer_banner;
                 break;
         }

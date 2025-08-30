@@ -1,24 +1,24 @@
 #pragma once
 
-enum layers {
-    _BASE = 0,
-    _BASE_NO_HRM,
-    _LOWER,
-    _RAISE,
-    _NAV_3D,
+typedef enum {
+    LAYER_BASE = 0,
+    LAYER_BASE_NO_HRM,
+    LAYER_LOWER,
+    LAYER_RAISE,
+    LAYER_NAV_3D,
 
-    _COUNT
-};
+    LAYER_COUNT
+} layer_id_t;
 
-enum custom_keycodes {
+typedef enum {
     DRAG_SCROLL = SAFE_RANGE,
-};
+} custom_keycodes_t;
 
-#define BASE TO(_BASE)
-#define BWOHRM MO(_BASE_NO_HRM)
-#define LOWER MO(_LOWER)
-#define RAISE MO(_RAISE)
-#define NAV_3D TO(_NAV_3D)
+#define BASE TO(LAYER_BASE)
+#define BWOHRM MO(LAYER_BASE_NO_HRM)
+#define LOWER MO(LAYER_LOWER)
+#define RAISE MO(LAYER_RAISE)
+#define NAV_3D TO(LAYER_NAV_3D)
 
 #define KC_GLO LCTL(LGUI(KC_SPC))
 

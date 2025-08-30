@@ -10,17 +10,17 @@ void keyboard_post_init_user(void) {
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     for (uint8_t i = led_min; i < led_max; i++) {
         switch (get_highest_layer(layer_state | default_layer_state)) {
-            case _BASE:
-            case _BASE_NO_HRM:
+            case LAYER_BASE:
+            case LAYER_BASE_NO_HRM:
                 rgb_matrix_set_color(i, RGB_BLUE);
                 break;
-            case _LOWER:
+            case LAYER_LOWER:
                 rgb_matrix_set_color(i, RGB_TEAL);
                 break;
-            case _RAISE:
+            case LAYER_RAISE:
                 rgb_matrix_set_color(i, RGB_TURQUOISE);
                 break;
-            case _NAV_3D:
+            case LAYER_NAV_3D:
                 rgb_matrix_set_color(i, RGB_CORAL);
                 break;
             default:
@@ -38,7 +38,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 //             for (uint8_t col = 0; col < MATRIX_COLS; ++col) {
 //                 uint8_t index = g_led_config.matrix_co[row][col];
 //
-//                 if (index >= led_min && index < led_max && index != NO_LED && keymap_key_to_keycode(layer, (keypos_t){col, row}) > KC_TRNS) {
+//                 if (index >= led_min && index < led_max && index != NO_LED && keymap_key_to_keycode(layer,
+//                 (keypos_t){col, row}) > KC_TRNS) {
 //                     rgb_matrix_set_color(index, RGB_GREEN);
 //                 }
 //             }

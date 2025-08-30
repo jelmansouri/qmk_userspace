@@ -146,8 +146,8 @@ layers:
     - PGDN
     - PGUP
     - END
-  - - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+  - - ''
+    - ''
     - {t: ▽, type: trans}
     - ^
     - {t: '&', h: '$$mdi:apple-keyboard-control$$'}
@@ -158,8 +158,8 @@ layers:
     - $$mdi:arrow-down-thick$$
   - - $$mdi:arrow-up-thick$$
     - $$mdi:arrow-right-thick$$
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+    - ''
+    - ''
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
@@ -172,10 +172,10 @@ layers:
     - {t: ▽, type: trans}
     - '['
     - ']'
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
-    - {t: ▽, type: trans}
+    - ''
+    - ''
+    - ''
+    - ''
   - - {t: ▽, type: trans}
     - {t: ▽, type: trans}
     - {t: ▽, type: trans}
