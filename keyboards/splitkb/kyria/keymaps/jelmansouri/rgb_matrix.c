@@ -40,8 +40,8 @@ static const layer_palette_t palette[LAYER_COUNT] = {
 };
 // clang-format on
 
-#define THUMB_COLOR_PRIMARY HSV_SEAFOAM_NOIR
-#define THUMB_COLOR_SECONDARY HSV_BRASS_NOIR
+#define THUMB_COLOR_PRIMARY HSV_RED
+#define THUMB_COLOR_SECONDARY HSV_YELLOW
 
 // Thumb key positions (row, col) - based on LAYOUT_split_3x6_5
 static const uint8_t thumb_keys[][2] = {
@@ -215,7 +215,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     bool          modifier_held = (get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0;
 
     for (uint8_t i = led_min; i < led_max; i++) {
-        hsv_t color = (hsv_t){HSV_TEAL_NOIR}; // off by default
+        hsv_t color = (hsv_t){HSV_RED}; // off by default
 
         // ZONE: UNDERGLOW
         if (led_info[i].zone == LED_ZONE_UNDER) {
