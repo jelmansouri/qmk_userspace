@@ -35,19 +35,19 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [LAYER_RAISE] = LAYOUT_split_3x6_5_hlc(
-      KC_TRNS, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                                     KC_HOME, KC_PGDN, KC_PGUP,  KC_END, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_CIRC,  AM_CTL,  AS_ALT,  LP_GUI, KC_RPRN,                                     KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, KC_TRNS, KC_TRNS,
-      KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LCBR, KC_RCBR, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LBRC, KC_RBRC, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
+      KC_TRNS, KC_EXLM,   KC_AT, KC_HASH,  KC_DLR, KC_PERC,                                     KC_HOME, KC_PGDN, KC_PGUP,  KC_END,   KC_NO,   KC_NO,
+      KC_TRNS, KC_CIRC,  AM_CTL,  AS_ALT,  LP_GUI, KC_RPRN,                                     KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT,   KC_NO,   KC_NO,
+      KC_TRNS,   KC_NO,   KC_NO,   KC_NO, KC_LCBR, KC_RCBR, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_LBRC, KC_RBRC,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_HELD, KC_TRNS, KC_TRNS,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
 
     [LAYER_NAV_3D] = LAYOUT_split_3x6_5_hlc(
-        KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RM_TOGG, RM_VALU, RM_VALD, KC_TRNS, KC_TRNS, KC_TRNS,
-        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                     KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V, KC_TRNS,  KC_SPC,   KC_NO,   KC_NO, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,
-                                 KC_LALT, KC_LGUI,   KC_NO, KC_TRNS,    BASE,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+        KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                                     RM_TOGG, RM_VALU, RM_VALD,   KC_NO,   KC_NO,   KC_NO,
+        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                                       KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+        KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,  KC_ESC,  KC_SPC,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+                                 KC_LALT, KC_LGUI,   KC_NO,   KC_NO,    BASE,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
 
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     )

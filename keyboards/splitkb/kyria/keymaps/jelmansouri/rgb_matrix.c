@@ -206,12 +206,12 @@ void keyboard_post_init_user(void) {
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    layer_state_t layer_state_combined = layer_state | default_layer_state;
-    uint8_t       current_layer        = get_highest_layer(layer_state_combined);
-    uint8_t       brightness           = MIN(rgb_matrix_get_val(), VDEF_MAX);
-    bool          modifier_held = (get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0;
-    modifier_held =
-        modifier_held || ((current_layer == LAYER_BASE || current_layer == LAYER_BASE_NO_HRM) && is_caps_word_on());
+    const layer_state_t layer_state_combined = layer_state | default_layer_state;
+    const uint8_t       current_layer        = get_highest_layer(layer_state_combined);
+    const uint8_t       brightness           = MIN(rgb_matrix_get_val(), VDEF_MAX);
+    const bool          modifier_held =
+        ((get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0) ||
+        ((current_layer == LAYER_BASE || current_layer == LAYER_BASE_NO_HRM) && is_caps_word_on());
 
     for (uint8_t i = led_min; i < led_max; i++) {
         hsv_t color = (hsv_t){HSV_BLACK}; // off by default
