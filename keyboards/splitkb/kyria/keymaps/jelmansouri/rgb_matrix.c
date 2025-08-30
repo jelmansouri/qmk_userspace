@@ -208,126 +208,100 @@ void keyboard_post_init_user(void) {
     }
 }
 
-// bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-//     layer_state_t layer_state_combined = layer_state | default_layer_state;
-//     uint8_t       current_layer        = get_highest_layer(layer_state_combined);
-//     uint8_t       brightness           = rgb_matrix_get_val();
-//     bool          modifier_held = (get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) !=
-//     0;
-//
-//     for (uint8_t i = led_min; i < led_max; i++) {
-//         hsv_t color = (hsv_t){0, 0, 0}; // off by default
-//
-//         // ZONE: UNDERGLOW
-//         if (led_info[i].zone == LED_ZONE_UNDER) {
-//             color   = palette[current_layer].primary; // use .accent here if you prefer
-//             color.v = brightness;
-//         }
-//         // ZONE: THUMB
-//         else if (led_info[i].zone == LED_ZONE_THUMB) {
-//             layer_led_info_t info         = led_info[i].layer_info[current_layer];
-//             uint8_t          key_type     = layer_led_type(info);
-//             uint8_t          target_layer = layer_led_layer(info);
-//
-//             if (key_type == LAYER_LED_TO_LAYER && target_layer < LAYER_COUNT) {
-//                 color = palette[target_layer].primary;
-//             } else if (key_type == LAYER_LED_MOD) {
-//                 color = (hsv_t){THUMB_COLOR_SECONDARY};
-//             } else {
-//                 color = (hsv_t){THUMB_COLOR_PRIMARY};
-//             }
-//             color.v = brightness;
-//         }
-//         // ZONE: NORMAL
-//         else {
-//             layer_led_info_t info         = led_info[i].layer_info[current_layer];
-//             uint8_t          key_type     = layer_led_type(info);
-//             uint8_t          target_layer = layer_led_layer(info);
-//
-//             switch (key_type) {
-//                 case LAYER_LED_NONE:
-//                     // keep off
-//                     break;
-//
-//                 case LAYER_LED_TRANS: {
-//                     // Walk lower *active* layers, highest to lowest
-//                     if (current_layer > 0) {
-//                         for (int8_t fallback_layer = (int8_t)current_layer - 1; fallback_layer >= 0;
-//                         --fallback_layer) {
-//                             if (!(layer_state_combined & (1UL << fallback_layer))) continue; // skip inactive layer
-//                             layer_led_info_t fallback_info   = led_info[i].layer_info[fallback_layer];
-//                             uint8_t          fallback_type   = layer_led_type(fallback_info);
-//                             uint8_t          fallback_target = layer_led_layer(fallback_info);
-//                             if (fallback_type == LAYER_LED_NONE) break;
-//                             if (fallback_type == LAYER_LED_TRANS) continue;
-//
-//                             switch (fallback_type) {
-//                                 case LAYER_LED_TAP:
-//                                     color = modifier_held ? palette[fallback_layer].accent
-//                                                           : palette[fallback_layer].primary;
-//                                     break;
-//                                 case LAYER_LED_MOD:
-//                                 case LAYER_LED_MODTAP:
-//                                     color =
-//                                         modifier_held ? palette[fallback_layer].accent :
-//                                         palette[fallback_layer].modtap;
-//                                     break;
-//                                 case LAYER_LED_TO_LAYER:
-//                                     color = (fallback_target < LAYER_COUNT) ? palette[fallback_target].primary
-//                                                                             : palette[fallback_layer].primary;
-//                                     break;
-//                             }
-//                             color.v = brightness;
-//                             break; // stop at first concrete mapping
-//                         }
-//                     }
-//                 } break;
-//
-//                 case LAYER_LED_TAP:
-//                     color   = modifier_held ? palette[current_layer].accent : palette[current_layer].primary;
-//                     color.v = brightness;
-//                     break;
-//
-//                 case LAYER_LED_MOD:
-//                 case LAYER_LED_MODTAP:
-//                     color   = modifier_held ? palette[current_layer].accent : palette[current_layer].modtap;
-//                     color.v = brightness;
-//                     break;
-//
-//                 case LAYER_LED_TO_LAYER:
-//                     color =
-//                         (target_layer < LAYER_COUNT) ? palette[target_layer].primary :
-//                         palette[current_layer].primary;
-//                     color.v = brightness;
-//                     break;
-//             }
-//         }
-//
-//         // Single HSV->RGB conversion at the end per LED (no helper function)
-//         RGB rgb = hsv_to_rgb(color);
-//         rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
-//     }
-//     return false;
-// }
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
+    layer_state_t layer_state_combined = layer_state | default_layer_state;
+    uint8_t       current_layer        = get_highest_layer(layer_state_combined);
+    uint8_t       brightness           = rgb_matrix_get_val();
+    bool          modifier_held = (get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0;
+
     for (uint8_t i = led_min; i < led_max; i++) {
-        switch (get_highest_layer(layer_state | default_layer_state)) {
-            case LAYER_BASE:
-            case LAYER_BASE_NO_HRM:
-                rgb_matrix_set_color(i, RGB_BLUE);
-                break;
-            case LAYER_LOWER:
-                rgb_matrix_set_color(i, RGB_TEAL);
-                break;
-            case LAYER_RAISE:
-                rgb_matrix_set_color(i, RGB_TURQUOISE);
-                break;
-            case LAYER_NAV_3D:
-                rgb_matrix_set_color(i, RGB_CORAL);
-                break;
-            default:
-                break;
+        hsv_t color = (hsv_t){HSV_TEAL_NOIR}; // off by default
+
+        // ZONE: UNDERGLOW
+        if (led_info[i].zone == LED_ZONE_UNDER) {
+            color   = palette[current_layer].primary; // use .accent here if you prefer
+            color.v = brightness;
         }
+        // ZONE: THUMB
+        else if (led_info[i].zone == LED_ZONE_THUMB) {
+            layer_led_info_t info         = led_info[i].layer_info[current_layer];
+            uint8_t          key_type     = layer_led_type(info);
+            uint8_t          target_layer = layer_led_layer(info);
+
+            if (key_type == LAYER_LED_TO_LAYER && target_layer < LAYER_COUNT) {
+                color = palette[target_layer].primary;
+            } else if (key_type == LAYER_LED_MOD) {
+                color = (hsv_t){THUMB_COLOR_SECONDARY};
+            } else {
+                color = (hsv_t){THUMB_COLOR_PRIMARY};
+            }
+            color.v = brightness;
+        }
+        // ZONE: NORMAL
+        else {
+            layer_led_info_t info         = led_info[i].layer_info[current_layer];
+            uint8_t          key_type     = layer_led_type(info);
+            uint8_t          target_layer = layer_led_layer(info);
+
+            switch (key_type) {
+                case LAYER_LED_NONE:
+                    // keep off
+                    break;
+
+                case LAYER_LED_TRANS: {
+                    // Walk lower *active* layers, highest to lowest
+                    if (current_layer > 0) {
+                        for (int8_t fallback_layer = (int8_t)current_layer - 1; fallback_layer >= 0; --fallback_layer) {
+                            if (!(layer_state_combined & (1UL << fallback_layer))) continue; // skip inactive layer
+                            layer_led_info_t fallback_info   = led_info[i].layer_info[fallback_layer];
+                            uint8_t          fallback_type   = layer_led_type(fallback_info);
+                            uint8_t          fallback_target = layer_led_layer(fallback_info);
+                            if (fallback_type == LAYER_LED_NONE) break;
+                            if (fallback_type == LAYER_LED_TRANS) continue;
+
+                            switch (fallback_type) {
+                                case LAYER_LED_TAP:
+                                    color = modifier_held ? palette[fallback_layer].accent
+                                                          : palette[fallback_layer].primary;
+                                    break;
+                                case LAYER_LED_MOD:
+                                case LAYER_LED_MODTAP:
+                                    color =
+                                        modifier_held ? palette[fallback_layer].accent : palette[fallback_layer].modtap;
+                                    break;
+                                case LAYER_LED_TO_LAYER:
+                                    color = (fallback_target < LAYER_COUNT) ? palette[fallback_target].primary
+                                                                            : palette[fallback_layer].primary;
+                                    break;
+                            }
+                            color.v = brightness;
+                            break; // stop at first concrete mapping
+                        }
+                    }
+                } break;
+
+                case LAYER_LED_TAP:
+                    color   = modifier_held ? palette[current_layer].accent : palette[current_layer].primary;
+                    color.v = brightness;
+                    break;
+
+                case LAYER_LED_MOD:
+                case LAYER_LED_MODTAP:
+                    color   = modifier_held ? palette[current_layer].accent : palette[current_layer].modtap;
+                    color.v = brightness;
+                    break;
+
+                case LAYER_LED_TO_LAYER:
+                    color =
+                        (target_layer < LAYER_COUNT) ? palette[target_layer].primary : palette[current_layer].primary;
+                    color.v = brightness;
+                    break;
+            }
+        }
+
+        // Single HSV->RGB conversion at the end per LED (no helper function)
+        RGB rgb = hsv_to_rgb(color);
+        rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
     }
     return false;
 }
