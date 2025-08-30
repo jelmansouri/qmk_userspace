@@ -199,7 +199,7 @@ static led_info_t led_info[RGB_MATRIX_LED_COUNT];
 
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_sethsv_noeeprom(HSV_OFF);
+    rgb_matrix_sethsv_noeeprom(0, 0, rgb_matrix_get_val());
 
     // Initialize lookup tables
     for (uint8_t led_index = 0; led_index < RGB_MATRIX_LED_COUNT; led_index++) {
@@ -298,7 +298,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     bool          modifier_held = (get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0;
 
     for (uint8_t i = led_min; i < led_max; i++) {
-        hsv_t color = (hsv_t){HSV_RED}; // off by default
+        hsv_t color = (hsv_t){HSV_BLACK}; // off by default
 
         // ZONE: UNDERGLOW
         if (led_info[i].zone == LED_ZONE_UNDER) {
