@@ -7,10 +7,60 @@ typedef struct layer_palette_t {
 } layer_palette_t;
 
 // clang-format off
-// ----- Global brightness knob (one place to dim/boost the whole palette)
+// --------- Global brightness knob (one place to dim/boost everything)
 #define VDEF 255
+#endif
 
-// ----- NOIR palette macros (HSV 0..255 with refined S)
+// --------- Choose a palette style
+#define PALETTE_STYLE_NEO    1  // vivid/modern
+#define PALETTE_STYLE_NOIR   2  // refined/jewel-toned
+#define PALETTE_STYLE_PASTEL 3  // soft/pastel
+
+#ifndef PALETTE_STYLE
+#define PALETTE_STYLE PALETTE_STYLE_NEO
+#endif
+
+// =======================================================
+// NEO (vivid) — unique primaries; thumbs are warm & far
+// =======================================================
+#if PALETTE_STYLE == PALETTE_STYLE_NEO
+
+// Layer colors
+#define HSV_TEAL_NEO          110,240,VDEF
+#define HSV_TANGERINE_NEO      20,255,VDEF
+#define HSV_VIOLET_NEO        200,255,VDEF
+
+#define HSV_FUCHSIA_NEO       222,255,VDEF
+#define HSV_CHARTREUSE_NEO     64,255,VDEF
+#define HSV_AQUA_NEO          140,230,VDEF
+
+#define HSV_ELECTRIC_BLUE_NEO 170,255,VDEF
+#define HSV_ULTRAVIOLET_NEO   196,255,VDEF
+#define HSV_AMBER_NEO          32,255,VDEF
+
+#define HSV_NEON_GREEN_NEO     90,255,VDEF
+#define HSV_HOT_PINK_NEO      234,230,VDEF
+#define HSV_CRIMSON_NEO       248,255,VDEF
+
+// High-contrast thumbs (well away from all primaries)
+#define HSV_THUMB_PRIMARY     4,255,VDEF   // TOMATO
+#define HSV_THUMB_SECONDARY  32,255,VDEF   // GOLD
+
+static const layer_palette_t palette[LAYER_COUNT] = {
+    [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}, {HSV_VIOLET_NEO}},
+    [LAYER_BASE_NO_HRM] = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}, {HSV_VIOLET_NEO}},
+    [LAYER_LOWER]       = {{HSV_FUCHSIA_NEO},       {HSV_CHARTREUSE_NEO},{HSV_AQUA_NEO}},
+    [LAYER_RAISE]       = {{HSV_ELECTRIC_BLUE_NEO}, {HSV_ULTRAVIOLET_NEO},{HSV_AMBER_NEO}},
+    [LAYER_NAV_3D]      = {{HSV_NEON_GREEN_NEO},    {HSV_HOT_PINK_NEO},  {HSV_CRIMSON_NEO}},
+};
+
+#endif // NEO
+
+// =======================================================
+// NOIR (classy) — jewel tones; thumbs: burgundy/bronze
+// =======================================================
+#if PALETTE_STYLE == PALETTE_STYLE_NOIR
+
 #define HSV_TEAL_NOIR          110,200,VDEF
 #define HSV_COPPER_NOIR         18,210,VDEF
 #define HSV_ROYAL_PURPLE_NOIR  195,230,VDEF
@@ -27,9 +77,9 @@ typedef struct layer_palette_t {
 #define HSV_RASPBERRY_NOIR     236,210,VDEF
 #define HSV_RUBY_NOIR            0,230,VDEF
 
-// Thumbs
-#define HSV_SEAFOAM_NOIR       136,180,VDEF
-#define HSV_BRASS_NOIR          38,180,VDEF
+// High-contrast thumbs
+#define HSV_THUMB_PRIMARY     248,220,VDEF   // BURGUNDY
+#define HSV_THUMB_SECONDARY    28,200,VDEF   // BRONZE
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_TEAL_NOIR},   {HSV_COPPER_NOIR},      {HSV_ROYAL_PURPLE_NOIR}},
@@ -38,6 +88,43 @@ static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_RAISE]       = {{HSV_COBALT_NOIR}, {HSV_STEEL_BLUE_NOIR},  {HSV_AMBER_NOIR}},
     [LAYER_NAV_3D]      = {{HSV_FOREST_NOIR}, {HSV_RASPBERRY_NOIR},   {HSV_RUBY_NOIR}},
 };
+
+#endif // NOIR
+
+// =======================================================
+// PASTEL (soft) — low-mid S; thumbs: cool indigo/cerulean
+// =======================================================
+#if PALETTE_STYLE == PALETTE_STYLE_PASTEL
+
+#define HSV_MINT_PASTEL         115,  90,VDEF
+#define HSV_PEACH_PASTEL         22, 120,VDEF
+#define HSV_LILAC_PASTEL        200, 110,VDEF
+
+#define HSV_BABY_PINK_PASTEL    238,  80,VDEF
+#define HSV_PASTEL_LIME          58, 110,VDEF
+#define HSV_SKY_PASTEL          160, 110,VDEF
+
+#define HSV_APRICOT_PASTEL       28, 120,VDEF
+#define HSV_POWDER_BLUE_PASTEL  170, 100,VDEF
+#define HSV_PERIWINKLE_PASTEL   185, 120,VDEF
+
+#define HSV_SAGE_PASTEL          90,  80,VDEF
+#define HSV_DUSTY_ROSE_PASTEL   244,  90,VDEF
+#define HSV_SOFT_RED_PASTEL       5, 110,VDEF
+
+// High-contrast thumbs (far from all primaries: 115,238,28,90)
+#define HSV_THUMB_PRIMARY      196,  95,VDEF   // INDIGO
+#define HSV_THUMB_SECONDARY    170,  95,VDEF   // CERULEAN
+
+static const layer_palette_t palette[LAYER_COUNT] = {
+    [LAYER_BASE]        = {{HSV_MINT_PASTEL},   {HSV_PEACH_PASTEL},      {HSV_LILAC_PASTEL}},
+    [LAYER_BASE_NO_HRM] = {{HSV_MINT_PASTEL},   {HSV_PEACH_PASTEL},      {HSV_LILAC_PASTEL}},
+    [LAYER_LOWER]       = {{HSV_BABY_PINK_PASTEL}, {HSV_PASTEL_LIME},    {HSV_SKY_PASTEL}},
+    [LAYER_RAISE]       = {{HSV_APRICOT_PASTEL},{HSV_POWDER_BLUE_PASTEL},{HSV_PERIWINKLE_PASTEL}},
+    [LAYER_NAV_3D]      = {{HSV_SAGE_PASTEL},   {HSV_DUSTY_ROSE_PASTEL}, {HSV_SOFT_RED_PASTEL}},
+};
+
+#endif // PASTEL
 // clang-format on
 
 #define THUMB_COLOR_PRIMARY HSV_RED
@@ -116,7 +203,7 @@ static led_info_t led_info[RGB_MATRIX_LED_COUNT];
 
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_sethsv_noeeprom(HSV_TEAL_NOIR);
+    rgb_matrix_sethsv_noeeprom(HSV_OFF);
 
     // Initialize lookup tables
     for (uint8_t led_index = 0; led_index < RGB_MATRIX_LED_COUNT; led_index++) {
@@ -224,7 +311,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         }
         // ZONE: THUMB
         else if (led_info[i].zone == LED_ZONE_THUMB) {
-            layer_led_info_t info         = led_info[i].layer_info[current_layer];
+            layer_led_info_t info = led_info[i].layer_info[current_layer != LAYER_NAV_3D ? LAYER_BASE : LAYER_NAV_3D];
             uint8_t          key_type     = layer_led_type(info);
             uint8_t          target_layer = layer_led_layer(info);
 
