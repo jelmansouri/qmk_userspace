@@ -116,7 +116,7 @@ static led_info_t led_info[RGB_MATRIX_LED_COUNT];
 
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_sethsv_noeeprom(HSV_OFF);
+    rgb_matrix_sethsv_noeeprom(HSV_TEAL_NOIR);
 
     // Initialize lookup tables
     for (uint8_t led_index = 0; led_index < RGB_MATRIX_LED_COUNT; led_index++) {
