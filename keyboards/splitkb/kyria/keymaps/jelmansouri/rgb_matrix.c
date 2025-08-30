@@ -10,20 +10,6 @@ typedef struct layer_palette_t {
 // --------- Global brightness knob (one place to dim/boost everything)
 #define VDEF_MAX 255
 
-// --------- Choose a palette style
-#define PALETTE_STYLE_NEO    1  // vivid/modern
-#define PALETTE_STYLE_NOIR   2  // refined/jewel-toned
-#define PALETTE_STYLE_PASTEL 3  // soft/pastel
-
-#ifndef PALETTE_STYLE
-#define PALETTE_STYLE PALETTE_STYLE_NEO
-#endif
-
-// =======================================================
-// NEO (vivid) — unique primaries; thumbs are warm & far
-// =======================================================
-#if PALETTE_STYLE == PALETTE_STYLE_NEO
-
 // Layer colors
 #define HSV_TEAL_NEO          110,240,VDEF_MAX
 #define HSV_TANGERINE_NEO      20,255,VDEF_MAX
@@ -52,78 +38,6 @@ static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_RAISE]       = {{HSV_ELECTRIC_BLUE_NEO}, {HSV_ULTRAVIOLET_NEO},{HSV_AMBER_NEO}},
     [LAYER_NAV_3D]      = {{HSV_NEON_GREEN_NEO},    {HSV_HOT_PINK_NEO},  {HSV_CRIMSON_NEO}},
 };
-
-#endif // NEO
-
-// =======================================================
-// NOIR (classy) — jewel tones; thumbs: burgundy/bronze
-// =======================================================
-#if PALETTE_STYLE == PALETTE_STYLE_NOIR
-
-#define HSV_TEAL_NOIR          110,200,VDEF_MAX
-#define HSV_COPPER_NOIR         18,210,VDEF_MAX
-#define HSV_ROYAL_PURPLE_NOIR  195,230,VDEF_MAX
-
-#define HSV_PLUM_NOIR          206,220,VDEF_MAX
-#define HSV_OLIVE_GOLD_NOIR     52,170,VDEF_MAX
-#define HSV_SMOKE_AQUA_NOIR    140,170,VDEF_MAX
-
-#define HSV_COBALT_NOIR        170,230,VDEF_MAX
-#define HSV_STEEL_BLUE_NOIR    160,160,VDEF_MAX
-#define HSV_AMBER_NOIR          30,230,VDEF_MAX
-
-#define HSV_FOREST_NOIR         92,220,VDEF_MAX
-#define HSV_RASPBERRY_NOIR     236,210,VDEF_MAX
-#define HSV_RUBY_NOIR            0,230,VDEF_MAX
-
-// High-contrast thumbs
-#define HSV_THUMB_PRIMARY     248,220,VDEF_MAX   // BURGUNDY
-#define HSV_THUMB_SECONDARY    28,200,VDEF_MAX   // BRONZE
-
-static const layer_palette_t palette[LAYER_COUNT] = {
-    [LAYER_BASE]        = {{HSV_TEAL_NOIR},   {HSV_COPPER_NOIR},      {HSV_ROYAL_PURPLE_NOIR}},
-    [LAYER_BASE_NO_HRM] = {{HSV_TEAL_NOIR},   {HSV_COPPER_NOIR},      {HSV_ROYAL_PURPLE_NOIR}},
-    [LAYER_LOWER]       = {{HSV_PLUM_NOIR},   {HSV_OLIVE_GOLD_NOIR},  {HSV_SMOKE_AQUA_NOIR}},
-    [LAYER_RAISE]       = {{HSV_COBALT_NOIR}, {HSV_STEEL_BLUE_NOIR},  {HSV_AMBER_NOIR}},
-    [LAYER_NAV_3D]      = {{HSV_FOREST_NOIR}, {HSV_RASPBERRY_NOIR},   {HSV_RUBY_NOIR}},
-};
-
-#endif // NOIR
-
-// =======================================================
-// PASTEL (soft) — low-mid S; thumbs: cool indigo/cerulean
-// =======================================================
-#if PALETTE_STYLE == PALETTE_STYLE_PASTEL
-
-#define HSV_MINT_PASTEL         115,  90,VDEF_MAX
-#define HSV_PEACH_PASTEL         22, 120,VDEF_MAX
-#define HSV_LILAC_PASTEL        200, 110,VDEF_MAX
-
-#define HSV_BABY_PINK_PASTEL    238,  80,VDEF_MAX
-#define HSV_PASTEL_LIME          58, 110,VDEF_MAX
-#define HSV_SKY_PASTEL          160, 110,VDEF_MAX
-
-#define HSV_APRICOT_PASTEL       28, 120,VDEF_MAX
-#define HSV_POWDER_BLUE_PASTEL  170, 100,VDEF_MAX
-#define HSV_PERIWINKLE_PASTEL   185, 120,VDEF_MAX
-
-#define HSV_SAGE_PASTEL          90,  80,VDEF_MAX
-#define HSV_DUSTY_ROSE_PASTEL   244,  90,VDEF_MAX
-#define HSV_SOFT_RED_PASTEL       5, 110,VDEF_MAX
-
-// High-contrast thumbs (far from all primaries: 115,238,28,90)
-#define HSV_THUMB_PRIMARY      196,  95,VDEF_MAX   // INDIGO
-#define HSV_THUMB_SECONDARY    170,  95,VDEF_MAX   // CERULEAN
-
-static const layer_palette_t palette[LAYER_COUNT] = {
-    [LAYER_BASE]        = {{HSV_MINT_PASTEL},   {HSV_PEACH_PASTEL},      {HSV_LILAC_PASTEL}},
-    [LAYER_BASE_NO_HRM] = {{HSV_MINT_PASTEL},   {HSV_PEACH_PASTEL},      {HSV_LILAC_PASTEL}},
-    [LAYER_LOWER]       = {{HSV_BABY_PINK_PASTEL}, {HSV_PASTEL_LIME},    {HSV_SKY_PASTEL}},
-    [LAYER_RAISE]       = {{HSV_APRICOT_PASTEL},{HSV_POWDER_BLUE_PASTEL},{HSV_PERIWINKLE_PASTEL}},
-    [LAYER_NAV_3D]      = {{HSV_SAGE_PASTEL},   {HSV_DUSTY_ROSE_PASTEL}, {HSV_SOFT_RED_PASTEL}},
-};
-
-#endif // PASTEL
 // clang-format on
 
 // Thumb key positions (row, col) - based on LAYOUT_split_3x6_5
@@ -199,7 +113,7 @@ static led_info_t led_info[RGB_MATRIX_LED_COUNT];
 
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
-    rgb_matrix_sethsv_noeeprom(0, 0, rgb_matrix_get_val());
+    rgb_matrix_sethsv_noeeprom(0, 0, MIN(rgb_matrix_get_val(), VDEF_MAX));
 
     // Initialize lookup tables
     for (uint8_t led_index = 0; led_index < RGB_MATRIX_LED_COUNT; led_index++) {
@@ -294,8 +208,10 @@ void keyboard_post_init_user(void) {
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     layer_state_t layer_state_combined = layer_state | default_layer_state;
     uint8_t       current_layer        = get_highest_layer(layer_state_combined);
-    uint8_t       brightness           = rgb_matrix_get_val();
+    uint8_t       brightness           = MIN(rgb_matrix_get_val(), VDEF_MAX);
     bool          modifier_held = (get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0;
+    modifier_held =
+        modifier_held || ((current_layer == LAYER_BASE || current_layer == LAYER_BASE_NO_HRM) && is_caps_word_on());
 
     for (uint8_t i = led_min; i < led_max; i++) {
         hsv_t color = (hsv_t){HSV_BLACK}; // off by default
