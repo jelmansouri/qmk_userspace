@@ -7,16 +7,41 @@ typedef struct layer_palette_t {
 } layer_palette_t;
 
 // clang-format off
+// ----- Global brightness knob (one place to dim/boost the whole palette)
+#define VDEF 255
+
+// ----- NOIR palette macros (HSV 0..255 with refined S)
+#define HSV_TEAL_NOIR          110,200,VDEF
+#define HSV_COPPER_NOIR         18,210,VDEF
+#define HSV_ROYAL_PURPLE_NOIR  195,230,VDEF
+
+#define HSV_PLUM_NOIR          206,220,VDEF
+#define HSV_OLIVE_GOLD_NOIR     52,170,VDEF
+#define HSV_SMOKE_AQUA_NOIR    140,170,VDEF
+
+#define HSV_COBALT_NOIR        170,230,VDEF
+#define HSV_STEEL_BLUE_NOIR    160,160,VDEF
+#define HSV_AMBER_NOIR          30,230,VDEF
+
+#define HSV_FOREST_NOIR         92,220,VDEF
+#define HSV_RASPBERRY_NOIR     236,210,VDEF
+#define HSV_RUBY_NOIR            0,230,VDEF
+
+// Thumbs
+#define HSV_SEAFOAM_NOIR       136,180,VDEF
+#define HSV_BRASS_NOIR          38,180,VDEF
+
 static const layer_palette_t palette[LAYER_COUNT] = {
-    [LAYER_BASE]        = {{HSV_CYAN},    {HSV_CORAL},  {HSV_ORANGE}},
-    [LAYER_BASE_NO_HRM] = {{HSV_CYAN},    {HSV_CORAL},  {HSV_ORANGE}},
-    [LAYER_LOWER]       = {{HSV_MAGENTA}, {HSV_YELLOW}, {HSV_CYAN}},
-    [LAYER_RAISE]       = {{HSV_ORANGE},  {HSV_AZURE},  {HSV_PURPLE}},
-    [LAYER_NAV_3D]      = {{HSV_GREEN},   {HSV_PINK},   {HSV_RED}},
+    [LAYER_BASE]        = {{HSV_TEAL_NOIR},   {HSV_COPPER_NOIR},      {HSV_ROYAL_PURPLE_NOIR}},
+    [LAYER_BASE_NO_HRM] = {{HSV_TEAL_NOIR},   {HSV_COPPER_NOIR},      {HSV_ROYAL_PURPLE_NOIR}},
+    [LAYER_LOWER]       = {{HSV_PLUM_NOIR},   {HSV_OLIVE_GOLD_NOIR},  {HSV_SMOKE_AQUA_NOIR}},
+    [LAYER_RAISE]       = {{HSV_COBALT_NOIR}, {HSV_STEEL_BLUE_NOIR},  {HSV_AMBER_NOIR}},
+    [LAYER_NAV_3D]      = {{HSV_FOREST_NOIR}, {HSV_RASPBERRY_NOIR},   {HSV_RUBY_NOIR}},
 };
 // clang-format on
 
-#define THUMB_COLOR HSV_GOLDENROD
+#define THUMB_COLOR_PRIMARY HSV_SEAFOAM_NOIR
+#define THUMB_COLOR_SECONDARY HSV_BRASS_NOIR
 
 // Thumb key positions (row, col) - based on LAYOUT_split_3x6_5
 static const uint8_t thumb_keys[][2] = {
@@ -184,122 +209,95 @@ void keyboard_post_init_user(void) {
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-    uint8_t current_layer = get_highest_layer(layer_state | default_layer_state);
-    uint8_t brightness    = rgb_matrix_get_val();
-    bool    modifier_held = get_mods() || get_oneshot_mods() || get_weak_mods();
+    layer_state_t st       = layer_state | default_layer_state;
+    uint8_t       current  = get_highest_layer(st);
+    uint8_t       bright   = rgb_matrix_get_val();
+    bool          mod_held = (get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0;
 
     for (uint8_t i = led_min; i < led_max; i++) {
-        hsv_t color = {0, 0, 0}; // Off by default
+        hsv_t color = (hsv_t){0, 0, 0}; // off by default
 
-        // Handle underglow
+        // ZONE: UNDERGLOW
         if (led_info[i].zone == LED_ZONE_UNDER) {
-            color   = palette[current_layer].primary;
-            color.v = brightness;
+            color   = palette[current].primary; // use .accent here if you prefer
+            color.v = bright;
         }
-        // Handle thumb keys
+        // ZONE: THUMB
         else if (led_info[i].zone == LED_ZONE_THUMB) {
-            layer_led_info_t info         = led_info[i].layer_info[current_layer];
-            uint8_t          led_type     = layer_led_type(info);
+            layer_led_info_t info         = led_info[i].layer_info[current];
+            uint8_t          t            = layer_led_type(info);
             uint8_t          target_layer = layer_led_layer(info);
 
-            if (led_type == LAYER_LED_TO_LAYER && target_layer < LAYER_COUNT) {
-                // Layer transition key - use target layer color
+            if (t == LAYER_LED_TO_LAYER && target_layer < LAYER_COUNT) {
                 color = palette[target_layer].primary;
+            } else if (t == LAYER_LED_MOD) {
+                color = (hsv_t){THUMB_COLOR_SECONDARY};
             } else {
-                // Regular thumb key - use constant color
-                color = (hsv_t){THUMB_COLOR};
+                color = (hsv_t){THUMB_COLOR_PRIMARY};
             }
-            color.v = brightness;
+            color.v = bright;
         }
-        // Handle normal keys
-        else if (led_info[i].zone == LED_ZONE_NORMAL) {
-            layer_led_info_t info         = led_info[i].layer_info[current_layer];
-            uint8_t          led_type     = layer_led_type(info);
+        // ZONE: NORMAL
+        else {
+            layer_led_info_t info         = led_info[i].layer_info[current];
+            uint8_t          t            = layer_led_type(info);
             uint8_t          target_layer = layer_led_layer(info);
 
-            switch (led_type) {
+            switch (t) {
                 case LAYER_LED_NONE:
-                    // Key is off - keep default {0, 0, 0}
+                    // keep off
                     break;
 
-                case LAYER_LED_TRANS:
-                    // Transparent - find the first non-transparent layer below
-                    for (int8_t fallback_layer = current_layer - 1; fallback_layer >= 0; fallback_layer--) {
-                        layer_led_info_t fallback_info   = led_info[i].layer_info[fallback_layer];
-                        uint8_t          fallback_type   = layer_led_type(fallback_info);
-                        uint8_t          fallback_target = layer_led_layer(fallback_info);
+                case LAYER_LED_TRANS: {
+                    // Walk lower *active* layers, highest to lowest
+                    if (current > 0) {
+                        for (int8_t l = (int8_t)current - 1; l >= 0; --l) {
+                            if (!(st & (1UL << l))) continue; // skip inactive layer
+                            layer_led_info_t fb   = led_info[i].layer_info[l];
+                            uint8_t          ft   = layer_led_type(fb);
+                            uint8_t          targ = layer_led_layer(fb);
+                            if (ft == LAYER_LED_NONE) break;
+                            if (ft == LAYER_LED_TRANS) continue;
 
-                        if (fallback_type != LAYER_LED_TRANS && fallback_type != LAYER_LED_NONE) {
-                            switch (fallback_type) {
+                            switch (ft) {
                                 case LAYER_LED_TAP:
-                                    if (modifier_held) {
-                                        color = palette[fallback_layer].accent;
-                                    } else {
-                                        color = palette[fallback_layer].primary;
-                                    }
+                                    color = mod_held ? palette[l].accent : palette[l].primary;
                                     break;
-                                case LAYER_LED_MODTAP:
                                 case LAYER_LED_MOD:
-                                    if (modifier_held) {
-                                        color = palette[fallback_layer].accent;
-                                    } else {
-                                        color = palette[fallback_layer].modtap;
-                                    }
+                                case LAYER_LED_MODTAP:
+                                    color = mod_held ? palette[l].accent : palette[l].modtap;
                                     break;
                                 case LAYER_LED_TO_LAYER:
-                                    if (fallback_target < LAYER_COUNT) {
-                                        color = palette[fallback_target].primary;
-                                    } else {
-                                        color = palette[fallback_layer].primary;
-                                    }
+                                    color = (targ < LAYER_COUNT) ? palette[targ].primary : palette[l].primary;
                                     break;
                             }
-                            color.v = brightness;
-                            break; // Found non-transparent key, stop searching
+                            color.v = bright;
+                            break; // stop at first concrete mapping
                         }
                     }
-                    break;
+                } break;
 
                 case LAYER_LED_TAP:
-                    if (modifier_held) {
-                        // When modifier held, use accent color
-                        color   = palette[current_layer].accent;
-                        color.v = brightness;
-                    } else {
-                        // Regular key - use layer primary color
-                        color   = palette[current_layer].primary;
-                        color.v = brightness;
-                    }
+                    color   = mod_held ? palette[current].accent : palette[current].primary;
+                    color.v = bright;
                     break;
 
-                case LAYER_LED_MODTAP:
                 case LAYER_LED_MOD:
-                    if (modifier_held) {
-                        // When modifier held, use accent color
-                        color   = palette[current_layer].accent;
-                        color.v = brightness;
-                    } else {
-                        // Pure modifier - use mod-tap color
-                        color   = palette[current_layer].modtap;
-                        color.v = brightness;
-                    }
+                case LAYER_LED_MODTAP:
+                    color   = mod_held ? palette[current].accent : palette[current].modtap;
+                    color.v = bright;
                     break;
 
                 case LAYER_LED_TO_LAYER:
-                    // Layer transition key
-                    if (target_layer < LAYER_COUNT) {
-                        // Normal state - show target layer color
-                        color = palette[target_layer].primary;
-                    } else {
-                        // Fallback to layer primary
-                        color = palette[current_layer].primary;
-                    }
-                    color.v = brightness;
+                    color   = (target_layer < LAYER_COUNT) ? palette[target_layer].primary : palette[current].primary;
+                    color.v = bright;
                     break;
             }
         }
 
-        rgb_matrix_set_color(i, color.h, color.s, color.v);
+        // Single HSV->RGB conversion at the end per LED (no helper function)
+        RGB rgb = hsv_to_rgb(color);
+        rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
     }
     return false;
 }
