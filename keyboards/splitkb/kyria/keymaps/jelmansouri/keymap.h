@@ -48,3 +48,10 @@ typedef enum {
 #define LP_GUI MT(MOD_LGUI, KC_LPRN)
 
 #define DSCROLL DRAG_SCROLL
+
+#define HRM_MOD_TAP_PER_SIDE 3
+
+extern uint8_t right_mod_hold_count;
+extern uint8_t left_mod_hold_count;
+extern bool    right_registred_state[HRM_MOD_TAP_PER_SIDE];
+extern bool    left_registred_state[HRM_MOD_TAP_PER_SIDE];

@@ -217,11 +217,6 @@ void oled_write_icon(const char* PROGMEM icon, uint8_t col, uint8_t line) {
     oled_write_raw_P(icon + HALF_ICON_SIZE, HALF_ICON_SIZE);
 }
 
-extern uint8_t right_mod_hold_count;
-extern uint8_t left_mod_hold_count;
-extern bool    right_registred_state[3];
-extern bool    left_registred_state[3];
-
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         // Host Keyboard Layer Status
@@ -255,19 +250,6 @@ bool oled_task_user(void) {
                 (get_weak_mods() & MOD_MASK_SHIFT) ? caps_word_enabled_shift_pressed_icon : caps_word_enabled_icon;
         }
 
-        oled_set_cursor(0, 4);
-        oled_write_char('0' + left_mod_hold_count, false);
-        oled_write_char('-', false);
-        oled_write_char(right_registred_state[0] ? 'x' : 'o', false);
-        oled_write_char(right_registred_state[1] ? 'x' : 'o', false);
-        oled_write_char(right_registred_state[2] ? 'x' : 'o', false);
-
-        oled_set_cursor(0, 5);
-        oled_write_char('0' + right_mod_hold_count, false);
-        oled_write_char(left_registred_state[0] ? 'x' : 'o', false);
-        oled_write_char(left_registred_state[1] ? 'x' : 'o', false);
-        oled_write_char(left_registred_state[2] ? 'x' : 'o', false);
-
         uint8_t start_x = oled_rotation_width >> 2;
         if (is_hrm_disabled) {
             oled_write_icon(blank_icon, start_x, ICON_ROW);
@@ -285,6 +267,23 @@ bool oled_task_user(void) {
             oled_write_icon(modifiers & MOD_MASK_GUI ? command_pressed_icon : command_icon, start_x + ICON_WIDTH * 3,
                             ICON_ROW);
         }
+
+#define DEBUG_HRM_DISABLE_ON_OPPOSITE_HAND
+#if defined(DEBUG_HRM_DISABLE_ON_OPPOSITE_HAND)
+        oled_set_cursor(0, 4);
+        oled_write_char('0' + left_mod_hold_count, false);
+        oled_write_char('-', false);
+        oled_write_char(right_registred_state[0] ? 'x' : 'o', false);
+        oled_write_char(right_registred_state[1] ? 'x' : 'o', false);
+        oled_write_char(right_registred_state[2] ? 'x' : 'o', false);
+
+        oled_set_cursor(0, 5);
+        oled_write_char('0' + right_mod_hold_count, false);
+        oled_write_char('-', false);
+        oled_write_char(left_registred_state[0] ? 'x' : 'o', false);
+        oled_write_char(left_registred_state[1] ? 'x' : 'o', false);
+        oled_write_char(left_registred_state[2] ? 'x' : 'o', false);
+#endif
     }
     return false;
 }

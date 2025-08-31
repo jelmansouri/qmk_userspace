@@ -44,8 +44,6 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool set_scrolling = false;
 
-#define HRM_MOD_TAP_PER_SIDE 3
-
 uint8_t right_mod_hold_count                        = 0;
 bool    right_registred_state[HRM_MOD_TAP_PER_SIDE] = {0};
 uint8_t left_mod_hold_count                         = 0;
