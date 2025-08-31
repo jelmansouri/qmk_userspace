@@ -110,19 +110,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
 
-        // Right-hand mod-taps (map to indices 0..2) but with special handling for presses
         case AM_CTL:
-            state_idx--; /* fallthrough */
         case AS_ALT:
-            state_idx--; /* fallthrough */
         case LP_GUI:
-            state_idx--;
             if (record->tap.count && record->event.pressed) {
                 tap_code16(S(QK_MOD_TAP_GET_TAP_KEYCODE(keycode)));
-                return false;
-            }
-            if (register_hold_as_tap_key_down(keycode, record, &left_mod_hold_count, &right_mod_hold_count,
-                                              &left_registred_state[state_idx])) {
                 return false;
             }
             break;
