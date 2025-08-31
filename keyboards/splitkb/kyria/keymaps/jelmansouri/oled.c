@@ -254,7 +254,7 @@ bool oled_task_user(void) {
 
         oled_set_cursor(0, 5);
 
-        oled_write_char('0' + left_mod_hold_count, false);
+        oled_write_char('0' + right_mod_hold_count, false);
 
         uint8_t start_x = oled_rotation_width >> 2;
         if (is_hrm_disabled) {
