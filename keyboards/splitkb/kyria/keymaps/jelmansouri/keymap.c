@@ -49,26 +49,26 @@ bool    right_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE] = {0};
 uint8_t left_mod_hold_count                                        = 0;
 bool    left_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE]  = {0};
 
-// this function allows held keys on one side of the keyboard to behave as long tap key press if the other side
+// This function allows held keys on one side of the keyboard to behave as long tap key press if the other side
 // registered a hold beforehand, so instead of relying on quick tap, you can hold CTL + R (on Colemak-DH) to do a
 // continuous redo for example, othewise CTL would be held on both sides
 static inline bool register_hold_as_tap_key_down(uint16_t keycode, keyrecord_t *record,
                                                  uint8_t *this_side_mod_hold_count, uint8_t *other_side_mod_hold_count,
                                                  bool *registered_state) {
     // We only special-case holds (tap.count == 0). Taps fall through to QMK.
-    if (!record->tap.count && record->event.pressed) {
+    if (record->tap.count == 0 && record->event.pressed) {
         if (*other_side_mod_hold_count > 0) {
             // Other side is holding a mod-tap: emit the tap key instead of the mod.
-            register_code16(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
+            register_code(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
             *registered_state = true;
             return true;
         } else {
             (*this_side_mod_hold_count)++;
         }
-    } else if (!record->tap.count && !record->event.pressed) {
+    } else if (record->tap.count == 0 && !record->event.pressed) {
         if (*registered_state) {
             // We previously registered the tap key on press; release it now.
-            unregister_code16(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
+            unregister_code(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
             *registered_state = false;
             return true;
         } else if (*this_side_mod_hold_count > 0) {
