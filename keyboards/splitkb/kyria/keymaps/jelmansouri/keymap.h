@@ -53,5 +53,5 @@ typedef enum {
 
 extern uint8_t right_mod_hold_count;
 extern uint8_t left_mod_hold_count;
-extern bool    right_registred_state[HRM_MOD_TAP_PER_SIDE];
-extern bool    left_registred_state[HRM_MOD_TAP_PER_SIDE];
+extern bool    right_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE];
+extern bool    left_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE];

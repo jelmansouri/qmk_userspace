@@ -44,23 +44,26 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool set_scrolling = false;
 
-uint8_t right_mod_hold_count                        = 0;
-bool    right_registred_state[HRM_MOD_TAP_PER_SIDE] = {0};
-uint8_t left_mod_hold_count                         = 0;
-bool    left_registred_state[HRM_MOD_TAP_PER_SIDE]  = {0};
+uint8_t right_mod_hold_count                                       = 0;
+bool    right_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE] = {0};
+uint8_t left_mod_hold_count                                        = 0;
+bool    left_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE]  = {0};
 
+// this function allows held keys on one side of the keyboard to behave as long tap key press if the other side
+// registered a hold beforehand, so instead of relying on quick tap, you can hold CTL + R (on Colemak-DH) to do a
+// continuous redo for example, othewise CTL would be held on both sides
 static inline bool register_hold_as_tap_key_down(uint16_t keycode, keyrecord_t *record,
-                                                 uint8_t *this_side_mod_hold_cound, uint8_t *other_side_mod_hold_cound,
+                                                 uint8_t *this_side_mod_hold_count, uint8_t *other_side_mod_hold_cound,
                                                  bool *registered_state) {
     // We only special-case holds (tap.count == 0). Taps fall through to QMK.
     if (!record->tap.count && record->event.pressed) {
-        if (*other_side_mod_hold_cound > 0) {
+        if (*other_side_mod_hold_count > 0) {
             // Other side is holding a mod-tap: emit the tap key instead of the mod.
             register_code16(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
             *registered_state = true;
             return true;
         } else {
-            (*this_side_mod_hold_cound)++;
+            (*this_side_mod_hold_count)++;
         }
     } else if (!record->tap.count && !record->event.pressed) {
         if (*registered_state) {
@@ -68,12 +71,17 @@ static inline bool register_hold_as_tap_key_down(uint16_t keycode, keyrecord_t *
             unregister_code16(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
             *registered_state = false;
             return true;
-        } else if (*this_side_mod_hold_cound > 0) {
-            (*this_side_mod_hold_cound)--;
+        } else if (*this_side_mod_hold_count > 0) {
+            (*this_side_mod_hold_count)--;
         }
     }
     return false;
 }
+
+#if __STDC_VERSION__ >= 201112L
+// To no to forget to update the fallthrough logic
+_Static_assert(HRM_MOD_TAP_PER_SIDE == 3, "Update index mapping if count changes");
+#endif
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     int state_idx = HRM_MOD_TAP_PER_SIDE;
@@ -89,7 +97,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case F8_GUI:
             state_idx--;
             if (register_hold_as_tap_key_down(keycode, record, &left_mod_hold_count, &right_mod_hold_count,
-                                              &left_registred_state[state_idx])) {
+                                              &left_hold_registered_as_press_state[state_idx])) {
                 return false;
             }
             break;
@@ -105,7 +113,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case N4_GUI:
             state_idx--;
             if (register_hold_as_tap_key_down(keycode, record, &right_mod_hold_count, &left_mod_hold_count,
-                                              &right_registred_state[state_idx])) {
+                                              &right_hold_registered_as_press_state[state_idx])) {
                 return false;
             }
             break;

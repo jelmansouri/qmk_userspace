@@ -273,16 +273,16 @@ bool oled_task_user(void) {
         oled_set_cursor(0, 4);
         oled_write_char('0' + left_mod_hold_count, false);
         oled_write_char('-', false);
-        oled_write_char(right_registred_state[0] ? 'x' : 'o', false);
-        oled_write_char(right_registred_state[1] ? 'x' : 'o', false);
-        oled_write_char(right_registred_state[2] ? 'x' : 'o', false);
+        oled_write_char(right_hold_registered_as_press_state[0] ? 'x' : 'o', false);
+        oled_write_char(right_hold_registered_as_press_state[1] ? 'x' : 'o', false);
+        oled_write_char(right_hold_registered_as_press_state[2] ? 'x' : 'o', false);
 
         oled_set_cursor(0, 5);
         oled_write_char('0' + right_mod_hold_count, false);
         oled_write_char('-', false);
-        oled_write_char(left_registred_state[0] ? 'x' : 'o', false);
-        oled_write_char(left_registred_state[1] ? 'x' : 'o', false);
-        oled_write_char(left_registred_state[2] ? 'x' : 'o', false);
+        oled_write_char(left_hold_registered_as_press_state[0] ? 'x' : 'o', false);
+        oled_write_char(left_hold_registered_as_press_state[1] ? 'x' : 'o', false);
+        oled_write_char(left_hold_registered_as_press_state[2] ? 'x' : 'o', false);
 #endif
     }
     return false;
