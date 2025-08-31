@@ -51,10 +51,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case R_CTL:
             if (!record->tap.count && record->event.pressed) {
-                // R_CTL is being held - check if other left mods are active
                 if (right_mod_hold_count > 0) {
                     // Other left hand mods are held, just send R instead of control mod
-                    tap_code16(KC_R);
+                    register_code16(KC_R);
+                    return false;
+                }
+            } else if (!record->tap.count && !record->event.pressed) {
+                if (right_mod_hold_count > 0) {
+                    // Other left hand mods are held, just send R instead of control mod
+                    unregister_code16(KC_R);
                     return false;
                 }
             }
