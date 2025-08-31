@@ -218,6 +218,7 @@ void oled_write_icon(const char* PROGMEM icon, uint8_t col, uint8_t line) {
 }
 
 extern uint8_t right_mod_hold_count;
+extern uint8_t left_mod_hold_count;
 
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
@@ -253,8 +254,10 @@ bool oled_task_user(void) {
         }
 
         oled_set_cursor(0, 5);
-
         oled_write_char('0' + right_mod_hold_count, false);
+
+        oled_set_cursor(0, 6);
+        oled_write_char('0' + left_mod_hold_count, false);
 
         uint8_t start_x = oled_rotation_width >> 2;
         if (is_hrm_disabled) {

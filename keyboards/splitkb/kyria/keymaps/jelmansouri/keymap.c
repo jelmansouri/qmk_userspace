@@ -44,7 +44,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 bool set_scrolling = false;
 
 // Track hold state of left hand mod-tap keys
-uint8_t right_mod_hold_count = 0;
+uint8_t     right_mod_hold_count = 0;
+uint8_t     left_mod_hold_count  = 0;
+static bool r_registred          = false;
 
 // Handle new Mod Tap shifted keycodes as they are not supported using the MT macro
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -54,17 +56,41 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 if (right_mod_hold_count > 0) {
                     // Other left hand mods are held, just send R instead of control mod
                     register_code16(KC_R);
+                    r_registred = true;
                     return false;
+                } else {
+                    left_mod_hold_count++;
                 }
             } else if (!record->tap.count && !record->event.pressed) {
-                if (right_mod_hold_count > 0) {
+                if (r_registred) {
                     // Other left hand mods are held, just send R instead of control mod
                     unregister_code16(KC_R);
+                    r_registred = false;
                     return false;
+                } else {
+                    left_mod_hold_count--;
                 }
             }
             break;
         case I_CTL:
+            if (!record->tap.count && record->event.pressed) {
+                // S_ALT is being held
+                right_mod_hold_count++;
+            } else if (!record->tap.count && !record->event.pressed) {
+                // S_ALT hold is released
+                right_mod_hold_count--;
+            }
+            break;
+        case E_ALT:
+            if (!record->tap.count && record->event.pressed) {
+                // S_ALT is being held
+                right_mod_hold_count++;
+            } else if (!record->tap.count && !record->event.pressed) {
+                // S_ALT hold is released
+                right_mod_hold_count--;
+            }
+            break;
+        case N_GUI:
             if (!record->tap.count && record->event.pressed) {
                 // S_ALT is being held
                 right_mod_hold_count++;
