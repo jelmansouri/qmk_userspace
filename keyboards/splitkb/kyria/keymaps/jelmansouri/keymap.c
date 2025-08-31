@@ -44,10 +44,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool set_scrolling = false;
 
-uint8_t     right_mod_hold_count     = 0;
-static bool right_registred_state[3] = {0};
-uint8_t     left_mod_hold_count      = 0;
-static bool left_registred_state[3]  = {0};
+#define HRM_MOD_TAP_PER_SIDE 3
+
+uint8_t right_mod_hold_count                        = 0;
+bool    right_registred_state[HRM_MOD_TAP_PER_SIDE] = {0};
+uint8_t left_mod_hold_count                         = 0;
+bool    left_registred_state[HRM_MOD_TAP_PER_SIDE]  = {0};
 
 static inline bool register_hold_as_tap_key_down(uint16_t keycode, keyrecord_t *record,
                                                  uint8_t *this_side_mod_hold_cound, uint8_t *other_side_mod_hold_cound,
@@ -76,47 +78,53 @@ static inline bool register_hold_as_tap_key_down(uint16_t keycode, keyrecord_t *
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
-    int state_idx = 3;
+    int state_idx = HRM_MOD_TAP_PER_SIDE;
     switch (keycode) {
         // Right-hand mod-taps (map to indices 0..2)
         case R_CTL:
+        case F6_CTL:
             state_idx--; /* fallthrough */
         case S_ALT:
+        case F7_ALT:
             state_idx--; /* fallthrough */
         case T_GUI:
+        case F8_GUI:
             state_idx--;
             if (register_hold_as_tap_key_down(keycode, record, &left_mod_hold_count, &right_mod_hold_count,
                                               &left_registred_state[state_idx])) {
                 return false;
             }
             break;
+
+        // Left-hand mod-taps (map to indices 0..2)
         case I_CTL:
-            // Left-hand mod-taps (map to indices 0..2)
+        case N6_CTL:
             state_idx--; /* fallthrough */
         case E_ALT:
+        case N5_ALT:
             state_idx--; /* fallthrough */
         case N_GUI:
+        case N4_GUI:
             state_idx--;
             if (register_hold_as_tap_key_down(keycode, record, &right_mod_hold_count, &left_mod_hold_count,
                                               &right_registred_state[state_idx])) {
                 return false;
             }
             break;
+
+        // Right-hand mod-taps (map to indices 0..2) but with special handling for presses
         case AM_CTL:
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_AMPR);
-                return false;
-            }
-            break;
+            state_idx--; /* fallthrough */
         case AS_ALT:
+            state_idx--; /* fallthrough */
+        case LP_GUI:
+            state_idx--;
             if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_ASTR);
+                tap_code16(S(QK_MOD_TAP_GET_TAP_KEYCODE(keycode)));
                 return false;
             }
-            break;
-        case LP_GUI:
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_LPRN);
+            if (register_hold_as_tap_key_down(keycode, record, &left_mod_hold_count, &right_mod_hold_count,
+                                              &left_registred_state[state_idx])) {
                 return false;
             }
             break;
