@@ -53,7 +53,7 @@ bool    left_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE]  = {0};
 // registered a hold beforehand, so instead of relying on quick tap, you can hold CTL + R (on Colemak-DH) to do a
 // continuous redo for example, othewise CTL would be held on both sides
 static inline bool register_hold_as_tap_key_down(uint16_t keycode, keyrecord_t *record,
-                                                 uint8_t *this_side_mod_hold_count, uint8_t *other_side_mod_hold_cound,
+                                                 uint8_t *this_side_mod_hold_count, uint8_t *other_side_mod_hold_count,
                                                  bool *registered_state) {
     // We only special-case holds (tap.count == 0). Taps fall through to QMK.
     if (!record->tap.count && record->event.pressed) {
