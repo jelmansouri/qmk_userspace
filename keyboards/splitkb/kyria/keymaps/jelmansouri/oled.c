@@ -217,6 +217,8 @@ void oled_write_icon(const char* PROGMEM icon, uint8_t col, uint8_t line) {
     oled_write_raw_P(icon + HALF_ICON_SIZE, HALF_ICON_SIZE);
 }
 
+extern uint8_t right_mod_hold_count;
+
 bool oled_task_user(void) {
     if (is_keyboard_master()) {
         // Host Keyboard Layer Status
@@ -249,6 +251,10 @@ bool oled_task_user(void) {
             final_shift_icon =
                 (get_weak_mods() & MOD_MASK_SHIFT) ? caps_word_enabled_shift_pressed_icon : caps_word_enabled_icon;
         }
+
+        oled_set_cursor(0, 5);
+
+        oled_write_char('0' + left_mod_hold_count, false);
 
         uint8_t start_x = oled_rotation_width >> 2;
         if (is_hrm_disabled) {

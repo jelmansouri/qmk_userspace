@@ -44,7 +44,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 bool set_scrolling = false;
 
 // Track hold state of left hand mod-tap keys
-static uint8_t right_mod_hold_count = 0;
+uint8_t right_mod_hold_count = 0;
 
 // Handle new Mod Tap shifted keycodes as they are not supported using the MT macro
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
