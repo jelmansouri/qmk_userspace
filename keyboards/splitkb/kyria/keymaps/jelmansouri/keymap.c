@@ -43,13 +43,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool set_scrolling = false;
 
+// Track hold state of left hand mod-tap keys
+static uint8_t right_mod_hold_count = 0;
+
 // Handle new Mod Tap shifted keycodes as they are not supported using the MT macro
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case AM_CTL:
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_AMPR);
-                return false;
+        case R_CTL:
+            if (!record->tap.count && record->event.pressed) {
+                // R_CTL is being held - check if other left mods are active
+                if (right_mod_hold_count > 0) {
+                    // Other left hand mods are held, just send R instead of control mod
+                    tap_code16(KC_R);
+                    return false;
+                }
+            }
+            break;
+        case I_CTL:
+            if (!record->tap.count && record->event.pressed) {
+                // S_ALT is being held
+                right_mod_hold_count++;
+            } else if (!record->tap.count && !record->event.pressed) {
+                // S_ALT hold is released
+                right_mod_hold_count--;
             }
             break;
         case AS_ALT:
