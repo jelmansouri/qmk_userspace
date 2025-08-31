@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include QMK_KEYBOARD_H
 
 #include "keymap.h"
@@ -43,60 +44,68 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool set_scrolling = false;
 
-// Track hold state of left hand mod-tap keys
-uint8_t     right_mod_hold_count = 0;
-uint8_t     left_mod_hold_count  = 0;
-static bool r_registred          = false;
+uint8_t     right_mod_hold_count     = 0;
+static bool right_registred_state[3] = {0};
+uint8_t     left_mod_hold_count      = 0;
+static bool left_registred_state[3]  = {0};
 
-// Handle new Mod Tap shifted keycodes as they are not supported using the MT macro
+static inline bool register_hold_as_tap_key_down(uint16_t keycode, keyrecord_t *record,
+                                                 uint8_t *this_side_mod_hold_cound, uint8_t *other_side_mod_hold_cound,
+                                                 bool *registered_state) {
+    // We only special-case holds (tap.count == 0). Taps fall through to QMK.
+    if (!record->tap.count && record->event.pressed) {
+        if (*other_side_mod_hold_cound > 0) {
+            // Other side is holding a mod-tap: emit the tap key instead of the mod.
+            register_code16(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
+            *registered_state = true;
+            return true;
+        } else {
+            (*this_side_mod_hold_cound)++;
+        }
+    } else if (!record->tap.count && !record->event.pressed) {
+        if (*registered_state) {
+            // We previously registered the tap key on press; release it now.
+            unregister_code16(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
+            *registered_state = false;
+            return true;
+        } else if (*this_side_mod_hold_cound > 0) {
+            (*this_side_mod_hold_cound)--;
+        }
+    }
+    return false;
+}
+
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    int state_idx = 3;
     switch (keycode) {
+        // Right-hand mod-taps (map to indices 0..2)
         case R_CTL:
-            if (!record->tap.count && record->event.pressed) {
-                if (right_mod_hold_count > 0) {
-                    // Other left hand mods are held, just send R instead of control mod
-                    register_code16(KC_R);
-                    r_registred = true;
-                    return false;
-                } else {
-                    left_mod_hold_count++;
-                }
-            } else if (!record->tap.count && !record->event.pressed) {
-                if (r_registred) {
-                    // Other left hand mods are held, just send R instead of control mod
-                    unregister_code16(KC_R);
-                    r_registred = false;
-                    return false;
-                } else {
-                    left_mod_hold_count--;
-                }
+            state_idx--; /* fallthrough */
+        case S_ALT:
+            state_idx--; /* fallthrough */
+        case T_GUI:
+            state_idx--;
+            if (register_hold_as_tap_key_down(keycode, record, &left_mod_hold_count, &right_mod_hold_count,
+                                              &left_registred_state[state_idx])) {
+                return false;
             }
             break;
         case I_CTL:
-            if (!record->tap.count && record->event.pressed) {
-                // S_ALT is being held
-                right_mod_hold_count++;
-            } else if (!record->tap.count && !record->event.pressed) {
-                // S_ALT hold is released
-                right_mod_hold_count--;
-            }
-            break;
+            // Left-hand mod-taps (map to indices 0..2)
+            state_idx--; /* fallthrough */
         case E_ALT:
-            if (!record->tap.count && record->event.pressed) {
-                // S_ALT is being held
-                right_mod_hold_count++;
-            } else if (!record->tap.count && !record->event.pressed) {
-                // S_ALT hold is released
-                right_mod_hold_count--;
+            state_idx--; /* fallthrough */
+        case N_GUI:
+            state_idx--;
+            if (register_hold_as_tap_key_down(keycode, record, &right_mod_hold_count, &left_mod_hold_count,
+                                              &right_registred_state[state_idx])) {
+                return false;
             }
             break;
-        case N_GUI:
-            if (!record->tap.count && record->event.pressed) {
-                // S_ALT is being held
-                right_mod_hold_count++;
-            } else if (!record->tap.count && !record->event.pressed) {
-                // S_ALT hold is released
-                right_mod_hold_count--;
+        case AM_CTL:
+            if (record->tap.count && record->event.pressed) {
+                tap_code16(KC_AMPR);
+                return false;
             }
             break;
         case AS_ALT:
