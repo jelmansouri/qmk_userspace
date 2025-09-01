@@ -25,6 +25,21 @@ That’s when I decided to give tap-hold another shot, this time with [urob’s 
 
 The unavoidable challenge with HRM is that it cares about release order as well as press order. My muscle memory only ever tracked presses. For example, Ctrl + A could be done as Ctrl down → A down → Ctrl up → A up, or Ctrl down → A down → A up → Ctrl up. With timeless HRM and permissibve hold/balanced settings, only the first produces the intended behavior. Rewiring this took practice: I spent 10 minutes a day slowly drilling the correct up/down order, and after about two weeks I saw a real improvement.
 
+### Configuration
+
+I'm using the following configuration to achieve timeless homerow mods in QMK:
+
+```c
+#define TAPPING_TERM 280
+#define FLOW_TAP_TERM 150
+#define CHORDAL_HOLD
+#define PERMISSIVE_HOLD
+#define QUICK_TAP_TERM 0
+#define CAPS_WORD_INVERT_ON_SHIFT
+```
+
+In addition to QMK’s default behavior defined by the configuration above, I’ve added a custom rule for bilateral holds. Once a hold is detected on one hand, any simultaneous holds on the other hand are treated as tap-holds rather than modifier holds. In practice, this means you can’t activate the same modifier on both sides at once. For example, depending on which hand is holding Control, you’ll end up with either Ctrl + I repeating or Ctrl + R repeating, but never Control being held on both hands simultaneously.
+
 ## Layers:
 
 After wrestling with home-row mods, the next big design decision was how many layers to live with. Putting Shift on the thumb cluster broke the neat modifier-layer logic I had liked in the Kyriel approach, but it wasn’t much of a concession. I prefer a low number of layers anyway—constant layer switching only adds to the cognitive burden while typing. What mattered more was keeping navigation and the numpad anchored on the right half of the split. I’m used to moving lines in code editors by typing a relative line number followed by up or down, so I needed a flow where my left hand triggers the layer, the right hand types the number, and then I can immediately switch to Raise (sometimes while still holding Lower) and hit the direction keys. That interaction dictated the way I built the layers more than anything else.
