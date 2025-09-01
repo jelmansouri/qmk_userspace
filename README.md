@@ -27,6 +27,7 @@ This worked better, but **combining multiple modifiers was still clumsy**, espec
 Around that time I saw a write-up about the **Kyriel design**, which implements home row mods **without relying on mod-tap behavior**. I gave it a fair **two-week trial** while on vacation. It introduced more layers so modifiers could sit on the same side as the layer thumb keys, which gave the layout a **clean internal logic** I really enjoyed. But even with consistent use, **it never felt comfortable enough**. That’s when I decided to give tap-hold another shot—this time with **urob’s “timeless” HRM approach**. It directly solved one of my biggest gripes:  
 - **Perceived latency**  
 - **Reliance on tapping term** (since my typing speed isn’t consistent)  
+
 With **flow tap** (`require-prior-idle` on ZMK), false positives dropped to **nearly zero**, and the layout finally felt **snappy**. The only remaining issue was **false negatives—mostly with Shift**. Typing something like `AsRef` required waiting for the `FLOW_TAP_TERM` before hitting `R`, which was frustrating.
 
 **Solution:** I moved **Shift back to a dedicated thumb key** on both halves, and left only **GUI, Alt, and Ctrl** on the home row.  
@@ -42,8 +43,6 @@ My muscle memory only tracked presses. For example:
   - `Ctrl down → A down → A up → Ctrl up` ❌ (fails with timeless HRM + permissive hold/balanced)  
 
 Rewiring this took practice. I spent **10 minutes a day drilling the correct up/down order**, and after about **two weeks** I saw a real improvement.
-
----
 
 ### Configuration
 
