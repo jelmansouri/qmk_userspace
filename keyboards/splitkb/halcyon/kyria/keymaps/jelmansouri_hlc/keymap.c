@@ -54,26 +54,89 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 };
 // clang-format on
 
+// This function allows held keys on one side of the keyboard to behave as long tap key press if the other side
+// registered a hold beforehand, so instead of relying on quick tap, you can hold CTL + R (on Colemak-DH) to do a
+// continuous redo for example, othewise CTL would be held on both sides
+static inline bool register_mod_hold_as_tap_hold(uint16_t keycode, keyrecord_t *record,
+                                                 uint8_t *this_side_mod_hold_count, uint8_t *other_side_mod_hold_count,
+                                                 bool *registered_state) {
+    // We only special-case holds (tap.count == 0). Taps fall through to QMK.
+    if (record->tap.count == 0 && record->event.pressed) {
+        if (*other_side_mod_hold_count > 0) {
+            // Other side is holding a mod-tap: emit the tap key instead of the mod.
+            register_code(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
+            *registered_state = true;
+            return true;
+        } else {
+            (*this_side_mod_hold_count)++;
+        }
+    } else if (record->tap.count == 0 && !record->event.pressed) {
+        if (*registered_state) {
+            // We previously registered the tap key on press; release it now.
+            unregister_code(QK_MOD_TAP_GET_TAP_KEYCODE(keycode));
+            *registered_state = false;
+            return true;
+        } else if (*this_side_mod_hold_count > 0) {
+            (*this_side_mod_hold_count)--;
+        }
+    }
+    return false;
+}
+
+#define HRM_MOD_TAP_PER_SIDE 3
+
+#if __STDC_VERSION__ >= 201112L
+// To no to forget to update the fallthrough logic
+_Static_assert(HRM_MOD_TAP_PER_SIDE == 3, "Update index mapping if count changes");
+#endif
+
 bool set_scrolling = false;
 
-// Handle new Mod Tap shifted keycodes as they are not supported using the MT macro
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    static uint8_t right_mod_hold_count                                       = 0;
+    static bool    right_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE] = {0};
+    static uint8_t left_mod_hold_count                                        = 0;
+    static bool    left_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE]  = {0};
+
+    int state_idx = HRM_MOD_TAP_PER_SIDE;
     switch (keycode) {
+        // Right-hand mod-taps (map to indices 0..2)
+        case R_CTL:
+        case F6_CTL:
+            state_idx--; /* fallthrough */
+        case S_ALT:
+        case F7_ALT:
+            state_idx--; /* fallthrough */
+        case T_GUI:
+        case F8_GUI:
+            state_idx--;
+            if (register_mod_hold_as_tap_hold(keycode, record, &left_mod_hold_count, &right_mod_hold_count,
+                                              &left_hold_registered_as_press_state[state_idx])) {
+                return false;
+            }
+            break;
+
+        // Left-hand mod-taps (map to indices 0..2)
+        case I_CTL:
+        case N6_CTL:
+            state_idx--; /* fallthrough */
+        case E_ALT:
+        case N5_ALT:
+            state_idx--; /* fallthrough */
+        case N_GUI:
+        case N4_GUI:
+            state_idx--;
+            if (register_mod_hold_as_tap_hold(keycode, record, &right_mod_hold_count, &left_mod_hold_count,
+                                              &right_hold_registered_as_press_state[state_idx])) {
+                return false;
+            }
+            break;
+
         case AM_CTL:
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_AMPR);
-                return false;
-            }
-            break;
         case AS_ALT:
-            if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_ASTR);
-                return false;
-            }
-            break;
         case LP_GUI:
             if (record->tap.count && record->event.pressed) {
-                tap_code16(KC_LPRN);
+                tap_code16(S(QK_MOD_TAP_GET_TAP_KEYCODE(keycode)));
                 return false;
             }
             break;
