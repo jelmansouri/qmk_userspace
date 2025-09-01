@@ -13,39 +13,28 @@ My layout primary goals
  
 ## Shiftless and timeless homerow mods
 
-One of the most common recommendations in the ergo keyboard world is to adopt **home row mods (HRMs)**.  
-
-I first tried them through Oryx on a fresh Voyager, back before **chordal hold** was available in QMK. I didn’t want to give up Oryx to use Accordion at the time, so I experimented with **tap-hold terms** and every available setting.  
-Eventually I gave up: the setup **hurt more than it helped**. I felt **latency on the home row**, dealt with **too many false positives and negatives**, and the experience killed my enjoyment of the board. Tap-hold on the **thumb cluster** (Enter and Space) felt like the **lesser evil**, since latency bothered me less there.
+One of the most common recommendations in the ergo keyboard world is to adopt **home row mods (HRMs)**. I first tried them through Oryx on a fresh Voyager, back before **chordal hold** was available in QMK. I didn’t want to give up Oryx to use Accordion at the time, so I experimented with **tap-hold terms** and every available setting. Eventually I gave up: the setup **hurt more than it helped**. I felt **latency on the home row**, dealt with **too many false positives and negatives**, and the experience killed my enjoyment of the board. Tap-hold on the **thumb cluster** (Enter and Space) felt like the **lesser evil**, since latency bothered me less there.
 
 When I switched to the **Corne**, the extra thumb key helped me push more modifiers down to the thumbs. It was an improvement, but still imperfect:  
 - **Mod-taps overlapped with Enter and Space**, often triggering the wrong thing (like sending a message prematurely).  
 - **Combining multiple modifiers required awkward finger gymnastics**, which felt especially out of place on an ergo board.
 
-A major motivation for moving to the **Kyria** (besides its better stagger, which is hard to give up once you get used to it) was the **extra thumb keys**.  
-I dedicated the **innermost cluster** (aligned vertically) to modifiers:  
+A major motivation for moving to the **Kyria** (besides its better stagger, which is hard to give up once you get used to it) was the **extra thumb keys**. I dedicated the **innermost cluster** (aligned vertically) to modifiers:  
 - Shift + Ctrl on one side  
 - Cmd + Shift on the other  
 
 This worked better, but **combining multiple modifiers was still clumsy**, especially when layers were involved (e.g., **Option + Shift + nav layer + arrows to select text**).
-
-Around that time I saw a write-up about the **Kyriel design**, which implements home row mods **without relying on mod-tap behavior**. I gave it a fair **two-week trial** while on vacation.  
-It introduced more layers so modifiers could sit on the same side as the layer thumb keys, which gave the layout a **clean internal logic** I really enjoyed. But even with consistent use, **it never felt comfortable enough**.
-That’s when I decided to give tap-hold another shot—this time with **urob’s “timeless” HRM approach**.  
-It directly solved one of my biggest gripes:  
+Around that time I saw a write-up about the **Kyriel design**, which implements home row mods **without relying on mod-tap behavior**. I gave it a fair **two-week trial** while on vacation. It introduced more layers so modifiers could sit on the same side as the layer thumb keys, which gave the layout a **clean internal logic** I really enjoyed. But even with consistent use, **it never felt comfortable enough**. That’s when I decided to give tap-hold another shot—this time with **urob’s “timeless” HRM approach**. It directly solved one of my biggest gripes:  
 - **Perceived latency**  
 - **Reliance on tapping term** (since my typing speed isn’t consistent)  
-
-With **flow tap** (`require-prior-idle` on ZMK), false positives dropped to **nearly zero**, and the layout finally felt **snappy**.  
-
-The only remaining issue was **false negatives—mostly with Shift**. Typing something like `AsRef` required waiting for the `FLOW_TAP_TERM` before hitting `R`, which was frustrating.  
+With **flow tap** (`require-prior-idle` on ZMK), false positives dropped to **nearly zero**, and the layout finally felt **snappy**. The only remaining issue was **false negatives—mostly with Shift**. Typing something like `AsRef` required waiting for the `FLOW_TAP_TERM` before hitting `R`, which was frustrating.
 
 **Solution:** I moved **Shift back to a dedicated thumb key** on both halves, and left only **GUI, Alt, and Ctrl** on the home row.  
 
 As a **Mac and Vim user**, I use all three often—far more than on Windows where Ctrl dominates shortcuts—so keeping the **natural Ctrl–Opt–Cmd order** from Mac keyboards made sense.  
 I didn’t have to sacrifice one of them to the pinky, and the layout became both **consistent and reliable**.
 
-The unavoidable challenge with HRM is that it cares about **release order as well as press order**.  
+The unavoidable challenge with HRM is that it cares about **release order as well as press order**. 
 
 My muscle memory only tracked presses. For example:  
 - `Ctrl + A` could be done as:  
