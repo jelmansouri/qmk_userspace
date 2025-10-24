@@ -2,7 +2,7 @@
 
 #include "keymap.h"
 
-extern uint8_t* oled_cursor;
+extern uint8_t *oled_cursor;
 extern uint8_t  oled_buffer[];
 extern uint8_t  oled_rotation_width;
 
@@ -210,7 +210,7 @@ static const char PROGMEM control_pressed_icon[ICON_SIZE] = {
     0, 0,   0,   128, 192, 192, 192, 192, 192, 192, 192, 192, 128, 0,   0,   0,
 };
 
-void oled_write_icon(const char* PROGMEM icon, uint8_t col, uint8_t line) {
+void oled_write_icon(const char *PROGMEM icon, uint8_t col, uint8_t line) {
     oled_set_cursor_raw(col, line);
     oled_write_raw_P(icon, HALF_ICON_SIZE);
     oled_set_cursor_raw(col, line + 1);
@@ -221,7 +221,7 @@ bool oled_task_user(void) {
     if (is_keyboard_master()) {
         // Host Keyboard Layer Status
         oled_set_cursor_raw(0, 0);
-        const char* PROGMEM banner          = undefined_layer_banner;
+        const char *PROGMEM banner          = undefined_layer_banner;
         bool                is_hrm_disabled = false;
         switch (get_highest_layer(layer_state | default_layer_state)) {
             case LAYER_BASE:
@@ -244,7 +244,7 @@ bool oled_task_user(void) {
         oled_write_raw_P(banner, BANNER_SIZE);
 
         uint8_t             modifiers        = get_mods();
-        const char* PROGMEM final_shift_icon = modifiers & MOD_MASK_SHIFT ? shift_pressed_icon : shift_icon;
+        const char *PROGMEM final_shift_icon = modifiers & MOD_MASK_SHIFT ? shift_pressed_icon : shift_icon;
         if (is_caps_word_on()) {
             final_shift_icon =
                 (get_weak_mods() & MOD_MASK_SHIFT) ? caps_word_enabled_shift_pressed_icon : caps_word_enabled_icon;
@@ -268,7 +268,7 @@ bool oled_task_user(void) {
                             ICON_ROW);
         }
 
-#define DEBUG_HRM_DISABLE_ON_OPPOSITE_HAND
+// #define DEBUG_HRM_DISABLE_ON_OPPOSITE_HAND
 #if defined(DEBUG_HRM_DISABLE_ON_OPPOSITE_HAND)
         oled_set_cursor(0, 4);
         oled_write_char('0' + left_mod_hold_count, false);
