@@ -20,7 +20,9 @@ typedef enum {
 #define RAISE MO(LAYER_RAISE)
 #define NAV_3D TO(LAYER_NAV_3D)
 
-#define KC_GLO LCTL(LGUI(KC_SPC))
+#define KC_PRSC LGUI(LSFT(KC_4))
+#define KC_RCSC LGUI(LSFT(KC_5))
+#define KC_LCK LGUI(LCTL(KC_Q))
 
 #define KC_HELD KC_TRNS
 
