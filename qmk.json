@@ -48,5 +48,12 @@
                 "TARGET": "splitkb_kyria_rev3_jelmansouri"
             }
         ],
+        [
+            "cyboard/imprint/imprint_letters_only_2key_bottom_row",
+            "jelmansouri",
+            {
+                "TARGET": "cypoard_imprint_jelmansouri"
+            }
+        ],
     ]
 }
