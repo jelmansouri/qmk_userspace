@@ -43,21 +43,32 @@ static const layer_palette_t palette[LAYER_COUNT] = {
 // Thumb key positions (row, col) - based on LAYOUT_split_3x6_5
 static const uint8_t thumb_keys[][2] = {
     // Left side thumb keys
-    {0, 3}, {0, 2}, {0, 1}, {0, 7}, {0, 6}, {0, 5},
+    {0, 3},
+    {0, 2},
+    {0, 1},
+    {0, 7},
+    {0, 6},
+    {0, 5},
     // Right side thumb keys
-    {7, 3}, {7, 2}, {7, 1}, {7, 7}, {7, 6}, {7, 5},
+    {7, 3},
+    {7, 2},
+    {7, 1},
+    {7, 7},
+    {7, 6},
+    {7, 5}};
+
 //
 #define NUM_THUMB_KEYS (sizeof(thumb_keys) / sizeof(thumb_keys[0]))
 
-    // ----- Types -----
-    typedef enum {
-        LAYER_LED_NONE     = 0,
-        LAYER_LED_TAP      = 1,
-        LAYER_LED_MOD      = 2,
-        LAYER_LED_MODTAP   = 3,
-        LAYER_LED_TO_LAYER = 4,
-        LAYER_LED_TRANS    = 5,
-    } layer_led_type_t;
+// ----- Types -----
+typedef enum {
+    LAYER_LED_NONE     = 0,
+    LAYER_LED_TAP      = 1,
+    LAYER_LED_MOD      = 2,
+    LAYER_LED_MODTAP   = 3,
+    LAYER_LED_TO_LAYER = 4,
+    LAYER_LED_TRANS    = 5,
+} layer_led_type_t;
 
 typedef enum {
     LED_ZONE_NORMAL = 0,
