@@ -49,6 +49,11 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 // clang-format on
 
+const uint16_t PROGMEM middle_click_combo[] = {MS_BTN1, MS_BTN2, COMBO_END};
+combo_t                key_combos[]         = {
+    COMBO(middle_click_combo, MS_BTN3),
+};
+
 bool set_scrolling = false;
 
 uint8_t right_mod_hold_count                                       = 0;
