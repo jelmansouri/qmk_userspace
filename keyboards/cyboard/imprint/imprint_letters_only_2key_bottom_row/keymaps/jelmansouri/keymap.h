@@ -10,10 +10,6 @@ typedef enum {
     LAYER_COUNT
 } layer_id_t;
 
-typedef enum {
-    DRAG_SCROLL = SAFE_RANGE,
-} custom_keycodes_t;
-
 #define BASE TO(LAYER_BASE)
 #define BWOHRM MO(LAYER_BASE_NO_HRM)
 #define LOWER MO(LAYER_LOWER)
@@ -48,8 +44,6 @@ typedef enum {
 #define AM_CTL MT(MOD_LCTL, KC_AMPR)
 #define AS_ALT MT(MOD_LALT, KC_ASTR)
 #define LP_GUI MT(MOD_LGUI, KC_LPRN)
-
-#define DSCROLL DRAG_SCROLL
 
 #define HRM_MOD_TAP_PER_SIDE 3
 

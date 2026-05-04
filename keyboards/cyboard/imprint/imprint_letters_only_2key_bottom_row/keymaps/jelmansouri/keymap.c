@@ -40,7 +40,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [LAYER_NAV_3D] = LAYOUT_let(
         KC_NO,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                             RM_TOGG, RM_VALU, RM_VALD,   KC_NO,   KC_NO,   KC_NO,
-        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                               KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
+        KC_NO, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                               KC_NO, DPI_MOD,DPI_RMOD,   KC_NO,   KC_NO,   KC_NO,
         KC_NO, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,                               KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,
                           KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_HELD,           KC_NO,  KC_SPC, KC_BSPC, KC_TRNS, KC_TRNS,
                                             KC_TRNS, KC_TRNS, KC_TRNS,           KC_NO,  KC_ENT,  KC_ESC
@@ -53,8 +53,6 @@ const uint16_t PROGMEM middle_click_combo[] = {MS_BTN1, MS_BTN2, COMBO_END};
 combo_t                key_combos[]         = {
     COMBO(middle_click_combo, MS_BTN3),
 };
-
-bool set_scrolling = false;
 
 uint8_t right_mod_hold_count                                       = 0;
 bool    right_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE] = {0};
@@ -138,18 +136,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 return false;
             }
             break;
-        case DRAG_SCROLL:
-            // Toggle set_scrolling when DRAG_SCROLL key is pressed or released
-            set_scrolling = record->event.pressed;
-            break;
     }
     return true;
-}
-
-// Function to handle layer changes and disable drag scrolling
-layer_state_t layer_state_set_user(layer_state_t state) {
-    set_scrolling = false;
-    return state;
 }
 
 bool is_flow_tap_key(uint16_t keycode) {
