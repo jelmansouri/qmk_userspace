@@ -47,6 +47,11 @@ typedef enum {
 
 #define HRM_MOD_TAP_PER_SIDE 3
 
+#define LDPI_FR LEFT_POINTER_DEFAULT_DPI_FORWARD
+#define LDPI_RV LEFT_POINTER_DEFAULT_DPI_REVERSE
+#define RDPI_FR RIGHT_POINTER_DEFAULT_DPI_FORWARD
+#define RDPI_RV RIGHT_POINTER_DEFAULT_DPI_REVERSE
+
 extern uint8_t right_mod_hold_count;
 extern uint8_t left_mod_hold_count;
 extern bool    right_hold_registered_as_press_state[HRM_MOD_TAP_PER_SIDE];
