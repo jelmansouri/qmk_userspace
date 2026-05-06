@@ -10,6 +10,20 @@ typedef enum {
     LAYER_COUNT
 } layer_id_t;
 
+typedef enum {
+    LEFT_CPI_200 = QK_USER_0,
+    LEFT_CPI_400,
+    LEFT_CPI_800,
+    LEFT_CPI_1600,
+    LEFT_CPI_3200,
+
+    RIGHT_CPI_200,
+    RIGHT_CPI_400,
+    RIGHT_CPI_800,
+    RIGHT_CPI_1600,
+    RIGHT_CPI_3200,
+} custom_keycodes_t;
+
 #define BASE TO(LAYER_BASE)
 #define BWOHRM MO(LAYER_BASE_NO_HRM)
 #define LOWER MO(LAYER_LOWER)
@@ -47,10 +61,17 @@ typedef enum {
 
 #define HRM_MOD_TAP_PER_SIDE 3
 
-#define LDPI_FR LEFT_POINTER_DEFAULT_DPI_FORWARD
-#define LDPI_RV LEFT_POINTER_DEFAULT_DPI_REVERSE
-#define RDPI_FR RIGHT_POINTER_DEFAULT_DPI_FORWARD
-#define RDPI_RV RIGHT_POINTER_DEFAULT_DPI_REVERSE
+#define LCPI_1 LEFT_CPI_200
+#define LCPI_2 LEFT_CPI_400
+#define LCPI_3 LEFT_CPI_800
+#define LCPI_4 LEFT_CPI_1600
+#define LCPI_5 LEFT_CPI_3200
+
+#define RCPI_1 RIGHT_CPI_200
+#define RCPI_2 RIGHT_CPI_400
+#define RCPI_3 RIGHT_CPI_800
+#define RCPI_4 RIGHT_CPI_1600
+#define RCPI_5 RIGHT_CPI_3200
 
 extern uint8_t right_mod_hold_count;
 extern uint8_t left_mod_hold_count;

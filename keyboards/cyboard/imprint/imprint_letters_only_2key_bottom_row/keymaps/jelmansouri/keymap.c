@@ -40,8 +40,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     [LAYER_NAV_3D] = LAYOUT_let(
       XXXXXXX,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                             RM_TOGG, RM_VALU, RM_VALD, XXXXXXX, XXXXXXX, XXXXXXX,
-      XXXXXXX, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                             XXXXXXX, LDPI_FR, LDPI_RV, XXXXXXX, XXXXXXX, XXXXXXX,
-      XXXXXXX, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,                             XXXXXXX, RDPI_FR, RDPI_RV, XXXXXXX, XXXXXXX, XXXXXXX,
+      XXXXXXX, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                              LCPI_1,  LCPI_2,  LCPI_3,  LCPI_4,  LCPI_5, XXXXXXX,
+      XXXXXXX, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,                              RCPI_1,  RCPI_2,  RCPI_3,  RCPI_4,  RCPI_5, XXXXXXX,
                           _______, _______, _______, _______, KC_HELD,         XXXXXXX,  KC_SPC, KC_BSPC, _______, _______,
                                             _______, _______, _______,         XXXXXXX,  KC_ENT,  KC_ESC
     )
@@ -136,6 +136,20 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
                 return false;
             }
             break;
+
+        case LEFT_CPI_200 ... LEFT_CPI_3200:
+            if (record->event.pressed) {
+                uint16_t cpi = 200 << (keycode - LEFT_CPI_200);
+                pointing_device_set_cpi_on_side(true, cpi);
+            }
+            return false;
+
+        case RIGHT_CPI_200 ... RIGHT_CPI_3200:
+            if (record->event.pressed) {
+                uint16_t cpi = 200 << (keycode - RIGHT_CPI_200);
+                pointing_device_set_cpi_on_side(false, cpi);
+            }
+            return false;
     }
     return true;
 }
