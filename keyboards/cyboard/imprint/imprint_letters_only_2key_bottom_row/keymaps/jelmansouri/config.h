@@ -67,13 +67,3 @@
 #    undef ENABLE_RGB_MATRIX_RIVERFLOW                 // Modification to breathing animation, offset's animation depending on key location to simulate a river flowing
 // clang-format on
 #endif // RGB_MATRIX_ENABLE
-
-#ifdef OLED_ENABLE
-#    define SPLIT_OLED_ENABLE
-#    define OLED_TIMEOUT 600000
-#endif // OLED_ENABLE
-
-#ifdef POINTING_DEVICE_ENABLE
-#    define SPLIT_POINTING_ENABLE
-#    define POINTING_DEVICE_RIGHT
-#endif // POINTING_DEVICE_ENABLE
