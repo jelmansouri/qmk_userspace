@@ -1,5 +1,7 @@
 #pragma once
 
+#include "quantum_keycodes.h"
+
 typedef enum {
     LAYER_BASE = 0,
     LAYER_BASE_NO_HRM,
@@ -11,7 +13,7 @@ typedef enum {
 } layer_id_t;
 
 typedef enum {
-    SCROLL_CPI_200 = QK_USER_0,
+    SCROLL_CPI_200 = SAFE_RANGE,
     SCROLL_CPI_300,
     SCROLL_CPI_400,
     SCROLL_CPI_500,
