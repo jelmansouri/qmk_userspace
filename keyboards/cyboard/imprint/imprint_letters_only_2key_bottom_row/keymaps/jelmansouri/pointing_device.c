@@ -2,90 +2,257 @@
 
 #if defined(POINTING_DEVICE_ENABLE) && defined(SPLIT_POINTING_ENABLE) && defined(POINTING_DEVICE_COMBINED)
 
+/* =========================================================================
+ * Sensor CPI (counts per inch). Drives velocity scaling for every threshold
+ * below: velocity = (sensor counts * 1000) / elapsed_ms, so doubling CPI
+ * doubles the perceived velocity for the same physical motion.
+ * If you change CPI, rescale TAKEOFF / KNEE / VELOCITY_MAX / spike counts
+ * roughly proportionally.
+ * ========================================================================= */
+
+/* Left-hand sensor CPI. Higher values track finer scroll motion but raise
+ * the velocity scale (and thus how soon scroll accel kicks in). */
 #    ifndef IMPRINT_POINTING_LEFT_DEFAULT_CPI
 #        define IMPRINT_POINTING_LEFT_DEFAULT_CPI 1000
 #    endif
 
+/* Right-hand sensor CPI for cursor. Lower values give finer cursor control
+ * at low speeds; the accel curve compensates for fast motion. */
 #    ifndef IMPRINT_POINTING_RIGHT_DEFAULT_CPI
 #        define IMPRINT_POINTING_RIGHT_DEFAULT_CPI 400
 #    endif
 
+/* =========================================================================
+ * Sensor noise filter. Drops sub-threshold jitter unless it forms a
+ * consistent direction within a short window. Bypassed during active motion
+ * (see IMPRINT_SENSOR_ACTIVE_MS).
+ * ========================================================================= */
+
+/* Manhattan-magnitude threshold below which a sample is "noise-sized" and
+ * subject to confirmation. Raise to be more aggressive about filtering tiny
+ * sensor jitter; lower to let small motions through immediately. */
 #    ifndef IMPRINT_SENSOR_NOISE_COUNTS
 #        define IMPRINT_SENSOR_NOISE_COUNTS 1
 #    endif
 
+/* Cumulative magnitude required to confirm a held noise candidate. With
+ * COUNTS=1 and CONFIRM=2, you need at least two same-direction ticks to
+ * release motion. Higher = more conservative. */
 #    ifndef IMPRINT_SENSOR_NOISE_CONFIRM_COUNTS
 #        define IMPRINT_SENSOR_NOISE_CONFIRM_COUNTS 2
 #    endif
 
+/* Time window (ms) for confirming the held noise candidate. If a second
+ * agreeing tick doesn't arrive within this window, pending state expires.
+ * Slow drift (1 tick / >CONFIRM_MS) will be silently filtered. */
 #    ifndef IMPRINT_SENSOR_NOISE_CONFIRM_MS
 #        define IMPRINT_SENSOR_NOISE_CONFIRM_MS 15
 #    endif
 
+/* Active-motion grace period (ms). While motion is being accepted, the noise
+ * filter is bypassed for this long after the last released sample. Higher =
+ * smoother feel during continuous motion; too high and re-engaging the noise
+ * filter at the end of a stroke takes a while. */
 #    ifndef IMPRINT_SENSOR_ACTIVE_MS
 #        define IMPRINT_SENSOR_ACTIVE_MS 40
 #    endif
 
+/* =========================================================================
+ * Sensor spike filter. Catches implausibly large jumps that don't match
+ * the recent motion envelope and either caps them or holds them one frame
+ * for confirmation.
+ * ========================================================================= */
+
+/* Magnitudes below this are never considered spikes and pass through
+ * unchecked. Set near the top of "normal motion" range. */
 #    ifndef IMPRINT_SENSOR_SPIKE_COUNTS
 #        define IMPRINT_SENSOR_SPIKE_COUNTS 32U
 #    endif
 
+/* Hard cap used when motion arrives after a quiet period (no recent_motion).
+ * The first frame coming out of idle is allowed up to this magnitude. */
 #    ifndef IMPRINT_SENSOR_SPIKE_IDLE_COUNTS
 #        define IMPRINT_SENSOR_SPIKE_IDLE_COUNTS 80U
 #    endif
 
+/* How long after the last accepted motion we still consider the user
+ * "active" for spike-envelope purposes. Past this, spike checks fall back
+ * to the idle path with the IDLE_COUNTS cap. */
 #    ifndef IMPRINT_SENSOR_SPIKE_WINDOW_MS
 #        define IMPRINT_SENSOR_SPIKE_WINDOW_MS 20U
 #    endif
 
+/* A held suspicious sample must be re-asserted (similar direction, similar
+ * magnitude) within this window to be accepted (capped). Past the window,
+ * the held candidate is dropped and a new one is held. */
 #    ifndef IMPRINT_SENSOR_SPIKE_CONFIRM_MS
 #        define IMPRINT_SENSOR_SPIKE_CONFIRM_MS 8U
 #    endif
 
+/* During recent motion, samples up to last_movement * MAX_MULTIPLIER pass
+ * through. Larger = more tolerant of acceleration; too large lets spikes
+ * through. */
 #    ifndef IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER
 #        define IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER 5U
 #    endif
 
+/* Additive grace term on top of last_movement * MULT. Allows a small jump
+ * even when last_movement is near zero. */
 #    ifndef IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS
 #        define IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS 16U
 #    endif
 
+/* Lower bound for the recent-activity envelope. Without this, a noise-confirm
+ * release (which sets last_movement to ~CONFIRM_COUNTS) collapses the
+ * envelope and false-flags the next legitimate motion as a spike.
+ * Effective allowance: max(last_movement, BASELINE) * MULT + ACCEL_COUNTS. */
+#    ifndef IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS
+#        define IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS 16U
+#    endif
+
+/* =========================================================================
+ * Right-hand cursor acceleration curve.
+ *   gain(v) = 1 + (MAX_GAIN - 1) * v² / (v² + KNEE²)   for v > TAKEOFF
+ * (clamped at v <= VELOCITY_MAX). Gain is multiplied into each axis using
+ * Q-fixed-point math to preserve sub-pixel precision via a per-axis carry.
+ *
+ * Velocity is the Euclidean magnitude of (x, y) per ms (not Manhattan), so
+ * diagonal motion gets the same gain as cardinal motion of equal physical
+ * speed. TAKEOFF/KNEE are calibrated against this Euclidean magnitude.
+ * ========================================================================= */
+
+/* Velocity below which gain stays at 1.0 (no acceleration). Raise to widen
+ * the precision zone; lower to make accel kick in earlier. */
 #    ifndef IMPRINT_RIGHT_ACCEL_TAKEOFF
 #        define IMPRINT_RIGHT_ACCEL_TAKEOFF 900U
 #    endif
 
+/* Half-response point of the curve (where gain ≈ midway between 1 and MAX).
+ * Smaller KNEE = sharper transition; larger = smoother ramp. */
 #    ifndef IMPRINT_RIGHT_ACCEL_KNEE
 #        define IMPRINT_RIGHT_ACCEL_KNEE 3600U
 #    endif
 
-#    ifndef IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8
-#        define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8 704U
+/* Velocity clamp before evaluating the curve. Mostly there to keep
+ * intermediate math bounded on extreme flicks; rarely needs tuning. */
+#    ifndef IMPRINT_RIGHT_ACCEL_VELOCITY_MAX
+#        define IMPRINT_RIGHT_ACCEL_VELOCITY_MAX 30000U
 #    endif
 
+/* If the cursor sits idle longer than this, the per-axis carry is dropped
+ * so the next motion starts from a clean state. */
 #    ifndef IMPRINT_RIGHT_ACCEL_CARRY_TIMEOUT_MS
 #        define IMPRINT_RIGHT_ACCEL_CARRY_TIMEOUT_MS 120U
 #    endif
 
+/* =========================================================================
+ * Left-hand scroll acceleration curve.
+ *   divisor(v) = base - (base - min) * v² / (v² + KNEE²)   for v > TAKEOFF
+ * Larger divisor = more sensor counts needed per scroll tick; the curve
+ * smoothly shrinks the divisor with speed, giving "page-flick" behavior.
+ * ========================================================================= */
+
+/* Velocity below which the divisor stays at base (slowest scroll). Lower
+ * = scroll accel ramps up sooner. */
+#    ifndef IMPRINT_LEFT_SCROLL_ACCEL_TAKEOFF
+#        define IMPRINT_LEFT_SCROLL_ACCEL_TAKEOFF 600U
+#    endif
+
+/* Half-response point. Lower KNEE = scroll reaches max speed faster. */
+#    ifndef IMPRINT_LEFT_SCROLL_ACCEL_KNEE
+#        define IMPRINT_LEFT_SCROLL_ACCEL_KNEE 4500U
+#    endif
+
+/* Velocity clamp; same role as the right-side counterpart. */
+#    ifndef IMPRINT_LEFT_SCROLL_ACCEL_VELOCITY_MAX
+#        define IMPRINT_LEFT_SCROLL_ACCEL_VELOCITY_MAX 30000U
+#    endif
+
+/* =========================================================================
+ * Velocity smoothing (single-pole EMA shared by both sides):
+ *   smoothed = (prev * (D-N) + cur * N) / D
+ * N == D disables smoothing. Smaller N/D ratios (e.g., 1/4) feel "heavier"
+ * (more lag, less jitter); larger ratios (e.g., 3/4) are snappier.
+ * ========================================================================= */
+
+/* Numerator of the new-sample weight. */
+#    ifndef IMPRINT_VELOCITY_SMOOTH_NUMER
+#        define IMPRINT_VELOCITY_SMOOTH_NUMER 1U
+#    endif
+
+/* Denominator. Default 1/2 = balanced smoothing. */
+#    ifndef IMPRINT_VELOCITY_SMOOTH_DENOM
+#        define IMPRINT_VELOCITY_SMOOTH_DENOM 2U
+#    endif
+
+#    if (IMPRINT_VELOCITY_SMOOTH_DENOM == 0U) || (IMPRINT_VELOCITY_SMOOTH_NUMER == 0U) || \
+        (IMPRINT_VELOCITY_SMOOTH_NUMER > IMPRINT_VELOCITY_SMOOTH_DENOM)
+#        error "IMPRINT_VELOCITY_SMOOTH_NUMER must be in [1, IMPRINT_VELOCITY_SMOOTH_DENOM] and DENOM > 0"
+#    endif
+
+/* =========================================================================
+ * Q fixed-point precision used by accel + scroll accumulators.
+ * Q12 (default) = 4096 sub-units per integer; Q16 = 65536. Higher = finer
+ * sub-tick resolution at the cost of slightly larger intermediate math.
+ * Q12 is the right balance for RP2040 (no FPU); Q16 also fits comfortably.
+ * ========================================================================= */
+#    ifndef IMPRINT_Q_SHIFT
+#        define IMPRINT_Q_SHIFT 12U
+#    endif
+
+#    if (IMPRINT_Q_SHIFT < 1U) || (IMPRINT_Q_SHIFT > 30U)
+#        error "IMPRINT_Q_SHIFT must be between 1 and 30"
+#    endif
+
+#    define IMPRINT_Q_ONE   ((int32_t)1 << IMPRINT_Q_SHIFT)
+#    define IMPRINT_Q_ONE_U ((uint32_t)1U << IMPRINT_Q_SHIFT)
+
+/* Maximum gain applied at peak velocity, expressed in current-Q units.
+ * Default = 11/4 = 2.75x. Legacy: define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8
+ * (in Q8 units, e.g., 704 = 2.75x) and it will be auto-converted. */
+#    ifndef IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q
+#        ifdef IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8
+/* Legacy Q8 fallback. The result must fit in uint32_t; guard against
+ * misconfiguration where a large legacy Q8 value combined with a large
+ * IMPRINT_Q_SHIFT would overflow the runtime type. */
+#            if (((uint64_t)(IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8) * (1ULL << IMPRINT_Q_SHIFT) / 256ULL) > 0xFFFFFFFFULL
+#                error "IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8 overflows uint32_t at the configured IMPRINT_Q_SHIFT; define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q directly or lower IMPRINT_Q_SHIFT"
+#            endif
+#            define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q ((uint32_t)(((uint64_t)(IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8) * IMPRINT_Q_ONE_U) / 256U))
+#        else
+#            define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q ((uint32_t)(((uint64_t)IMPRINT_Q_ONE_U * 11U) / 4U))
+#        endif
+#    endif
+
+/* =========================================================================
+ * Left-hand scroll output stage. Sensor delta is divided by `divisor` (per
+ * axis) to yield wheel ticks. The accel curve shrinks the divisor with
+ * speed; sub-tick remainders are carried in Q-fixed-point.
+ * ========================================================================= */
+
+/* Base (slow) divisor for horizontal wheel. Larger = slower scroll at low
+ * speed (more counts per tick). */
 #    ifndef IMPRINT_LEFT_SCROLL_DIVISOR_H
 #        define IMPRINT_LEFT_SCROLL_DIVISOR_H 128U
 #    endif
 
+/* Base (slow) divisor for vertical wheel. */
 #    ifndef IMPRINT_LEFT_SCROLL_DIVISOR_V
 #        define IMPRINT_LEFT_SCROLL_DIVISOR_V 128U
 #    endif
 
+/* Minimum divisor at peak velocity (fastest scroll). Smaller = faster
+ * "flick" scrolling. The accel curve interpolates between base and min. */
 #    ifndef IMPRINT_LEFT_SCROLL_MIN_DIVISOR_H
-#        define IMPRINT_LEFT_SCROLL_MIN_DIVISOR_H 12U
+#        define IMPRINT_LEFT_SCROLL_MIN_DIVISOR_H 16U
 #    endif
 
 #    ifndef IMPRINT_LEFT_SCROLL_MIN_DIVISOR_V
-#        define IMPRINT_LEFT_SCROLL_MIN_DIVISOR_V 12U
+#        define IMPRINT_LEFT_SCROLL_MIN_DIVISOR_V 16U
 #    endif
 
-#    ifndef IMPRINT_LEFT_SCROLL_ACCEL_STEP
-#        define IMPRINT_LEFT_SCROLL_ACCEL_STEP 700U
-#    endif
-
+/* Set to 1 to flip the corresponding scroll axis. Useful when the trackball
+ * is mounted such that "natural" scroll feels inverted. */
 #    ifndef IMPRINT_LEFT_SCROLL_REVERSE_X
 #        define IMPRINT_LEFT_SCROLL_REVERSE_X 1
 #    endif
@@ -94,19 +261,50 @@
 #        define IMPRINT_LEFT_SCROLL_REVERSE_Y 1
 #    endif
 
-#    ifndef IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_Y
-#        define IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_Y 1U
+/* =========================================================================
+ * Left-hand scroll axis lock. Constrains scrolling to a single axis once
+ * the user shows clear intent, suppressing diagonal noise. Acquisition is
+ * gated by hysteresis so a single diagonal blip doesn't grab the lock.
+ * ========================================================================= */
+
+/* Acquisition: dominant axis must be at least this many times the other
+ * for HYSTERESIS_SAMPLES consecutive polls before lock commits. Higher =
+ * harder to acquire (purer cardinal motion required). */
+#    ifndef IMPRINT_LEFT_SCROLL_AXIS_LOCK_ACQUIRE_RATIO
+#        define IMPRINT_LEFT_SCROLL_AXIS_LOCK_ACQUIRE_RATIO 2U
 #    endif
 
-#    ifndef IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_X
-#        define IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_X 3U
+/* Number of consecutive qualifying samples needed to commit the lock.
+ * 1 = lock instantly on first dominant sample (no hysteresis). 2 is a good
+ * trade-off between responsiveness and rejecting transients. Max 254. */
+#    ifndef IMPRINT_LEFT_SCROLL_AXIS_LOCK_HYSTERESIS_SAMPLES
+#        define IMPRINT_LEFT_SCROLL_AXIS_LOCK_HYSTERESIS_SAMPLES 2U
 #    endif
 
+#    if IMPRINT_LEFT_SCROLL_AXIS_LOCK_HYSTERESIS_SAMPLES > 254U
+#        error "IMPRINT_LEFT_SCROLL_AXIS_LOCK_HYSTERESIS_SAMPLES must be <= 254"
+#    endif
+
+/* Stay-locked stickiness for vertical lock: while Y is locked, motion stays
+ * locked as long as ay * STAY_RATIO_Y >= ax. Larger = stickier (harder to
+ * break the Y lock with incidental X motion). */
+#    ifndef IMPRINT_LEFT_SCROLL_AXIS_LOCK_STAY_RATIO_Y
+#        define IMPRINT_LEFT_SCROLL_AXIS_LOCK_STAY_RATIO_Y 1U
+#    endif
+
+/* Stay-locked stickiness for horizontal lock. Default 3 makes horizontal
+ * lock noticeably stickier than vertical because horizontal scrolls are
+ * rarer and we want to forgive incidental vertical motion mid-scroll. */
+#    ifndef IMPRINT_LEFT_SCROLL_AXIS_LOCK_STAY_RATIO_X
+#        define IMPRINT_LEFT_SCROLL_AXIS_LOCK_STAY_RATIO_X 3U
+#    endif
+
+/* Idle reset for the entire left-scroll subsystem. After this much quiet
+ * time, all derived state (axis lock, candidate, remainders, smoothed
+ * velocity, directions) is cleared so the next motion cold-starts. */
 #    ifndef IMPRINT_LEFT_SCROLL_IDLE_RESET_MS
-#        define IMPRINT_LEFT_SCROLL_IDLE_RESET_MS 120U
+#        define IMPRINT_LEFT_SCROLL_IDLE_RESET_MS 60U
 #    endif
-
-#    define IMPRINT_Q8 256L
 
 #    ifdef CONSOLE_ENABLE
 #        define IMPRINT_PD_DEBUG(...) uprintf("imprint_pd: " __VA_ARGS__)
@@ -129,20 +327,24 @@ typedef struct {
 } sensor_noise_filter_t;
 
 typedef struct {
-    int32_t  remainder_h_q8;
-    int32_t  remainder_v_q8;
+    int32_t  remainder_h_q;
+    int32_t  remainder_v_q;
+    uint32_t velocity_smooth;
     int8_t   direction_h;
     int8_t   direction_v;
-    int8_t   axis_lock;
+    int8_t   axis_lock;       /* 0 = none, +1 = locked to Y (vertical), -1 = locked to X (horizontal) */
+    int8_t   lock_candidate;  /* proposed lock direction awaiting hysteresis confirmation */
+    uint8_t  lock_samples;    /* consecutive samples agreeing with lock_candidate */
     uint32_t timer;
 } scroll_state_t;
 
 static sensor_noise_filter_t left_noise_filter;
 static sensor_noise_filter_t right_noise_filter;
 static scroll_state_t        left_scroll_state;
-static int32_t               right_accel_carry_x_q8;
-static int32_t               right_accel_carry_y_q8;
+static int32_t               right_accel_carry_x_q;
+static int32_t               right_accel_carry_y_q;
 static uint32_t              right_accel_timer;
+static uint32_t              right_velocity_smooth;
 
 static inline int32_t abs32(int32_t value) {
     if (value >= 0) {
@@ -178,12 +380,21 @@ static uint32_t isqrt_u64(uint64_t value) {
         return 0;
     }
 
-    uint64_t x = value;
-    uint64_t y = (x + 1U) >> 1;
-    while (y < x) {
-        x = y;
-        y = (x + (value / x)) >> 1;
+    const uint8_t bit_length = (uint8_t)(64U - (uint8_t)__builtin_clzll(value));
+    uint64_t      x          = 1ULL << ((bit_length + 1U) >> 1);
+
+    x = (x + (value / x)) >> 1;
+    x = (x + (value / x)) >> 1;
+    x = (x + (value / x)) >> 1;
+
+    while (x > (value / x)) {
+        --x;
     }
+
+    while ((x + 1U) <= (value / (x + 1U))) {
+        ++x;
+    }
+
     return (uint32_t)x;
 }
 
@@ -209,6 +420,17 @@ static report_mouse_t limit_report_manhattan(report_mouse_t report, uint32_t lim
     }
     if (sy == 0 && report.y != 0) {
         sy = sign32(report.y);
+    }
+
+    /* Bumping zeroed axes to ±1 can push the manhattan sum past `limit`
+       (the truncated quotients can each round up by 1). Zero the
+       smaller-magnitude axis to honor the contract. */
+    if ((uint32_t)abs32(sx) + (uint32_t)abs32(sy) > limit) {
+        if ((uint32_t)abs32(sx) <= (uint32_t)abs32(sy)) {
+            sx = 0;
+        } else {
+            sy = 0;
+        }
     }
 
     report.x = clamp_xy(sx);
@@ -247,6 +469,15 @@ static void update_motion_history(sensor_noise_filter_t *state, report_mouse_t r
 }
 
 static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_filter_t *state, char side) {
+    /* Drop a stale held-spike candidate so it doesn't linger past its confirm
+       window. Harmless functionally (the confirmed_spike check already inspects
+       the timer) but keeps state tidy. */
+    if (state->spike_timer && timer_elapsed32(state->spike_timer) > IMPRINT_SENSOR_SPIKE_CONFIRM_MS) {
+        state->spike_x     = 0;
+        state->spike_y     = 0;
+        state->spike_timer = 0;
+    }
+
     const uint32_t movement = manhattan_abs_u32(report.x, report.y);
 
     if (movement == 0 || movement < IMPRINT_SENSOR_SPIKE_COUNTS) {
@@ -265,11 +496,18 @@ static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_fi
     if (!recent_motion) {
         suspicious = movement >= IMPRINT_SENSOR_SPIKE_IDLE_COUNTS;
     } else {
-        allowed = (state->last_movement * IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER) + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS;
+        /* Floor last_movement so a tiny preceding sample (e.g. a noise-confirm
+           release) doesn't collapse the envelope and turn the next real motion
+           into a false spike. */
+        uint32_t effective_last = state->last_movement;
+        if (effective_last < IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS) {
+            effective_last = IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS;
+        }
+        allowed = (effective_last * IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER) + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS;
         aligned = vectors_correlate(report.x, report.y, state->last_x, state->last_y);
 
         suspicious =
-            movement > allowed || (!aligned && movement > state->last_movement + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS);
+            movement > allowed || (!aligned && movement > effective_last + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS);
     }
 
     if (!suspicious) {
@@ -301,8 +539,13 @@ static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_fi
     state->spike_x     = report.x;
     state->spike_y     = report.y;
     state->spike_timer = timer_read32();
-    report.x           = 0;
-    report.y           = 0;
+    /* Keep `recent_motion` alive while we're actively holding spikes so that
+       a real motion arriving just past the spike window doesn't drop into
+       the more conservative idle path. We deliberately leave `last_movement`
+       and `last_x/y` untouched: the held sample is suspicious, not a fact. */
+    state->last_motion_timer = state->spike_timer;
+    report.x                 = 0;
+    report.y                 = 0;
     return report;
 }
 
@@ -382,24 +625,51 @@ static uint32_t elapsed_or_one(uint32_t *timer) {
     return elapsed == 0 ? 1 : elapsed;
 }
 
-static uint32_t right_accel_gain_q8(uint32_t velocity) {
-    const uint32_t max_gain_q8 =
-        IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8 < IMPRINT_Q8 ? IMPRINT_Q8 : IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8;
+/*
+ * Smooth velocity-response curve: returns 0..IMPRINT_Q_ONE_U.
+ * Below `takeoff` the response is 0; above takeoff it ramps as v² / (v² + knee²).
+ * `velocity_max` clamps the input to keep intermediate math bounded.
+ */
+static uint32_t accel_curve_response_q(uint32_t velocity, uint32_t takeoff, uint32_t knee, uint32_t velocity_max) {
+    if (velocity <= takeoff || knee == 0U) {
+        return 0U;
+    }
+    velocity -= takeoff;
+    if (velocity_max != 0U && velocity > velocity_max) {
+        velocity = velocity_max;
+    }
+    const uint64_t v2    = (uint64_t)velocity * velocity;
+    const uint64_t knee2 = (uint64_t)knee * knee;
+    return (uint32_t)((v2 * IMPRINT_Q_ONE_U) / (v2 + knee2));
+}
 
-    if (velocity <= IMPRINT_RIGHT_ACCEL_TAKEOFF || max_gain_q8 == IMPRINT_Q8) {
-        return IMPRINT_Q8;
+static inline uint32_t velocity_smooth_u32(uint32_t prev, uint32_t current) {
+#    if IMPRINT_VELOCITY_SMOOTH_NUMER == IMPRINT_VELOCITY_SMOOTH_DENOM
+    (void)prev;
+    return current;
+#    else
+    return (uint32_t)(((uint64_t)prev * (IMPRINT_VELOCITY_SMOOTH_DENOM - IMPRINT_VELOCITY_SMOOTH_NUMER) +
+                       (uint64_t)current * IMPRINT_VELOCITY_SMOOTH_NUMER) /
+                      IMPRINT_VELOCITY_SMOOTH_DENOM);
+#    endif
+}
+
+static uint32_t right_accel_gain_q(uint32_t velocity) {
+    const uint32_t max_gain_q =
+        IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q < IMPRINT_Q_ONE_U ? IMPRINT_Q_ONE_U : IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q;
+
+    if (max_gain_q == IMPRINT_Q_ONE_U) {
+        return IMPRINT_Q_ONE_U;
     }
 
-    velocity -= IMPRINT_RIGHT_ACCEL_TAKEOFF;
-    if (velocity > 30000U) {
-        velocity = 30000U;
+    const uint32_t curve_q = accel_curve_response_q(velocity, IMPRINT_RIGHT_ACCEL_TAKEOFF, IMPRINT_RIGHT_ACCEL_KNEE,
+                                                    IMPRINT_RIGHT_ACCEL_VELOCITY_MAX);
+    if (curve_q == 0U) {
+        return IMPRINT_Q_ONE_U;
     }
 
-    const uint64_t v2       = (uint64_t)velocity * velocity;
-    const uint64_t knee2    = (uint64_t)IMPRINT_RIGHT_ACCEL_KNEE * IMPRINT_RIGHT_ACCEL_KNEE;
-    const uint32_t curve_q8 = (uint32_t)((v2 * IMPRINT_Q8) / (v2 + knee2));
-
-    return IMPRINT_Q8 + (((max_gain_q8 - IMPRINT_Q8) * curve_q8) / IMPRINT_Q8);
+    const uint64_t boost = ((uint64_t)(max_gain_q - IMPRINT_Q_ONE_U) * curve_q) >> IMPRINT_Q_SHIFT;
+    return IMPRINT_Q_ONE_U + (uint32_t)boost;
 }
 
 static report_mouse_t accelerate_right_report(report_mouse_t report) {
@@ -408,118 +678,190 @@ static report_mouse_t accelerate_right_report(report_mouse_t report) {
 
     if (x == 0 && y == 0) {
         if (right_accel_timer && timer_elapsed32(right_accel_timer) > IMPRINT_RIGHT_ACCEL_CARRY_TIMEOUT_MS) {
-            right_accel_carry_x_q8 = 0;
-            right_accel_carry_y_q8 = 0;
+            right_accel_carry_x_q = 0;
+            right_accel_carry_y_q = 0;
+            right_velocity_smooth = 0;
         }
         return report;
     }
 
     const uint32_t elapsed = elapsed_or_one(&right_accel_timer);
-    if (elapsed > IMPRINT_RIGHT_ACCEL_CARRY_TIMEOUT_MS || opposite_sign(x, right_accel_carry_x_q8) ||
-        opposite_sign(y, right_accel_carry_y_q8)) {
-        right_accel_carry_x_q8 = 0;
-        right_accel_carry_y_q8 = 0;
+    if (elapsed > IMPRINT_RIGHT_ACCEL_CARRY_TIMEOUT_MS || opposite_sign(x, right_accel_carry_x_q) ||
+        opposite_sign(y, right_accel_carry_y_q)) {
+        right_accel_carry_x_q = 0;
+        right_accel_carry_y_q = 0;
+        right_velocity_smooth = 0;
     }
 
-    const uint32_t distance = manhattan_abs_u32(x, y);
+    const uint32_t distance = vector_length_u32(x, y);
     const uint32_t velocity = (distance * 1000U) / elapsed;
-    const uint32_t gain_q8  = right_accel_gain_q8(velocity);
+    /* Cold-start: skip EMA on the very first responsive sample so accel
+       isn't artificially halved coming out of idle. */
+    right_velocity_smooth =
+        right_velocity_smooth ? velocity_smooth_u32(right_velocity_smooth, velocity) : velocity;
+    const uint32_t gain_q = right_accel_gain_q(right_velocity_smooth);
 
-    const int32_t scaled_x_q8 = right_accel_carry_x_q8 + (x * (int32_t)gain_q8);
-    const int32_t scaled_y_q8 = right_accel_carry_y_q8 + (y * (int32_t)gain_q8);
-    const int32_t out_x       = scaled_x_q8 / IMPRINT_Q8;
-    const int32_t out_y       = scaled_y_q8 / IMPRINT_Q8;
+    const int64_t scaled_x_q = (int64_t)right_accel_carry_x_q + ((int64_t)x * (int64_t)gain_q);
+    const int64_t scaled_y_q = (int64_t)right_accel_carry_y_q + ((int64_t)y * (int64_t)gain_q);
+    const int32_t out_x      = (int32_t)(scaled_x_q / IMPRINT_Q_ONE);
+    const int32_t out_y      = (int32_t)(scaled_y_q / IMPRINT_Q_ONE);
 
-    right_accel_carry_x_q8 = scaled_x_q8 - (out_x * IMPRINT_Q8);
-    right_accel_carry_y_q8 = scaled_y_q8 - (out_y * IMPRINT_Q8);
-    report.x               = clamp_xy(out_x);
-    report.y               = clamp_xy(out_y);
+    right_accel_carry_x_q = (int32_t)(scaled_x_q - ((int64_t)out_x * IMPRINT_Q_ONE));
+    right_accel_carry_y_q = (int32_t)(scaled_y_q - ((int64_t)out_y * IMPRINT_Q_ONE));
+    report.x              = clamp_xy(out_x);
+    report.y              = clamp_xy(out_y);
     return report;
 }
 
+/*
+ * Smooth scroll divisor: shrinks from `base` down to `minimum` along the
+ * shared accel curve. Fast motion -> small divisor -> bigger scroll steps.
+ */
 static uint16_t scroll_divisor(uint16_t base, uint16_t minimum, uint32_t velocity) {
-    if (base < minimum) {
-        base = minimum;
+    if (base <= minimum) {
+        return minimum;
     }
+    const uint16_t span    = (uint16_t)(base - minimum);
+    const uint32_t curve_q = accel_curve_response_q(velocity, IMPRINT_LEFT_SCROLL_ACCEL_TAKEOFF,
+                                                    IMPRINT_LEFT_SCROLL_ACCEL_KNEE,
+                                                    IMPRINT_LEFT_SCROLL_ACCEL_VELOCITY_MAX);
+    if (curve_q == 0U) {
+        return base;
+    }
+    uint32_t reduction = (uint32_t)(((uint64_t)span * curve_q) >> IMPRINT_Q_SHIFT);
+    if (reduction > span) {
+        reduction = span;
+    }
+    return (uint16_t)(base - reduction);
+}
 
-    uint16_t reduction = (uint16_t)(velocity / IMPRINT_LEFT_SCROLL_ACCEL_STEP);
-    if (reduction > (base - minimum)) {
-        reduction = base - minimum;
+/*
+ * Update axis lock state and project (x,y) onto the locked axis.
+ *
+ *   - Acquisition requires the dominant axis to exceed the other by a
+ *     configurable factor for several consecutive samples (hysteresis),
+ *     preventing single-tick diagonal blips from grabbing the lock.
+ *   - Release uses a stickier threshold ("stay" ratios) so incidental
+ *     off-axis motion does not break an active lock.
+ *   - When projecting we keep the dominant component AS-IS (no vector-length
+ *     boost). The orthogonal axis is zeroed and its accumulator state is
+ *     cleared when the lock direction changes.
+ */
+static void scroll_clear_axis_state(bool clear_h, bool clear_v) {
+    if (clear_h) {
+        left_scroll_state.remainder_h_q = 0;
+        left_scroll_state.direction_h   = 0;
     }
-    return base - reduction;
+    if (clear_v) {
+        left_scroll_state.remainder_v_q = 0;
+        left_scroll_state.direction_v   = 0;
+    }
+}
+
+static void scroll_commit_lock(int32_t *x, int32_t *y, int8_t direction) {
+    if (direction > 0) {
+        /* lock to Y: zero X, clear stale H state */
+        if (left_scroll_state.axis_lock != 1) {
+            scroll_clear_axis_state(true, false);
+        }
+        left_scroll_state.axis_lock = 1;
+        *x                          = 0;
+    } else if (direction < 0) {
+        /* lock to X: zero Y, clear stale V state */
+        if (left_scroll_state.axis_lock != -1) {
+            scroll_clear_axis_state(false, true);
+        }
+        left_scroll_state.axis_lock = -1;
+        *y                          = 0;
+    }
+    left_scroll_state.lock_candidate = 0;
+    left_scroll_state.lock_samples   = 0;
 }
 
 static void apply_scroll_axis_lock(int32_t *x, int32_t *y) {
-    int32_t ax = abs32(*x);
-    int32_t ay = abs32(*y);
+    const int32_t ax = abs32(*x);
+    const int32_t ay = abs32(*y);
 
     if (ax == 0 && ay == 0) {
         return;
     }
 
-    if (left_scroll_state.timer && timer_elapsed32(left_scroll_state.timer) > IMPRINT_LEFT_SCROLL_IDLE_RESET_MS) {
-        left_scroll_state.axis_lock = 0;
-    }
-
+    /* Stay-locked check first: stickier release thresholds. */
     if (left_scroll_state.axis_lock > 0) {
-        if ((int64_t)ay * IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_Y >= ax) {
-            const int32_t locked = (int32_t)vector_length_u32(*x, *y);
-            *y                   = sign32(*y) * locked;
-            *x                   = 0;
+        if ((int64_t)ay * IMPRINT_LEFT_SCROLL_AXIS_LOCK_STAY_RATIO_Y >= ax) {
+            *x = 0;
             return;
         }
         left_scroll_state.axis_lock = 0;
     } else if (left_scroll_state.axis_lock < 0) {
-        if ((int64_t)ax * IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_X >= ay) {
-            const int32_t locked = (int32_t)vector_length_u32(*x, *y);
-            *x                   = sign32(*x) * locked;
-            *y                   = 0;
+        if ((int64_t)ax * IMPRINT_LEFT_SCROLL_AXIS_LOCK_STAY_RATIO_X >= ay) {
+            *y = 0;
             return;
         }
         left_scroll_state.axis_lock = 0;
     }
 
-    if ((int64_t)ay * IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_Y >= ax) {
-        const int32_t locked        = (int32_t)vector_length_u32(*x, *y);
-        left_scroll_state.axis_lock = 1;
-        *y                          = sign32(*y) * locked;
-        *x                          = 0;
-    } else if ((int64_t)ax * IMPRINT_LEFT_SCROLL_AXIS_LOCK_RATIO_X >= ay) {
-        const int32_t locked        = (int32_t)vector_length_u32(*x, *y);
-        left_scroll_state.axis_lock = -1;
-        *x                          = sign32(*x) * locked;
-        *y                          = 0;
+    /* Acquisition: dominant axis must beat the other by ACQUIRE_RATIO. */
+    int8_t proposed = 0;
+    if ((int64_t)ay >= (int64_t)ax * IMPRINT_LEFT_SCROLL_AXIS_LOCK_ACQUIRE_RATIO) {
+        proposed = 1; /* Y dominant */
+    } else if ((int64_t)ax >= (int64_t)ay * IMPRINT_LEFT_SCROLL_AXIS_LOCK_ACQUIRE_RATIO) {
+        proposed = -1; /* X dominant */
+    }
+
+    if (proposed == 0) {
+        left_scroll_state.lock_candidate = 0;
+        left_scroll_state.lock_samples   = 0;
+        return; /* free motion (both axes pass through) */
+    }
+
+    if (left_scroll_state.lock_candidate == proposed) {
+        if (left_scroll_state.lock_samples < UINT8_MAX) {
+            left_scroll_state.lock_samples++;
+        }
+    } else {
+        left_scroll_state.lock_candidate = proposed;
+        left_scroll_state.lock_samples   = 1;
+    }
+
+    /* Commit the lock once the candidate has been observed enough times.
+       Until then both axes pass through unchanged so the user can still
+       resolve ambiguity (free diagonal scroll for ~HYSTERESIS_SAMPLES polls). */
+    if (left_scroll_state.lock_samples >= IMPRINT_LEFT_SCROLL_AXIS_LOCK_HYSTERESIS_SAMPLES) {
+        scroll_commit_lock(x, y, proposed);
     }
 }
 
-static mouse_hv_report_t scroll_axis(int32_t delta, int32_t *remainder_q8, int8_t *direction, uint16_t base_divisor,
-                                     uint16_t min_divisor, uint32_t elapsed) {
+static mouse_hv_report_t scroll_axis(int32_t delta, int32_t *remainder_q, int8_t *direction, uint16_t base_divisor,
+                                     uint16_t min_divisor, uint32_t velocity) {
     const int8_t new_direction = sign32(delta);
     if (new_direction == 0) {
         return 0;
     }
 
     if (*direction != 0 && *direction != new_direction) {
-        *remainder_q8 = 0;
+        *remainder_q = 0;
     }
     *direction = new_direction;
 
-    const uint32_t velocity = ((uint32_t)abs32(delta) * 1000U) / elapsed;
-    const uint16_t divisor  = scroll_divisor(base_divisor, min_divisor, velocity);
+    const uint16_t divisor = scroll_divisor(base_divisor, min_divisor, velocity);
+    if (divisor == 0U) {
+        return 0;
+    }
 
-    const int64_t next_q8    = (int64_t)*remainder_q8 + (((int64_t)delta * IMPRINT_Q8) / divisor);
-    const int32_t raw_output = (int32_t)(next_q8 / IMPRINT_Q8);
+    const int64_t next_q     = (int64_t)*remainder_q + (((int64_t)delta * IMPRINT_Q_ONE) / divisor);
+    const int32_t raw_output = (int32_t)(next_q / IMPRINT_Q_ONE);
 
     if (raw_output < MOUSE_REPORT_HV_MIN) {
-        *remainder_q8 = 0;
+        *remainder_q = 0;
         return MOUSE_REPORT_HV_MIN;
     }
     if (raw_output > MOUSE_REPORT_HV_MAX) {
-        *remainder_q8 = 0;
+        *remainder_q = 0;
         return MOUSE_REPORT_HV_MAX;
     }
 
-    *remainder_q8 = (int32_t)(next_q8 - ((int64_t)raw_output * IMPRINT_Q8));
+    *remainder_q = (int32_t)(next_q - ((int64_t)raw_output * IMPRINT_Q_ONE));
     return (mouse_hv_report_t)raw_output;
 }
 
@@ -534,22 +876,60 @@ static report_mouse_t scroll_left_report(report_mouse_t report) {
     y = -y;
 #    endif
 
-    uint32_t elapsed = elapsed_or_one(&left_scroll_state.timer);
-    if (elapsed > IMPRINT_LEFT_SCROLL_IDLE_RESET_MS) {
-        left_scroll_state.remainder_h_q8 = 0;
-        left_scroll_state.remainder_v_q8 = 0;
-        left_scroll_state.direction_h    = 0;
-        left_scroll_state.direction_v    = 0;
-        left_scroll_state.axis_lock      = 0;
-        elapsed                          = 1;
+    if (x == 0 && y == 0) {
+        if (left_scroll_state.timer && timer_elapsed32(left_scroll_state.timer) > IMPRINT_LEFT_SCROLL_IDLE_RESET_MS) {
+            left_scroll_state.remainder_h_q   = 0;
+            left_scroll_state.remainder_v_q   = 0;
+            left_scroll_state.direction_h     = 0;
+            left_scroll_state.direction_v     = 0;
+            left_scroll_state.axis_lock       = 0;
+            left_scroll_state.lock_candidate  = 0;
+            left_scroll_state.lock_samples    = 0;
+            left_scroll_state.velocity_smooth = 0;
+        }
+        report.h = 0;
+        report.v = 0;
+        report.x = 0;
+        report.y = 0;
+        return report;
     }
+
+    const uint32_t elapsed = elapsed_or_one(&left_scroll_state.timer);
+    if (elapsed > IMPRINT_LEFT_SCROLL_IDLE_RESET_MS) {
+        left_scroll_state.remainder_h_q   = 0;
+        left_scroll_state.remainder_v_q   = 0;
+        left_scroll_state.direction_h     = 0;
+        left_scroll_state.direction_v     = 0;
+        left_scroll_state.axis_lock       = 0;
+        left_scroll_state.lock_candidate  = 0;
+        left_scroll_state.lock_samples    = 0;
+        left_scroll_state.velocity_smooth = 0;
+    }
+
+    /* Compute velocity from the full pre-lock motion magnitude (Euclidean)
+       so that diagonal flicks get the same accel response as cardinal ones.
+       Reaching here implies x|y nonzero (zero-motion path early-returned
+       above). After an idle reset, velocity_smooth was cleared, so the very
+       first post-idle sample seeds directly from instant_velocity (no EMA
+       lag); since `elapsed` is large in that case, instant_velocity will be
+       small and the first scroll tick deliberately cold-starts at the slow
+       base divisor. Sustained scrolling then ramps up via EMA. */
+    const uint32_t pre_lock_distance = vector_length_u32(x, y);
+    const uint32_t instant_velocity  = (pre_lock_distance * 1000U) / elapsed;
+    /* Cold-start: skip EMA on the very first responsive sample. */
+    left_scroll_state.velocity_smooth =
+        left_scroll_state.velocity_smooth
+            ? velocity_smooth_u32(left_scroll_state.velocity_smooth, instant_velocity)
+            : instant_velocity;
 
     apply_scroll_axis_lock(&x, &y);
 
-    report.h = scroll_axis(x, &left_scroll_state.remainder_h_q8, &left_scroll_state.direction_h,
-                           IMPRINT_LEFT_SCROLL_DIVISOR_H, IMPRINT_LEFT_SCROLL_MIN_DIVISOR_H, elapsed);
-    report.v = scroll_axis(y, &left_scroll_state.remainder_v_q8, &left_scroll_state.direction_v,
-                           IMPRINT_LEFT_SCROLL_DIVISOR_V, IMPRINT_LEFT_SCROLL_MIN_DIVISOR_V, elapsed);
+    report.h = scroll_axis(x, &left_scroll_state.remainder_h_q, &left_scroll_state.direction_h,
+                           IMPRINT_LEFT_SCROLL_DIVISOR_H, IMPRINT_LEFT_SCROLL_MIN_DIVISOR_H,
+                           left_scroll_state.velocity_smooth);
+    report.v = scroll_axis(y, &left_scroll_state.remainder_v_q, &left_scroll_state.direction_v,
+                           IMPRINT_LEFT_SCROLL_DIVISOR_V, IMPRINT_LEFT_SCROLL_MIN_DIVISOR_V,
+                           left_scroll_state.velocity_smooth);
     report.x = 0;
     report.y = 0;
     return report;
