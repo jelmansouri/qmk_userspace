@@ -11,7 +11,7 @@ jobs:
     uses: qmk/.github/.github/workflows/qmk_userspace_build.yml@main
     with:
       qmk_repo: jelmansouri/vial-qmk
-      qmk_ref: jelmansouri/disable-charybdis-processing
+      qmk_ref: cyboard-qmk
 
   publish:
     name: 'QMK Userspace Publish'

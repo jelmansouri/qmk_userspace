@@ -137,16 +137,50 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
 
-        case LEFT_CPI_200 ... LEFT_CPI_3200:
+        case SCROLL_CPI_200 ... SCROLL_CPI_600:
             if (record->event.pressed) {
-                uint16_t cpi = 200 << (keycode - LEFT_CPI_200);
+                uint16_t cpi = 200;
+                switch (keycode) {
+                    case SCROLL_CPI_200:
+                        cpi = 200;
+                        break;
+                    case SCROLL_CPI_300:
+                        cpi = 300;
+                        break;
+                    case SCROLL_CPI_400:
+                        cpi = 400;
+                        break;
+                    case SCROLL_CPI_500:
+                        cpi = 500;
+                        break;
+                    case SCROLL_CPI_600:
+                        cpi = 600;
+                        break;
+                }
                 pointing_device_set_cpi_on_side(true, cpi);
             }
             return false;
 
-        case RIGHT_CPI_200 ... RIGHT_CPI_3200:
+        case MOUSE_CPI_600 ... MOUSE_CPI_1600:
             if (record->event.pressed) {
-                uint16_t cpi = 200 << (keycode - RIGHT_CPI_200);
+                uint16_t cpi = 600;
+                switch (keycode) {
+                    case MOUSE_CPI_600:
+                        cpi = 600;
+                        break;
+                    case MOUSE_CPI_800:
+                        cpi = 800;
+                        break;
+                    case MOUSE_CPI_1000:
+                        cpi = 1000;
+                        break;
+                    case MOUSE_CPI_1200:
+                        cpi = 1200;
+                        break;
+                    case MOUSE_CPI_1600:
+                        cpi = 1600;
+                        break;
+                }
                 pointing_device_set_cpi_on_side(false, cpi);
             }
             return false;

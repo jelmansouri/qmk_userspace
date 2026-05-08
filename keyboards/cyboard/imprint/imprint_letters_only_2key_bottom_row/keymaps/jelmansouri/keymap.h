@@ -11,17 +11,17 @@ typedef enum {
 } layer_id_t;
 
 typedef enum {
-    LEFT_CPI_200 = QK_USER_0,
-    LEFT_CPI_400,
-    LEFT_CPI_800,
-    LEFT_CPI_1600,
-    LEFT_CPI_3200,
+    SCROLL_CPI_200 = QK_USER_0,
+    SCROLL_CPI_300,
+    SCROLL_CPI_400,
+    SCROLL_CPI_500,
+    SCROLL_CPI_600,
 
-    RIGHT_CPI_200,
-    RIGHT_CPI_400,
-    RIGHT_CPI_800,
-    RIGHT_CPI_1600,
-    RIGHT_CPI_3200,
+    MOUSE_CPI_600,
+    MOUSE_CPI_800,
+    MOUSE_CPI_1000,
+    MOUSE_CPI_1200,
+    MOUSE_CPI_1600,
 } custom_keycodes_t;
 
 #define BASE TO(LAYER_BASE)
@@ -61,17 +61,17 @@ typedef enum {
 
 #define HRM_MOD_TAP_PER_SIDE 3
 
-#define LCPI_1 LEFT_CPI_200
-#define LCPI_2 LEFT_CPI_400
-#define LCPI_3 LEFT_CPI_800
-#define LCPI_4 LEFT_CPI_1600
-#define LCPI_5 LEFT_CPI_3200
+#define LCPI_1 SCROLL_CPI_200
+#define LCPI_2 SCROLL_CPI_300
+#define LCPI_3 SCROLL_CPI_400
+#define LCPI_4 SCROLL_CPI_500
+#define LCPI_5 SCROLL_CPI_600
 
-#define RCPI_1 RIGHT_CPI_200
-#define RCPI_2 RIGHT_CPI_400
-#define RCPI_3 RIGHT_CPI_800
-#define RCPI_4 RIGHT_CPI_1600
-#define RCPI_5 RIGHT_CPI_3200
+#define RCPI_1 MOUSE_CPI_600
+#define RCPI_2 MOUSE_CPI_800
+#define RCPI_3 MOUSE_CPI_1000
+#define RCPI_4 MOUSE_CPI_1200
+#define RCPI_5 MOUSE_CPI_1600
 
 extern uint8_t right_mod_hold_count;
 extern uint8_t left_mod_hold_count;
