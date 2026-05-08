@@ -134,8 +134,7 @@ parse_config:
     LOWER: Lower
     RAISE: Raise
     BWOHRM: No HRM
-    NAV_3D: {t: Nav3D, h: toggle}
-    BASE: {t: Base, h: tobble}
+    NAV_3D: Nav3D
     HELD: {type: held}
     GLO: $$mdi:web$$
     DSCROLL: $$mdi:mouse-scroll-wheel$$

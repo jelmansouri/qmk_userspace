@@ -41,7 +41,7 @@ layers:
   - $$mdi:mouse-left-click-outline$$
   - $$mdi:keyboard-esc$$
   - $$mdi:keyboard-return$$
-  - {t: Nav3D, h: toggle}
+  - Nav3D
   - $$mdi:backspace-reverse$$
   - $$mdi:keyboard-space$$
   - $$mdi:backspace$$
@@ -49,7 +49,7 @@ layers:
   - ']'
   - Lower
   - $$mdi:apple-keyboard-shift$$
-  - $$mdi:apple-keyboard-command$$
+  - No HRM
   - $$mdi:keyboard-caps$$
   - $$mdi:apple-keyboard-shift$$
   - Raise
@@ -188,10 +188,10 @@ layers:
   - ''
   - ''
   - ''
-  - '{'
-  - '}'
-  - '['
-  - ']'
+  - ''
+  - ''
+  - ''
+  - ''
   - ''
   - ''
   - ''
