@@ -105,6 +105,18 @@
 #        define IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS 16U
 #    endif
 
+/* Minimum sample magnitude required to refresh the spike filter's recent-
+ * motion history (last_x/last_y/last_movement/last_motion_timer). Samples
+ * at or below this threshold pass through the spike filter unchanged but
+ * leave the history alone, so e.g. a noise-confirm release of magnitude
+ * NOISE_CONFIRM_COUNTS doesn't shrink the spike envelope for the next real
+ * motion. Default = NOISE_CONFIRM_COUNTS (2): only the noise-filter floor
+ * is suppressed; any genuine motion (≥ 3) is recorded. Raising this floor
+ * delays when slow drifts begin to inform the envelope. */
+#    ifndef IMPRINT_SENSOR_SPIKE_HISTORY_MIN_COUNTS
+#        define IMPRINT_SENSOR_SPIKE_HISTORY_MIN_COUNTS IMPRINT_SENSOR_NOISE_CONFIRM_COUNTS
+#    endif
+
 /* Angular threshold for "this sample is moving in the same direction as the
  * reference". Encoded as cos²(θ) ≥ NUMER / DENOM (cross-multiplied to keep
  * the math in integers). Default 1/2 → angle ≤ 45°.
@@ -387,8 +399,14 @@ static inline bool opposite_sign(int32_t a, int32_t b) {
  * cross-multiplied to keep everything in integer math:
  *     dot² · DENOM ≥ |a|² · |b|² · NUMER
  * Returns false when either vector is zero (no defined direction) or when
- * the dot product is non-positive (angle > 90°). All intermediates fit in
- * uint64_t for any plausible mouse_xy_report_t range. */
+ * the dot product is non-positive (angle > 90°).
+ *
+ * Overflow note: intermediates fit in uint64 with comfortable margin for
+ * realistic per-poll deltas (sensors emit small counts per ms even with
+ * MOUSE_EXTENDED_REPORT enabled). Worst-case head-room shrinks if DENOM is
+ * raised above the defaults; e.g. with int16 reports near ±32767 and
+ * DENOM=4, lhs approaches the uint64 ceiling. Practical sensor traffic
+ * never reaches that range, so the bound is informational. */
 static inline bool vectors_aligned(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
     const int64_t dot = ((int64_t)x1 * x2) + ((int64_t)y1 * y2);
     if (dot <= 0) {
@@ -493,14 +511,15 @@ static inline mouse_hv_report_t clamp_hv(int32_t value) {
 
 static void update_motion_history(sensor_noise_filter_t *state, report_mouse_t report) {
     const uint32_t mv = manhattan_abs_u32(report.x, report.y);
-    /* A noise-confirm release emits a sample of magnitude ~NOISE_CONFIRM_COUNTS.
-       Letting that update last_movement/last_motion_timer would shrink the
-       spike envelope (allowed = last_movement * MULT + ACCEL) for the next
-       real motion within SPIKE_WINDOW_MS, false-flagging it as a spike. Skip
-       the update for those tiny releases so the spike state is unchanged.
-       Note: this also means a sustained stream of 1-2 count motions never
-       updates the timer, which is the desired behavior — those are noise. */
-    if (mv > IMPRINT_SENSOR_NOISE_CONFIRM_COUNTS) {
+    /* Only refresh recent-motion history for samples above the configured
+       floor (HISTORY_MIN_COUNTS, default NOISE_CONFIRM_COUNTS). Suppresses
+       any tiny passing sample — most importantly the noise-confirm release
+       of magnitude NOISE_CONFIRM_COUNTS — from shrinking the spike envelope
+       (allowed = last_movement * MULT + ACCEL) for the next real motion
+       within SPIKE_WINDOW_MS. The spike candidate state is always cleared
+       below regardless of magnitude so a tiny accepted sample still
+       invalidates a stale held candidate. */
+    if (mv > IMPRINT_SENSOR_SPIKE_HISTORY_MIN_COUNTS) {
         state->last_x            = report.x;
         state->last_y            = report.y;
         state->last_movement     = mv;
