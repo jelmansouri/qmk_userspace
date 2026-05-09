@@ -84,9 +84,12 @@
 
 /* A held suspicious sample must be re-asserted (similar direction, similar
  * magnitude) within this window to be accepted (capped). Past the window,
- * the held candidate is dropped and a new one is held. */
+ * the held candidate is dropped and a new one is held. Larger windows give
+ * the filter more chances to catch a sustained spike chain (each held frame
+ * extends the chain), reducing teleport feel at the cost of a slightly
+ * higher held-frame latency on legitimate fast flicks. */
 #    ifndef IMPRINT_SENSOR_SPIKE_CONFIRM_MS
-#        define IMPRINT_SENSOR_SPIKE_CONFIRM_MS 8U
+#        define IMPRINT_SENSOR_SPIKE_CONFIRM_MS 20U
 #    endif
 
 /* During recent motion, samples up to last_movement * MAX_MULTIPLIER pass
@@ -100,6 +103,27 @@
  * even when last_movement is near zero. */
 #    ifndef IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS
 #        define IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS 16U
+#    endif
+
+/* Angular threshold for "this sample is moving in the same direction as the
+ * reference". Encoded as cos²(θ) ≥ NUMER / DENOM (cross-multiplied to keep
+ * the math in integers). Default 1/2 → angle ≤ 45°.
+ *   1/2  = 45°  (default, catches near-perpendicular sensor outliers)
+ *   3/4  = 30°  (very strict; may flag legitimate sweeping curves)
+ *   1/4  = 60°  (loose; allows broader spread before flagging)
+ *   0/1  = 90°  (degenerate: equivalent to old dot>0 check)
+ * A smaller numerator widens the accepted cone; a larger one tightens it.
+ * Used by the spike filter for both initial alignment vs. last accepted
+ * motion and for re-asserting a held spike candidate. */
+#    ifndef IMPRINT_SENSOR_SPIKE_ALIGN_COS2_NUMER
+#        define IMPRINT_SENSOR_SPIKE_ALIGN_COS2_NUMER 1U
+#    endif
+#    ifndef IMPRINT_SENSOR_SPIKE_ALIGN_COS2_DENOM
+#        define IMPRINT_SENSOR_SPIKE_ALIGN_COS2_DENOM 2U
+#    endif
+#    if (IMPRINT_SENSOR_SPIKE_ALIGN_COS2_DENOM == 0U) || \
+        (IMPRINT_SENSOR_SPIKE_ALIGN_COS2_NUMER > IMPRINT_SENSOR_SPIKE_ALIGN_COS2_DENOM)
+#        error "IMPRINT_SENSOR_SPIKE_ALIGN_COS2_NUMER must be in [0, DENOM] and DENOM > 0"
 #    endif
 
 /* =========================================================================
@@ -358,9 +382,26 @@ static inline bool opposite_sign(int32_t a, int32_t b) {
     return a != 0 && b != 0 && ((a < 0) != (b < 0));
 }
 
-static inline bool vectors_correlate(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
+/* Returns true when (x1,y1) and (x2,y2) point in roughly the same direction,
+ * i.e. cos²(θ) ≥ ALIGN_COS2_NUMER / ALIGN_COS2_DENOM. The comparison is
+ * cross-multiplied to keep everything in integer math:
+ *     dot² · DENOM ≥ |a|² · |b|² · NUMER
+ * Returns false when either vector is zero (no defined direction) or when
+ * the dot product is non-positive (angle > 90°). All intermediates fit in
+ * uint64_t for any plausible mouse_xy_report_t range. */
+static inline bool vectors_aligned(int32_t x1, int32_t y1, int32_t x2, int32_t y2) {
     const int64_t dot = ((int64_t)x1 * x2) + ((int64_t)y1 * y2);
-    return dot > 0;
+    if (dot <= 0) {
+        return false;
+    }
+    const uint64_t cur_sq  = (uint64_t)((int64_t)x1 * x1 + (int64_t)y1 * y1);
+    const uint64_t last_sq = (uint64_t)((int64_t)x2 * x2 + (int64_t)y2 * y2);
+    if (cur_sq == 0U || last_sq == 0U) {
+        return false;
+    }
+    const uint64_t lhs = (uint64_t)dot * (uint64_t)dot * (uint64_t)IMPRINT_SENSOR_SPIKE_ALIGN_COS2_DENOM;
+    const uint64_t rhs = cur_sq * last_sq * (uint64_t)IMPRINT_SENSOR_SPIKE_ALIGN_COS2_NUMER;
+    return lhs >= rhs;
 }
 
 static inline uint32_t manhattan_abs_u32(int32_t x, int32_t y) {
@@ -451,13 +492,23 @@ static inline mouse_hv_report_t clamp_hv(int32_t value) {
 }
 
 static void update_motion_history(sensor_noise_filter_t *state, report_mouse_t report) {
-    state->last_x            = report.x;
-    state->last_y            = report.y;
-    state->last_movement     = manhattan_abs_u32(report.x, report.y);
-    state->last_motion_timer = timer_read32();
-    state->spike_x           = 0;
-    state->spike_y           = 0;
-    state->spike_timer       = 0;
+    const uint32_t mv = manhattan_abs_u32(report.x, report.y);
+    /* A noise-confirm release emits a sample of magnitude ~NOISE_CONFIRM_COUNTS.
+       Letting that update last_movement/last_motion_timer would shrink the
+       spike envelope (allowed = last_movement * MULT + ACCEL) for the next
+       real motion within SPIKE_WINDOW_MS, false-flagging it as a spike. Skip
+       the update for those tiny releases so the spike state is unchanged.
+       Note: this also means a sustained stream of 1-2 count motions never
+       updates the timer, which is the desired behavior — those are noise. */
+    if (mv > IMPRINT_SENSOR_NOISE_CONFIRM_COUNTS) {
+        state->last_x            = report.x;
+        state->last_y            = report.y;
+        state->last_movement     = mv;
+        state->last_motion_timer = timer_read32();
+    }
+    state->spike_x     = 0;
+    state->spike_y     = 0;
+    state->spike_timer = 0;
 }
 
 static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_filter_t *state, char side) {
@@ -489,7 +540,7 @@ static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_fi
         suspicious = movement >= IMPRINT_SENSOR_SPIKE_IDLE_COUNTS;
     } else {
         allowed = (state->last_movement * IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER) + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS;
-        aligned = vectors_correlate(report.x, report.y, state->last_x, state->last_y);
+        aligned = vectors_aligned(report.x, report.y, state->last_x, state->last_y);
 
         suspicious =
             movement > allowed || (!aligned && movement > state->last_movement + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS);
@@ -505,7 +556,7 @@ static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_fi
 
     const bool confirmed_spike = state->spike_timer &&
                                  timer_elapsed32(state->spike_timer) <= IMPRINT_SENSOR_SPIKE_CONFIRM_MS &&
-                                 vectors_correlate(report.x, report.y, state->spike_x, state->spike_y);
+                                 vectors_aligned(report.x, report.y, state->spike_x, state->spike_y);
     if (confirmed_spike) {
         uint32_t cap = recent_motion ? allowed : IMPRINT_SENSOR_SPIKE_IDLE_COUNTS;
         if (cap < IMPRINT_SENSOR_SPIKE_COUNTS) {
