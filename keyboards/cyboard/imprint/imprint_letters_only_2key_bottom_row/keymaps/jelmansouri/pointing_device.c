@@ -102,14 +102,6 @@
 #        define IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS 16U
 #    endif
 
-/* Lower bound for the recent-activity envelope. Without this, a noise-confirm
- * release (which sets last_movement to ~CONFIRM_COUNTS) collapses the
- * envelope and false-flags the next legitimate motion as a spike.
- * Effective allowance: max(last_movement, BASELINE) * MULT + ACCEL_COUNTS. */
-#    ifndef IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS
-#        define IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS 16U
-#    endif
-
 /* =========================================================================
  * Right-hand cursor acceleration curve.
  *   gain(v) = 1 + (MAX_GAIN - 1) * v² / (v² + KNEE²)   for v > TAKEOFF
@@ -496,18 +488,11 @@ static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_fi
     if (!recent_motion) {
         suspicious = movement >= IMPRINT_SENSOR_SPIKE_IDLE_COUNTS;
     } else {
-        /* Floor last_movement so a tiny preceding sample (e.g. a noise-confirm
-           release) doesn't collapse the envelope and turn the next real motion
-           into a false spike. */
-        uint32_t effective_last = state->last_movement;
-        if (effective_last < IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS) {
-            effective_last = IMPRINT_SENSOR_SPIKE_BASELINE_COUNTS;
-        }
-        allowed = (effective_last * IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER) + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS;
+        allowed = (state->last_movement * IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER) + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS;
         aligned = vectors_correlate(report.x, report.y, state->last_x, state->last_y);
 
         suspicious =
-            movement > allowed || (!aligned && movement > effective_last + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS);
+            movement > allowed || (!aligned && movement > state->last_movement + IMPRINT_SENSOR_SPIKE_ACCEL_COUNTS);
     }
 
     if (!suspicious) {
@@ -539,13 +524,14 @@ static report_mouse_t filter_sensor_spike(report_mouse_t report, sensor_noise_fi
     state->spike_x     = report.x;
     state->spike_y     = report.y;
     state->spike_timer = timer_read32();
-    /* Keep `recent_motion` alive while we're actively holding spikes so that
-       a real motion arriving just past the spike window doesn't drop into
-       the more conservative idle path. We deliberately leave `last_movement`
-       and `last_x/y` untouched: the held sample is suspicious, not a fact. */
-    state->last_motion_timer = state->spike_timer;
-    report.x                 = 0;
-    report.y                 = 0;
+    /* Deliberately leave `last_motion_timer`, `last_movement`, and `last_x/y`
+       untouched: the held sample is suspicious, not a fact. As a side effect,
+       a sustained burst of held spikes lets `last_motion_timer` age out, so
+       once SPIKE_WINDOW_MS has elapsed since the last *accepted* sample the
+       filter falls into the tighter idle path (cap = IDLE_COUNTS) on the
+       very next evaluation. */
+    report.x = 0;
+    report.y = 0;
     return report;
 }
 
