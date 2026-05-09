@@ -771,7 +771,15 @@ static report_mouse_t accelerate_right_report(report_mouse_t report) {
        isn't artificially halved coming out of idle. */
     right_velocity_smooth =
         right_velocity_smooth ? velocity_smooth_u32(right_velocity_smooth, velocity) : velocity;
-    const uint32_t gain_q = right_accel_gain_q(right_velocity_smooth);
+    /* Asymmetric gain: use whichever of instant/smoothed velocity is lower.
+       During acceleration the EMA lags below instant, so min == smoothed and
+       jitter is filtered out. During deceleration the EMA lags above instant,
+       so min == instant and gain drops immediately with the slowing motion.
+       Without this, post-flick deceleration tremor on the trackball gets
+       amplified by the still-high smoothed velocity, producing oscillating
+       cursor output that can trigger macOS' "shake to find pointer" feature. */
+    const uint32_t gain_velocity = (velocity < right_velocity_smooth) ? velocity : right_velocity_smooth;
+    const uint32_t gain_q        = right_accel_gain_q(gain_velocity);
 
     const int64_t scaled_x_q = (int64_t)right_accel_carry_x_q + ((int64_t)x * (int64_t)gain_q);
     const int64_t scaled_y_q = (int64_t)right_accel_carry_y_q + ((int64_t)y * (int64_t)gain_q);
