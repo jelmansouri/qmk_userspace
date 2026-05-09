@@ -11,7 +11,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          KC_TAB,    KC_A,   R_CTL,   S_ALT,   T_GUI,    KC_G,                              KC_M,   N_GUI,   E_ALT,   I_CTL,    KC_O, KC_SCLN,
         KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                              KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
                           MS_BTN2, MS_BTN1,  KC_ESC,  KC_ENT,  NAV_3D,          KC_DEL,  KC_SPC, KC_BSPC, KC_LBRC, KC_RBRC,
-                                              LOWER, KC_LSFT,  BWOHRM,         CW_TOGG, KC_LSFT,   RAISE
+                                              LOWER, KC_LSFT, KC_LGUI,         CW_TOGG, KC_LSFT,   RAISE
     ),
 
     [LAYER_BASE_NO_HRM] = LAYOUT_let(
