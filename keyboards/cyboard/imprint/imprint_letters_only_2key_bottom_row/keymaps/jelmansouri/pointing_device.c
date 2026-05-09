@@ -93,10 +93,17 @@
 #    endif
 
 /* During recent motion, samples up to last_movement * MAX_MULTIPLIER pass
- * through. Larger = more tolerant of acceleration; too large lets spikes
- * through. */
+ * through. Larger = more tolerant of acceleration; too large lets the
+ * envelope run away after a single spike-confirm — once a frame is capped,
+ * each subsequent in-direction frame can grow the envelope by this factor,
+ * producing multi-frame teleports during fast flicks.
+ *   2 = tight: single-frame escape is bounded to ~2x prior frame; very fast
+ *       motion will see 1-2 extra held frames before settling. Best teleport
+ *       suppression for high-poll-rate sensors. (default)
+ *   3 = compromise.
+ *   5 = old default; allows multi-frame teleports under right-side accel. */
 #    ifndef IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER
-#        define IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER 5U
+#        define IMPRINT_SENSOR_SPIKE_MAX_MULTIPLIER 2U
 #    endif
 
 /* Additive grace term on top of last_movement * MULT. Allows a small jump
@@ -171,6 +178,15 @@
  * so the next motion starts from a clean state. */
 #    ifndef IMPRINT_RIGHT_ACCEL_CARRY_TIMEOUT_MS
 #        define IMPRINT_RIGHT_ACCEL_CARRY_TIMEOUT_MS 120U
+#    endif
+
+/* Diagnostic high-water mark. When CONSOLE_ENABLE is on, any post-acceleration
+ * cursor frame whose Manhattan magnitude exceeds this threshold is logged via
+ * `R big-out`. Set to 0 to disable. Used for hunting teleport events: anything
+ * the OS sees as a single jump larger than this is captured along with input,
+ * gain, velocity, and the spike-filter state behind the decision. */
+#    ifndef IMPRINT_RIGHT_BIG_OUTPUT_COUNTS
+#        define IMPRINT_RIGHT_BIG_OUTPUT_COUNTS 60U
 #    endif
 
 /* =========================================================================
@@ -766,6 +782,22 @@ static report_mouse_t accelerate_right_report(report_mouse_t report) {
     right_accel_carry_y_q = (int32_t)(scaled_y_q - ((int64_t)out_y * IMPRINT_Q_ONE));
     report.x              = clamp_xy(out_x);
     report.y              = clamp_xy(out_y);
+
+#    if defined(CONSOLE_ENABLE) && IMPRINT_RIGHT_BIG_OUTPUT_COUNTS > 0
+    {
+        const uint32_t out_mag = (uint32_t)abs32(report.x) + (uint32_t)abs32(report.y);
+        if (out_mag > IMPRINT_RIGHT_BIG_OUTPUT_COUNTS) {
+            const sensor_noise_filter_t *st = &right_noise_filter;
+            IMPRINT_PD_DEBUG(
+                "R big-out in_x=%d in_y=%d in_mag=%lu out_x=%d out_y=%d out_mag=%lu "
+                "vel=%lu gain_q=%lu elapsed=%lu last_x=%d last_y=%d last_mv=%lu\n",
+                (int)x, (int)y, (unsigned long)distance, (int)report.x, (int)report.y,
+                (unsigned long)out_mag, (unsigned long)right_velocity_smooth, (unsigned long)gain_q,
+                (unsigned long)elapsed, (int)st->last_x, (int)st->last_y, (unsigned long)st->last_movement);
+        }
+    }
+#    endif
+
     return report;
 }
 
