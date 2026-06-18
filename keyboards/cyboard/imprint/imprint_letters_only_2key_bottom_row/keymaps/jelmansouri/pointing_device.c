@@ -1043,8 +1043,8 @@ report_mouse_t pointing_device_task_combined_user(report_mouse_t left_report, re
     left_report  = filter_sensor_noise(left_report, &left_noise_filter, 'L');
     right_report = filter_sensor_noise(right_report, &right_noise_filter, 'R');
 
-    left_report  = accelerate_right_report(left_report);
-    right_report = scroll_left_report(right_report);
+    left_report  = scroll_left_report(left_report);
+    right_report = accelerate_right_report(right_report);
 
     return pointing_device_combine_reports(left_report, right_report);
 }
