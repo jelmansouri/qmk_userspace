@@ -13,7 +13,7 @@
 /* Left-hand sensor CPI. Higher values track finer scroll motion but raise
  * the velocity scale (and thus how soon scroll accel kicks in). */
 #    ifndef IMPRINT_POINTING_LEFT_DEFAULT_CPI
-#        define IMPRINT_POINTING_LEFT_DEFAULT_CPI 1000
+#        define IMPRINT_POINTING_LEFT_DEFAULT_CPI 1200
 #    endif
 
 /* Right-hand sensor CPI for cursor. Lower values give finer cursor control
