@@ -13,14 +13,6 @@
             "splitkb/halcyon/kyria/rev4",
             "default_hlc",
             {
-                "HLC_ENCODER": "1",
-                "TARGET": "splitkb_halcyon_kyria_rev4_vial_hlc_encoder"
-            }
-        ],
-        [
-            "splitkb/halcyon/kyria/rev4",
-            "default_hlc",
-            {
                 "HLC_CIRQUE_TRACKPAD": "1",
                 "TARGET": "splitkb_halcyon_kyria_rev4_vial_hlc_cirque_trackpad"
             }
