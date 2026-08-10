@@ -248,7 +248,7 @@
 #        error "IMPRINT_Q_SHIFT must be between 1 and 30"
 #    endif
 
-#    define IMPRINT_Q_ONE   ((int32_t)1 << IMPRINT_Q_SHIFT)
+#    define IMPRINT_Q_ONE ((int32_t)1 << IMPRINT_Q_SHIFT)
 #    define IMPRINT_Q_ONE_U ((uint32_t)1U << IMPRINT_Q_SHIFT)
 
 /* Maximum gain applied at peak velocity, expressed in current-Q units.
@@ -260,9 +260,11 @@
  * misconfiguration where a large legacy Q8 value combined with a large
  * IMPRINT_Q_SHIFT would overflow the runtime type. */
 #            if (((uint64_t)(IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8) * (1ULL << IMPRINT_Q_SHIFT) / 256ULL) > 0xFFFFFFFFULL
-#                error "IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8 overflows uint32_t at the configured IMPRINT_Q_SHIFT; define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q directly or lower IMPRINT_Q_SHIFT"
+#                error \
+                    "IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8 overflows uint32_t at the configured IMPRINT_Q_SHIFT; define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q directly or lower IMPRINT_Q_SHIFT"
 #            endif
-#            define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q ((uint32_t)(((uint64_t)(IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8) * IMPRINT_Q_ONE_U) / 256U))
+#            define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q \
+                ((uint32_t)(((uint64_t)(IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q8) * IMPRINT_Q_ONE_U) / 256U))
 #        else
 #            define IMPRINT_RIGHT_ACCEL_MAX_GAIN_Q ((uint32_t)(((uint64_t)IMPRINT_Q_ONE_U * 11U) / 4U))
 #        endif
@@ -376,9 +378,9 @@ typedef struct {
     uint32_t velocity_smooth;
     int8_t   direction_h;
     int8_t   direction_v;
-    int8_t   axis_lock;       /* 0 = none, +1 = locked to Y (vertical), -1 = locked to X (horizontal) */
-    int8_t   lock_candidate;  /* proposed lock direction awaiting hysteresis confirmation */
-    uint8_t  lock_samples;    /* consecutive samples agreeing with lock_candidate */
+    int8_t   axis_lock;      /* 0 = none, +1 = locked to Y (vertical), -1 = locked to X (horizontal) */
+    int8_t   lock_candidate; /* proposed lock direction awaiting hysteresis confirmation */
+    uint8_t  lock_samples;   /* consecutive samples agreeing with lock_candidate */
     uint32_t timer;
 } scroll_state_t;
 
@@ -769,8 +771,7 @@ static report_mouse_t accelerate_right_report(report_mouse_t report) {
     const uint32_t velocity = (distance * 1000U) / elapsed;
     /* Cold-start: skip EMA on the very first responsive sample so accel
        isn't artificially halved coming out of idle. */
-    right_velocity_smooth =
-        right_velocity_smooth ? velocity_smooth_u32(right_velocity_smooth, velocity) : velocity;
+    right_velocity_smooth = right_velocity_smooth ? velocity_smooth_u32(right_velocity_smooth, velocity) : velocity;
     /* Asymmetric gain: use whichever of instant/smoothed velocity is lower.
        During acceleration the EMA lags below instant, so min == smoothed and
        jitter is filtered out. During deceleration the EMA lags above instant,
@@ -796,12 +797,12 @@ static report_mouse_t accelerate_right_report(report_mouse_t report) {
         const uint32_t out_mag = (uint32_t)abs32(report.x) + (uint32_t)abs32(report.y);
         if (out_mag > IMPRINT_RIGHT_BIG_OUTPUT_COUNTS) {
             const sensor_noise_filter_t *st = &right_noise_filter;
-            IMPRINT_PD_DEBUG(
-                "R big-out in_x=%d in_y=%d in_mag=%lu out_x=%d out_y=%d out_mag=%lu "
-                "vel=%lu gain_q=%lu elapsed=%lu last_x=%d last_y=%d last_mv=%lu\n",
-                (int)x, (int)y, (unsigned long)distance, (int)report.x, (int)report.y,
-                (unsigned long)out_mag, (unsigned long)right_velocity_smooth, (unsigned long)gain_q,
-                (unsigned long)elapsed, (int)st->last_x, (int)st->last_y, (unsigned long)st->last_movement);
+            IMPRINT_PD_DEBUG("R big-out in_x=%d in_y=%d in_mag=%lu out_x=%d out_y=%d out_mag=%lu "
+                             "vel=%lu gain_q=%lu elapsed=%lu last_x=%d last_y=%d last_mv=%lu\n",
+                             (int)x, (int)y, (unsigned long)distance, (int)report.x, (int)report.y,
+                             (unsigned long)out_mag, (unsigned long)right_velocity_smooth, (unsigned long)gain_q,
+                             (unsigned long)elapsed, (int)st->last_x, (int)st->last_y,
+                             (unsigned long)st->last_movement);
         }
     }
 #    endif
@@ -817,10 +818,10 @@ static uint16_t scroll_divisor(uint16_t base, uint16_t minimum, uint32_t velocit
     if (base <= minimum) {
         return minimum;
     }
-    const uint16_t span    = (uint16_t)(base - minimum);
-    const uint32_t curve_q = accel_curve_response_q(velocity, IMPRINT_LEFT_SCROLL_ACCEL_TAKEOFF,
-                                                    IMPRINT_LEFT_SCROLL_ACCEL_KNEE,
-                                                    IMPRINT_LEFT_SCROLL_ACCEL_VELOCITY_MAX);
+    const uint16_t span = (uint16_t)(base - minimum);
+    const uint32_t curve_q =
+        accel_curve_response_q(velocity, IMPRINT_LEFT_SCROLL_ACCEL_TAKEOFF, IMPRINT_LEFT_SCROLL_ACCEL_KNEE,
+                               IMPRINT_LEFT_SCROLL_ACCEL_VELOCITY_MAX);
     if (curve_q == 0U) {
         return base;
     }
@@ -1013,19 +1014,18 @@ static report_mouse_t scroll_left_report(report_mouse_t report) {
     const uint32_t pre_lock_distance = vector_length_u32(x, y);
     const uint32_t instant_velocity  = (pre_lock_distance * 1000U) / elapsed;
     /* Cold-start: skip EMA on the very first responsive sample. */
-    left_scroll_state.velocity_smooth =
-        left_scroll_state.velocity_smooth
-            ? velocity_smooth_u32(left_scroll_state.velocity_smooth, instant_velocity)
-            : instant_velocity;
+    left_scroll_state.velocity_smooth = left_scroll_state.velocity_smooth
+                                            ? velocity_smooth_u32(left_scroll_state.velocity_smooth, instant_velocity)
+                                            : instant_velocity;
 
     apply_scroll_axis_lock(&x, &y);
 
-    report.h = scroll_axis(x, &left_scroll_state.remainder_h_q, &left_scroll_state.direction_h,
-                           IMPRINT_LEFT_SCROLL_DIVISOR_H, IMPRINT_LEFT_SCROLL_MIN_DIVISOR_H,
-                           left_scroll_state.velocity_smooth);
-    report.v = scroll_axis(y, &left_scroll_state.remainder_v_q, &left_scroll_state.direction_v,
-                           IMPRINT_LEFT_SCROLL_DIVISOR_V, IMPRINT_LEFT_SCROLL_MIN_DIVISOR_V,
-                           left_scroll_state.velocity_smooth);
+    report.h =
+        scroll_axis(x, &left_scroll_state.remainder_h_q, &left_scroll_state.direction_h, IMPRINT_LEFT_SCROLL_DIVISOR_H,
+                    IMPRINT_LEFT_SCROLL_MIN_DIVISOR_H, left_scroll_state.velocity_smooth);
+    report.v =
+        scroll_axis(y, &left_scroll_state.remainder_v_q, &left_scroll_state.direction_v, IMPRINT_LEFT_SCROLL_DIVISOR_V,
+                    IMPRINT_LEFT_SCROLL_MIN_DIVISOR_V, left_scroll_state.velocity_smooth);
     report.x = 0;
     report.y = 0;
     return report;
