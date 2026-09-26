@@ -319,6 +319,17 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             }
         }
 
+        // Power budget: whites and pastels light all three channels and, across the whole
+        // board, draw enough current to brown out the LEDs. Cap the channel sum at 1.8x a
+        // single full channel, which every layer color already fits within.
+        const uint16_t budget = brightness * 9 / 5;
+        const uint16_t sum    = color.r + color.g + color.b;
+        if (sum > budget) {
+            color.r = color.r * budget / sum;
+            color.g = color.g * budget / sum;
+            color.b = color.b * budget / sum;
+        }
+
         rgb_matrix_set_color(i, color.r, color.g, color.b);
     }
     return false;
