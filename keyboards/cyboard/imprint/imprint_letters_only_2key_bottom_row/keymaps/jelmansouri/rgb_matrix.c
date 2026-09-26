@@ -33,7 +33,6 @@ typedef struct layer_palette_t {
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}, {HSV_VIOLET_NEO}},
-    [LAYER_BASE_NO_HRM] = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}, {HSV_VIOLET_NEO}},
     [LAYER_LOWER]       = {{HSV_FUCHSIA_NEO},       {HSV_CHARTREUSE_NEO},{HSV_AQUA_NEO}},
     [LAYER_RAISE]       = {{HSV_ELECTRIC_BLUE_NEO}, {HSV_ULTRAVIOLET_NEO},{HSV_AMBER_NEO}},
     [LAYER_NAV_3D]      = {{HSV_NEON_GREEN_NEO},    {HSV_HOT_PINK_NEO},  {HSV_CRIMSON_NEO}},
@@ -41,21 +40,20 @@ static const layer_palette_t palette[LAYER_COUNT] = {
 // clang-format on
 
 // Thumb key positions (row, col) - based on LAYOUT_split_3x6_5
-static const uint8_t thumb_keys[][2] = {
-    // Left side thumb keys
-    {0, 3},
-    {0, 2},
-    {0, 1},
-    {0, 7},
-    {0, 6},
-    {0, 5},
-    // Right side thumb keys
-    {7, 3},
-    {7, 2},
-    {7, 1},
-    {7, 7},
-    {7, 6},
-    {7, 5}};
+static const uint8_t thumb_keys[][2] = {// Left side thumb keys
+                                        {0, 3},
+                                        {0, 2},
+                                        {0, 1},
+                                        {0, 7},
+                                        {0, 6},
+                                        {0, 5},
+                                        // Right side thumb keys
+                                        {7, 3},
+                                        {7, 2},
+                                        {7, 1},
+                                        {7, 7},
+                                        {7, 6},
+                                        {7, 5}};
 
 //
 #define NUM_THUMB_KEYS (sizeof(thumb_keys) / sizeof(thumb_keys[0]))
@@ -159,30 +157,6 @@ void keyboard_post_init_user(void) {
                             case KC_RSFT:
                                 led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOD, LAYER_COUNT);
                                 break;
-                            case R_CTL:
-                            case S_ALT:
-                            case T_GUI:
-                            case N_GUI:
-                            case E_ALT:
-                            case I_CTL:
-                            case F6_CTL:
-                            case F7_ALT:
-                            case F8_GUI:
-                            case N4_GUI:
-                            case N5_ALT:
-                            case N6_CTL:
-                            case AM_CTL:
-                            case AS_ALT:
-                            case LP_GUI:
-                                led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MODTAP, LAYER_COUNT);
-                                break;
-                            case BASE:
-                                led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_TO_LAYER, LAYER_BASE);
-                                break;
-                            case BWOHRM:
-                                led_info[led_index].layer_info[layer] =
-                                    layer_led_make(LAYER_LED_TO_LAYER, LAYER_BASE_NO_HRM);
-                                break;
                             case LOWER:
                                 led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_TO_LAYER, LAYER_LOWER);
                                 break;
@@ -208,9 +182,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     const layer_state_t layer_state_combined = layer_state | default_layer_state;
     const uint8_t       current_layer        = get_highest_layer(layer_state_combined);
     const uint8_t       brightness           = MIN(rgb_matrix_get_val(), VDEF_MAX);
-    const bool          modifier_held =
-        ((get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0) ||
-        ((current_layer == LAYER_BASE || current_layer == LAYER_BASE_NO_HRM) && is_caps_word_on());
+    const bool modifier_held = ((get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0) ||
+                               (current_layer == LAYER_BASE && is_caps_word_on());
 
     for (uint8_t i = led_min; i < led_max; i++) {
         hsv_t color = (hsv_t){HSV_BLACK}; // off by default
