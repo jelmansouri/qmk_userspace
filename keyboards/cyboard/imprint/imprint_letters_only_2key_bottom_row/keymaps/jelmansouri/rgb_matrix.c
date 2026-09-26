@@ -3,7 +3,7 @@
 #include "keymap.h"
 
 typedef struct layer_palette_t {
-    hsv_t primary, modtap, accent;
+    hsv_t primary, modtap;
 } layer_palette_t;
 
 // clang-format off
@@ -13,33 +13,50 @@ typedef struct layer_palette_t {
 // Layer colors
 #define HSV_TEAL_NEO          110,240,VDEF_MAX
 #define HSV_TANGERINE_NEO      20,255,VDEF_MAX
-#define HSV_VIOLET_NEO        200,255,VDEF_MAX
 
 #define HSV_FUCHSIA_NEO       222,255,VDEF_MAX
 #define HSV_CHARTREUSE_NEO     64,255,VDEF_MAX
-#define HSV_AQUA_NEO          140,230,VDEF_MAX
 
 #define HSV_ELECTRIC_BLUE_NEO 170,255,VDEF_MAX
 #define HSV_ULTRAVIOLET_NEO   196,255,VDEF_MAX
-#define HSV_AMBER_NEO          32,255,VDEF_MAX
 
 #define HSV_NEON_GREEN_NEO     90,255,VDEF_MAX
 #define HSV_HOT_PINK_NEO      234,230,VDEF_MAX
-#define HSV_CRIMSON_NEO       248,255,VDEF_MAX
+
+// Modifier colors (layer independent). Held modifiers are averaged in RGB space,
+// so primaries mix cleanly: Ctrl+Opt = yellow, Ctrl+Cmd = magenta, Opt+Cmd = cyan,
+// and Shift (white) lightens whatever it is combined with.
+#define HSV_MOD_CTRL            0,255,VDEF_MAX   // RED
+#define HSV_MOD_ALT            85,255,VDEF_MAX   // GREEN
+#define HSV_MOD_GUI           170,255,VDEF_MAX   // BLUE
+#define HSV_MOD_SHIFT           0,  0,VDEF_MAX   // WHITE
+
+// Mouse buttons, so they stand out on the LOWER layer
+#define HSV_MOUSE             128,255,VDEF_MAX   // CYAN
 
 // High-contrast thumbs (well away from all primaries)
 #define HSV_THUMB_PRIMARY     4,255,VDEF_MAX   // TOMATO
 #define HSV_THUMB_SECONDARY  32,255,VDEF_MAX   // GOLD
 
 static const layer_palette_t palette[LAYER_COUNT] = {
-    [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}, {HSV_VIOLET_NEO}},
-    [LAYER_LOWER]       = {{HSV_FUCHSIA_NEO},       {HSV_CHARTREUSE_NEO},{HSV_AQUA_NEO}},
-    [LAYER_RAISE]       = {{HSV_ELECTRIC_BLUE_NEO}, {HSV_ULTRAVIOLET_NEO},{HSV_AMBER_NEO}},
-    [LAYER_NAV_3D]      = {{HSV_NEON_GREEN_NEO},    {HSV_HOT_PINK_NEO},  {HSV_CRIMSON_NEO}},
+    [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}},
+    [LAYER_LOWER]       = {{HSV_FUCHSIA_NEO},       {HSV_CHARTREUSE_NEO}},
+    [LAYER_RAISE]       = {{HSV_ELECTRIC_BLUE_NEO}, {HSV_ULTRAVIOLET_NEO}},
+    [LAYER_NAV_3D]      = {{HSV_NEON_GREEN_NEO},    {HSV_HOT_PINK_NEO}},
+};
+
+static const struct {
+    uint8_t mask;
+    hsv_t   color;
+} mod_colors[] = {
+    {MOD_MASK_CTRL,  {HSV_MOD_CTRL}},
+    {MOD_MASK_ALT,   {HSV_MOD_ALT}},
+    {MOD_MASK_GUI,   {HSV_MOD_GUI}},
+    {MOD_MASK_SHIFT, {HSV_MOD_SHIFT}},
 };
 // clang-format on
 
-// Thumb key positions (row, col) - based on LAYOUT_split_3x6_5
+// Thumb key positions (row, col) - based on LAYOUT_let
 static const uint8_t thumb_keys[][2] = {// Left side thumb keys
                                         {0, 3},
                                         {0, 2},
@@ -66,6 +83,7 @@ typedef enum {
     LAYER_LED_MODTAP   = 3,
     LAYER_LED_TO_LAYER = 4,
     LAYER_LED_TRANS    = 5,
+    LAYER_LED_MOUSE    = 6,
 } layer_led_type_t;
 
 typedef enum {
@@ -83,7 +101,7 @@ typedef uint8_t layer_led_info_t;
 #define LAYER_LED_LAYER_SHIFT 4
 
 static inline layer_led_info_t layer_led_make(uint8_t type, uint8_t layer) {
-    return (uint8_t)((type & LAYER_LED_TYPE_MASK) | ((layer & LAYER_LED_TYPE_MASK) << LAYER_LED_LAYER_SHIFT));
+    return (uint8_t)((type & LAYER_LED_TYPE_MASK) | ((layer << LAYER_LED_LAYER_SHIFT) & LAYER_LED_LAYER_MASK));
 }
 static inline uint8_t layer_led_type(layer_led_info_t v) {
     return v & LAYER_LED_TYPE_MASK;
@@ -101,7 +119,7 @@ typedef struct {
 // ----- Compile-time sanity checks -----
 #if __STDC_VERSION__ >= 201112L
 _Static_assert(LAYER_COUNT <= 16, "LAYER_COUNT must fit in 4 bits (<=16).");
-_Static_assert(LAYER_LED_TRANS < 16, "layer_led_type_t values must fit in 4 bits (<16).");
+_Static_assert(LAYER_LED_MOUSE < 16, "layer_led_type_t values must fit in 4 bits (<16).");
 _Static_assert(sizeof(layer_led_info_t) == 1, "layer_led_info_t must be 1 byte.");
 #endif
 
@@ -157,6 +175,9 @@ void keyboard_post_init_user(void) {
                             case KC_RSFT:
                                 led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOD, LAYER_COUNT);
                                 break;
+                            case MS_BTN1 ... MS_BTN8:
+                                led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOUSE, LAYER_COUNT);
+                                break;
                             case LOWER:
                                 led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_TO_LAYER, LAYER_LOWER);
                                 break;
@@ -178,20 +199,74 @@ void keyboard_post_init_user(void) {
     }
 }
 
+static inline rgb_t hsv_to_rgb_at(hsv_t color, uint8_t brightness) {
+    color.v = brightness;
+    return hsv_to_rgb(color);
+}
+
+// Average the colors of all held modifiers, then rescale so the brightest
+// channel sits at `brightness` (averaging alone would dim mixed colors).
+static bool mods_mix_color(uint8_t mods, uint8_t brightness, rgb_t *out) {
+    uint16_t r = 0, g = 0, b = 0;
+    uint8_t  count = 0;
+    for (uint8_t m = 0; m < ARRAY_SIZE(mod_colors); m++) {
+        if (mods & mod_colors[m].mask) {
+            rgb_t c = hsv_to_rgb_at(mod_colors[m].color, brightness);
+            r += c.r;
+            g += c.g;
+            b += c.b;
+            count++;
+        }
+    }
+    if (count == 0) return false;
+
+    r /= count;
+    g /= count;
+    b /= count;
+    uint16_t peak = MAX(r, MAX(g, b));
+    if (peak > 0) {
+        r = r * brightness / peak;
+        g = g * brightness / peak;
+        b = b * brightness / peak;
+    }
+    *out = (rgb_t){.r = r, .g = g, .b = b};
+    return true;
+}
+
+// Color of a non-thumb key of the given type on `layer`
+static rgb_t key_color(uint8_t key_type, uint8_t layer, uint8_t target_layer, bool mods_held, rgb_t mods_color,
+                       uint8_t brightness) {
+    switch (key_type) {
+        case LAYER_LED_TAP:
+        case LAYER_LED_MOD:
+        case LAYER_LED_MODTAP:
+            if (mods_held) return mods_color;
+            return hsv_to_rgb_at(key_type == LAYER_LED_TAP ? palette[layer].primary : palette[layer].modtap, brightness);
+        case LAYER_LED_MOUSE:
+            return hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
+        case LAYER_LED_TO_LAYER:
+            return hsv_to_rgb_at(palette[target_layer < LAYER_COUNT ? target_layer : layer].primary, brightness);
+        default:
+            return (rgb_t){RGB_BLACK};
+    }
+}
+
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     const layer_state_t layer_state_combined = layer_state | default_layer_state;
     const uint8_t       current_layer        = get_highest_layer(layer_state_combined);
     const uint8_t       brightness           = MIN(rgb_matrix_get_val(), VDEF_MAX);
-    const bool modifier_held = ((get_mods() | get_weak_mods() | get_oneshot_mods() | get_oneshot_locked_mods()) != 0) ||
-                               (current_layer == LAYER_BASE && is_caps_word_on());
+
+    uint8_t mods = get_mods() | get_oneshot_mods() | get_oneshot_locked_mods();
+    if (current_layer == LAYER_BASE && is_caps_word_on()) mods |= MOD_BIT(KC_LSFT);
+    rgb_t      mods_color = {RGB_BLACK};
+    const bool mods_held  = mods_mix_color(mods, brightness, &mods_color);
 
     for (uint8_t i = led_min; i < led_max; i++) {
-        hsv_t color = (hsv_t){HSV_BLACK}; // off by default
+        rgb_t color = {RGB_BLACK}; // off by default
 
         // ZONE: UNDERGLOW
         if (led_info[i].zone == LED_ZONE_UNDER) {
-            color   = palette[current_layer].primary; // use .accent here if you prefer
-            color.v = brightness;
+            color = hsv_to_rgb_at(palette[current_layer].primary, brightness);
         }
         // ZONE: THUMB
         else if (led_info[i].zone == LED_ZONE_THUMB) {
@@ -204,84 +279,41 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                     break;
                 case LAYER_LED_TO_LAYER:
                     if (target_layer < LAYER_COUNT) {
-                        color   = palette[target_layer].primary;
-                        color.v = brightness;
+                        color = hsv_to_rgb_at(palette[target_layer].primary, brightness);
                     }
                     break;
                 case LAYER_LED_MOD:
-                    color   = (hsv_t){HSV_THUMB_SECONDARY};
-                    color.v = brightness;
+                    color = hsv_to_rgb_at((hsv_t){HSV_THUMB_SECONDARY}, brightness);
+                    break;
+                case LAYER_LED_MOUSE:
+                    color = hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
                     break;
                 default:
-                    color   = (hsv_t){HSV_THUMB_PRIMARY};
-                    color.v = brightness;
+                    color = hsv_to_rgb_at((hsv_t){HSV_THUMB_PRIMARY}, brightness);
             }
         }
         // ZONE: NORMAL
         else {
-            layer_led_info_t info         = led_info[i].layer_info[current_layer];
-            uint8_t          key_type     = layer_led_type(info);
-            uint8_t          target_layer = layer_led_layer(info);
+            layer_led_info_t info     = led_info[i].layer_info[current_layer];
+            uint8_t          key_type = layer_led_type(info);
 
-            switch (key_type) {
-                case LAYER_LED_NONE:
-                    // keep off
+            if (key_type == LAYER_LED_TRANS) {
+                // Walk lower *active* layers, highest to lowest, stop at first concrete mapping
+                for (int8_t fallback_layer = (int8_t)current_layer - 1; fallback_layer >= 0; --fallback_layer) {
+                    if (!(layer_state_combined & (1UL << fallback_layer))) continue; // skip inactive layer
+                    layer_led_info_t fallback_info = led_info[i].layer_info[fallback_layer];
+                    uint8_t          fallback_type = layer_led_type(fallback_info);
+                    if (fallback_type == LAYER_LED_TRANS) continue;
+                    color = key_color(fallback_type, fallback_layer, layer_led_layer(fallback_info), mods_held,
+                                      mods_color, brightness);
                     break;
-
-                case LAYER_LED_TRANS: {
-                    // Walk lower *active* layers, highest to lowest
-                    if (current_layer > 0) {
-                        for (int8_t fallback_layer = (int8_t)current_layer - 1; fallback_layer >= 0; --fallback_layer) {
-                            if (!(layer_state_combined & (1UL << fallback_layer))) continue; // skip inactive layer
-                            layer_led_info_t fallback_info   = led_info[i].layer_info[fallback_layer];
-                            uint8_t          fallback_type   = layer_led_type(fallback_info);
-                            uint8_t          fallback_target = layer_led_layer(fallback_info);
-                            if (fallback_type == LAYER_LED_NONE) break;
-                            if (fallback_type == LAYER_LED_TRANS) continue;
-
-                            switch (fallback_type) {
-                                case LAYER_LED_TAP:
-                                    color = modifier_held ? palette[fallback_layer].accent
-                                                          : palette[fallback_layer].primary;
-                                    break;
-                                case LAYER_LED_MOD:
-                                case LAYER_LED_MODTAP:
-                                    color =
-                                        modifier_held ? palette[fallback_layer].accent : palette[fallback_layer].modtap;
-                                    break;
-                                case LAYER_LED_TO_LAYER:
-                                    color = (fallback_target < LAYER_COUNT) ? palette[fallback_target].primary
-                                                                            : palette[fallback_layer].primary;
-                                    break;
-                            }
-                            color.v = brightness;
-                            break; // stop at first concrete mapping
-                        }
-                    }
-                } break;
-
-                case LAYER_LED_TAP:
-                    color   = modifier_held ? palette[current_layer].accent : palette[current_layer].primary;
-                    color.v = brightness;
-                    break;
-
-                case LAYER_LED_MOD:
-                case LAYER_LED_MODTAP:
-                    color   = modifier_held ? palette[current_layer].accent : palette[current_layer].modtap;
-                    color.v = brightness;
-                    break;
-
-                case LAYER_LED_TO_LAYER:
-                    color =
-                        (target_layer < LAYER_COUNT) ? palette[target_layer].primary : palette[current_layer].primary;
-                    color.v = brightness;
-                    break;
+                }
+            } else {
+                color = key_color(key_type, current_layer, layer_led_layer(info), mods_held, mods_color, brightness);
             }
         }
 
-        // Single HSV->RGB conversion at the end per LED (no helper function)
-        RGB rgb = hsv_to_rgb(color);
-        rgb_matrix_set_color(i, rgb.r, rgb.g, rgb.b);
+        rgb_matrix_set_color(i, color.r, color.g, color.b);
     }
     return false;
 }
