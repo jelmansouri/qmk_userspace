@@ -26,9 +26,9 @@ typedef enum {
 } custom_keycodes_t;
 
 #define BASE TO(LAYER_BASE)
-#define LOWER MO(LAYER_LOWER)
-#define RAISE MO(LAYER_RAISE)
-#define NAV_3D MO(LAYER_NAV_3D)
+#define LOWER OSL(LAYER_LOWER)
+#define RAISE OSL(LAYER_RAISE)
+#define NAV_3D OSL(LAYER_NAV_3D)
 
 #define KC_PRSC LGUI(LSFT(KC_4))
 #define KC_RCSC LGUI(LSFT(KC_5))
