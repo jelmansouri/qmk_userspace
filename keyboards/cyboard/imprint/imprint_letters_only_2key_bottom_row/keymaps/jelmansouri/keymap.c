@@ -10,8 +10,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          KC_GRV,    KC_Q,    KC_W,    KC_F,    KC_P,    KC_B,                              KC_J,    KC_L,    KC_U,    KC_Y, KC_MINS,  KC_EQL,
          KC_TAB,    KC_A,    KC_R,    KC_S,    KC_T,    KC_G,                              KC_M,    KC_N,    KC_E,    KC_I,    KC_O, KC_SCLN,
         KC_BSLS,    KC_Z,    KC_X,    KC_C,    KC_D,    KC_V,                              KC_K,    KC_H, KC_COMM,  KC_DOT, KC_SLSH, KC_QUOT,
-                          KC_LCTL, KC_LALT,  KC_ESC,  KC_ENT, KC_LGUI,         KC_LGUI,  KC_SPC, KC_BSPC, KC_LALT, KC_LCTL,
-                                              LOWER,  NAV_3D, KC_LSFT,         KC_LSFT, CW_TOGG,   RAISE
+                          KC_LCTL, KC_LALT, KC_LGUI,  KC_ESC,  KC_ENT,          KC_SPC, KC_BSPC, KC_LGUI, KC_LALT, KC_LCTL,
+                                            KC_LSFT,   LOWER,  NAV_3D,         CW_TOGG,   RAISE, KC_LSFT
     ),
 
     [LAYER_LOWER] = LAYOUT_let(
@@ -19,7 +19,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_RCSC,   KC_F5,   KC_F6,   KC_F7,   KC_F8, MS_BTN1,                           XXXXXXX,    KC_4,    KC_5,    KC_6, XXXXXXX, XXXXXXX,
         _______,   KC_F1,   KC_F2,   KC_F3,   KC_F4, MS_BTN3,                              KC_0,    KC_1,    KC_2,    KC_3, _______, XXXXXXX,
                           _______, _______, _______, _______, _______,         _______, _______, _______, _______, _______,
-                                            KC_HELD, _______, _______,         _______, _______, _______
+                                            _______, KC_HELD, _______,         _______, _______, _______
     ),
 
     [LAYER_RAISE] = LAYOUT_let(
@@ -27,7 +27,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______, KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN,                           KC_LEFT, KC_DOWN,   KC_UP, KC_RGHT, XXXXXXX, XXXXXXX,
         _______, XXXXXXX, KC_LBRC, KC_RBRC, KC_LCBR, KC_RCBR,                           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
                           _______, _______, _______, _______, _______,         _______, _______, _______, _______, _______,
-                                            _______, _______, _______,         _______, _______, KC_HELD
+                                            _______, _______, _______,         _______, KC_HELD, _______
     ),
 
     [LAYER_NAV_3D] = LAYOUT_let(
@@ -35,10 +35,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       XXXXXXX, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                              LCPI_1,  LCPI_2,  LCPI_3,  LCPI_4,  LCPI_5, XXXXXXX,
       XXXXXXX, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,                              RCPI_1,  RCPI_2,  RCPI_3,  RCPI_4,  RCPI_5, XXXXXXX,
                           _______, _______, _______, _______, _______,         MS_BTN1,  KC_SPC, KC_BSPC, _______, _______,
-                                            _______, KC_HELD, _______,         MS_BTN2,  KC_ENT,  KC_ESC
+                                            _______, _______, KC_HELD,         MS_BTN2,  KC_ENT,  KC_ESC
     )
 };
-
 // clang-format on
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
