@@ -32,11 +32,10 @@ typedef struct layer_palette_t {
 #define HSV_MOD_SHIFT           0,  0,VDEF_MAX   // WHITE
 
 // Mouse buttons, so they stand out on the LOWER layer
-#define HSV_MOUSE             128,255,VDEF_MAX   // CYAN
+#define HSV_MOUSE              32,255,VDEF_MAX   // GOLD
 
 // High-contrast thumbs (well away from all primaries)
 #define HSV_THUMB_PRIMARY     4,255,VDEF_MAX   // TOMATO
-#define HSV_THUMB_SECONDARY  32,255,VDEF_MAX   // GOLD
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}},
@@ -93,6 +92,7 @@ typedef enum {
 } led_zone_t;
 
 // One byte: [layer:4 | type:4]
+// For LAYER_LED_MOD the upper nibble holds the index into mod_colors instead of a layer.
 typedef uint8_t layer_led_info_t;
 
 // ----- Packing helpers -----
@@ -173,7 +173,12 @@ void keyboard_post_init_user(void) {
                             case KC_RALT:
                             case KC_RGUI:
                             case KC_RSFT:
-                                led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOD, LAYER_COUNT);
+                                for (uint8_t m = 0; m < ARRAY_SIZE(mod_colors); m++) {
+                                    if (mod_colors[m].mask & MOD_BIT(keycode)) {
+                                        led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOD, m);
+                                        break;
+                                    }
+                                }
                                 break;
                             case MS_BTN1 ... MS_BTN8:
                                 led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOUSE, LAYER_COUNT);
@@ -238,10 +243,11 @@ static rgb_t key_color(uint8_t key_type, uint8_t layer, uint8_t target_layer, bo
                        uint8_t brightness) {
     switch (key_type) {
         case LAYER_LED_TAP:
-        case LAYER_LED_MOD:
         case LAYER_LED_MODTAP:
             if (mods_held) return mods_color;
             return hsv_to_rgb_at(key_type == LAYER_LED_TAP ? palette[layer].primary : palette[layer].modtap, brightness);
+        case LAYER_LED_MOD:
+            return hsv_to_rgb_at(mod_colors[target_layer].color, brightness);
         case LAYER_LED_MOUSE:
             return hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
         case LAYER_LED_TO_LAYER:
@@ -283,7 +289,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                     }
                     break;
                 case LAYER_LED_MOD:
-                    color = hsv_to_rgb_at((hsv_t){HSV_THUMB_SECONDARY}, brightness);
+                    color = hsv_to_rgb_at(mod_colors[target_layer].color, brightness);
                     break;
                 case LAYER_LED_MOUSE:
                     color = hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
