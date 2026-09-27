@@ -30,6 +30,9 @@ typedef enum {
 #define RAISE OSL(LAYER_RAISE)
 #define NAV_3D OSL(LAYER_NAV_3D)
 
+// Handles LOWER, RAISE and NAV_3D so that overlapping layer keys don't leave a layer stuck
+bool process_oneshot_layer_key(uint16_t keycode, keyrecord_t *record);
+
 #define KC_PRSC LGUI(LSFT(KC_4))
 #define KC_RCSC LGUI(LSFT(KC_5))
 
