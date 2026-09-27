@@ -42,6 +42,21 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
+        case LOWER:
+        case RAISE:
+        case NAV_3D:
+            // Stock OSL only drops the lock tracking when another layer key is pressed while a
+            // layer is locked, leaving the locked layer on and shadowing the requested one.
+            // Turn the locked layer off so the stock handling starts the requested one-shot.
+            if (record->event.pressed && (get_oneshot_layer_state() & ONESHOT_TOGGLED)) {
+                uint8_t locked = get_oneshot_layer();
+                if (locked != QK_ONE_SHOT_LAYER_GET_LAYER(keycode)) {
+                    reset_oneshot_layer();
+                    layer_off(locked);
+                }
+            }
+            return true;
+
         case SCROLL_CPI_200 ... SCROLL_CPI_600:
             if (record->event.pressed) {
                 uint16_t cpi = 200;

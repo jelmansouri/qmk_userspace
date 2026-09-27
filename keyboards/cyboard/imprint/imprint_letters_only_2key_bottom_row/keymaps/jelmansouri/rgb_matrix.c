@@ -1,6 +1,10 @@
 #include <stdint.h>
 #include "quantum.h"
+#include "lib/lib8tion/lib8tion.h"
 #include "keymap.h"
+#ifdef SPLIT_KEYBOARD
+#    include "transactions.h"
+#endif
 
 typedef struct layer_palette_t {
     hsv_t primary, modtap;
@@ -126,9 +130,44 @@ _Static_assert(sizeof(layer_led_info_t) == 1, "layer_led_info_t must be 1 byte."
 // Lookup tables populated in keyboard_post_init_user
 static led_info_t led_info[RGB_MATRIX_LED_COUNT];
 
+// Layer locked by a one-shot tap-toggle, LAYER_COUNT when none. One-shot state only lives on
+// the master half, so it is mirrored to the other half to pulse the layer key there too.
+static uint8_t locked_layer = LAYER_COUNT;
+
+static uint8_t current_locked_layer(void) {
+    return (get_oneshot_layer_state() & ONESHOT_TOGGLED) ? get_oneshot_layer() : LAYER_COUNT;
+}
+
+#ifdef SPLIT_KEYBOARD
+static void locked_layer_sync_handler(uint8_t in_buflen, const void *in_data, uint8_t out_buflen, void *out_data) {
+    if (in_buflen == sizeof(locked_layer)) {
+        locked_layer = *(const uint8_t *)in_data;
+    }
+}
+#endif
+
+void housekeeping_task_user(void) {
+    if (!is_keyboard_master()) return;
+    locked_layer = current_locked_layer();
+#ifdef SPLIT_KEYBOARD
+    static uint8_t  last_sent = LAYER_COUNT;
+    static uint32_t last_sync = 0;
+    // Send on change, and every 500ms in case a transfer was lost.
+    if (locked_layer != last_sent || timer_elapsed32(last_sync) > 500) {
+        if (transaction_rpc_send(RPC_ID_USER_LOCKED_LAYER, sizeof(locked_layer), &locked_layer)) {
+            last_sent = locked_layer;
+            last_sync = timer_read32();
+        }
+    }
+#endif
+}
+
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
     rgb_matrix_sethsv_noeeprom(0, 0, MIN(rgb_matrix_get_val(), VDEF_MAX));
+#ifdef SPLIT_KEYBOARD
+    transaction_register_rpc(RPC_ID_USER_LOCKED_LAYER, locked_layer_sync_handler);
+#endif
 
     // Initialize lookup tables
     for (uint8_t led_index = 0; led_index < RGB_MATRIX_LED_COUNT; led_index++) {
@@ -267,6 +306,10 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     rgb_t      mods_color = {RGB_BLACK};
     const bool mods_held  = mods_mix_color(mods, brightness, &mods_color);
 
+    // While a layer is locked, its keys pulse between 1/4 and full brightness, about once a second.
+    const bool    pulsing = locked_layer < LAYER_COUNT;
+    const uint8_t pulse   = 64 + scale8(sin8((uint8_t)(timer_read() / 4)), 255 - 64);
+
     for (uint8_t i = led_min; i < led_max; i++) {
         rgb_t color = {RGB_BLACK}; // off by default
 
@@ -317,6 +360,17 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
             } else {
                 color = key_color(key_type, current_layer, layer_led_layer(info), mods_held, mods_color, brightness);
             }
+        }
+
+        // Pulse the layer's keys and the locked layer's own key. The layer keys live on the
+        // base layer (transparent elsewhere), so look them up there whatever layer is showing.
+        const layer_led_info_t base_info = led_info[i].layer_info[LAYER_BASE];
+        const bool             is_locked_layer_key =
+            layer_led_type(base_info) == LAYER_LED_TO_LAYER && layer_led_layer(base_info) == locked_layer;
+        if (pulsing && (led_info[i].zone == LED_ZONE_NORMAL || (led_info[i].zone == LED_ZONE_THUMB && is_locked_layer_key))) {
+            color.r = scale8(color.r, pulse);
+            color.g = scale8(color.g, pulse);
+            color.b = scale8(color.b, pulse);
         }
 
         // Power budget: whites and pastels light all three channels and, across the whole

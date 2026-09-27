@@ -15,6 +15,7 @@
 #    define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_SOLID_COLOR
 #    define SPLIT_LAYER_STATE_ENABLE
 #    define SPLIT_MODS_ENABLE
+#    define SPLIT_TRANSACTION_IDS_USER RPC_ID_USER_LOCKED_LAYER // pulse locked layer key on both halves
 
 #    define ENABLE_RGB_MATRIX_SOLID_COLOR // Static single hue, no speed support
 
