@@ -45,14 +45,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case LOWER:
         case RAISE:
         case NAV_3D:
-            // Stock OSL only drops the lock tracking when another layer key is pressed while a
-            // layer is locked, leaving the locked layer on and shadowing the requested one.
-            // Turn the locked layer off so the stock handling starts the requested one-shot.
-            if (record->event.pressed && (get_oneshot_layer_state() & ONESHOT_TOGGLED)) {
-                uint8_t locked = get_oneshot_layer();
-                if (locked != QK_ONE_SHOT_LAYER_GET_LAYER(keycode)) {
+            // QMK tracks a single one-shot layer. Pressing another layer key while one is active
+            // (held, pending or locked) overwrites or drops that tracking but leaves the previous
+            // layer on, stuck. Turn it off so the stock handling starts the requested one-shot.
+            if (record->event.pressed && get_oneshot_layer_state()) {
+                uint8_t previous = get_oneshot_layer();
+                if (previous != QK_ONE_SHOT_LAYER_GET_LAYER(keycode)) {
                     reset_oneshot_layer();
-                    layer_off(locked);
+                    layer_off(previous);
                 }
             }
             return true;
