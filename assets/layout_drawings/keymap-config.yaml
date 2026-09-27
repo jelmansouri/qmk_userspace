@@ -140,6 +140,7 @@ parse_config:
     DSCROLL: $$mdi:mouse-scroll-wheel$$
     MS_BTN1: $$mdi:mouse-left-click-outline$$
     MS_BTN2: $$mdi:mouse-right-click-outline$$
+    MS_BTN3: $$mdi:mouse-scroll-wheel$$
     LGUI: $$mdi:apple-keyboard-command$$
     LSFT: $$mdi:apple-keyboard-shift$$
     LALT: $$mdi:apple-keyboard-option$$

@@ -26,7 +26,7 @@ qmk c2json --no-cpp \
 
 uvx --from keymap-drawer keymap -c "${CONFIG_YAML}" parse \
     -q "${TMP_JSON}" \
-    -l Base BaseNoHRM Lower Raise Nav3D \
+    -l Base Lower Raise Nav3D \
     -o "${OUT_DIR}/imprint_keymap.yaml"
 
 uvx --from keymap-drawer keymap -c "${CONFIG_YAML}" draw \
@@ -35,7 +35,7 @@ uvx --from keymap-drawer keymap -c "${CONFIG_YAML}" draw \
     "${OUT_DIR}/imprint_keymap.yaml" \
     -o "${OUT_DIR}/imprint_keymap.svg"
 
-for layer in Base BaseNoHRM Lower Raise Nav3D; do
+for layer in Base Lower Raise Nav3D; do
     uvx --from keymap-drawer keymap -c "${CONFIG_YAML}" draw \
         -j "${INFO_JSON}" \
         -l LAYOUT_let \

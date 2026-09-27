@@ -1,118 +1,16 @@
 layout: {qmk_keyboard: cyboard/imprint/imprint_letters_only_2key_bottom_row, layout_name: LAYOUT_let}
 layers:
-  Base:
-  - '`'
-  - Q
-  - W
-  - F
-  - P
-  - B
-  - J
-  - L
-  - U
-  - Y
-  - '-'
-  - '='
-  - $$mdi:keyboard-tab$$
-  - A
-  - {t: R, h: '$$mdi:apple-keyboard-control$$'}
-  - {t: S, h: '$$mdi:apple-keyboard-option$$'}
-  - {t: T, h: '$$mdi:apple-keyboard-command$$'}
-  - G
-  - M
-  - {t: N, h: '$$mdi:apple-keyboard-command$$'}
-  - {t: E, h: '$$mdi:apple-keyboard-option$$'}
-  - {t: I, h: '$$mdi:apple-keyboard-control$$'}
-  - O
-  - ;
-  - \
-  - Z
-  - X
-  - C
-  - D
-  - V
-  - K
-  - H
-  - ','
-  - .
-  - /
-  - ''''
-  - $$mdi:mouse-right-click-outline$$
-  - $$mdi:mouse-left-click-outline$$
-  - $$mdi:keyboard-esc$$
-  - $$mdi:keyboard-return$$
-  - Nav3D
-  - $$mdi:backspace-reverse$$
-  - $$mdi:keyboard-space$$
-  - $$mdi:backspace$$
-  - '['
-  - ']'
-  - Lower
-  - $$mdi:apple-keyboard-shift$$
-  - No HRM
-  - $$mdi:keyboard-caps$$
-  - $$mdi:apple-keyboard-shift$$
-  - Raise
-  BaseNoHRM:
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - R
-  - S
-  - T
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - N
-  - E
-  - I
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  Base: ['`', Q, W, F, P, B, J, L, U, Y, '-', '=', '$$mdi:keyboard-tab$$', A, R, S, T, G, M, N, E, I, O, ;, \, Z, X, C, D, V, K, H, ',', ., /, '''', '$$mdi:apple-keyboard-control$$',
+    '$$mdi:apple-keyboard-option$$', '$$mdi:keyboard-esc$$', '$$mdi:keyboard-return$$', Nav3D, '$$mdi:keyboard-caps$$', '$$mdi:keyboard-space$$', '$$mdi:backspace$$',
+    '$$mdi:apple-keyboard-option$$', '$$mdi:apple-keyboard-control$$', Lower, '$$mdi:apple-keyboard-shift$$', '$$mdi:apple-keyboard-command$$', '$$mdi:apple-keyboard-command$$',
+    '$$mdi:apple-keyboard-shift$$', Raise]
   Lower:
   - PRSC
   - F9
   - F10
   - F11
   - F12
-  - {t: ▽, type: trans}
+  - $$mdi:mouse-right-click-outline$$
   - ''
   - '7'
   - '8'
@@ -121,14 +19,14 @@ layers:
   - {t: ▽, type: trans}
   - RCSC
   - F5
-  - {t: F6, h: '$$mdi:apple-keyboard-command$$'}
-  - {t: F7, h: '$$mdi:apple-keyboard-option$$'}
-  - {t: F8, h: '$$mdi:apple-keyboard-command$$'}
-  - {t: ▽, type: trans}
+  - F6
+  - F7
+  - F8
+  - $$mdi:mouse-left-click-outline$$
   - ''
-  - {t: '4', h: '$$mdi:apple-keyboard-command$$'}
-  - {t: '5', h: '$$mdi:apple-keyboard-option$$'}
-  - {t: '6', h: '$$mdi:apple-keyboard-control$$'}
+  - '4'
+  - '5'
+  - '6'
   - ''
   - ''
   - {t: ▽, type: trans}
@@ -136,8 +34,8 @@ layers:
   - F2
   - F3
   - F4
-  - {t: ▽, type: trans}
-  - ''
+  - $$mdi:mouse-scroll-wheel$$
+  - '0'
   - '1'
   - '2'
   - '3'
@@ -151,8 +49,8 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - '0'
-  - .
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
   - {type: held}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -174,9 +72,9 @@ layers:
   - ''
   - {t: ▽, type: trans}
   - ^
-  - {t: '&', h: '$$mdi:apple-keyboard-control$$'}
-  - {t: '*', h: '$$mdi:apple-keyboard-option$$'}
-  - {t: (, h: '$$mdi:apple-keyboard-command$$'}
+  - '&'
+  - '*'
+  - (
   - )
   - $$mdi:arrow-left-thick$$
   - $$mdi:arrow-down-thick$$
@@ -188,24 +86,24 @@ layers:
   - ''
   - ''
   - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - ''
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - '{'
+  - '}'
   - '['
   - ']'
+  - ''
+  - ''
+  - ''
+  - ''
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
@@ -253,15 +151,15 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {type: held}
-  - ''
+  - {t: ▽, type: trans}
+  - $$mdi:mouse-left-click-outline$$
   - $$mdi:keyboard-space$$
   - $$mdi:backspace$$
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
+  - {type: held}
   - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
-  - ''
+  - $$mdi:mouse-right-click-outline$$
   - $$mdi:keyboard-return$$
   - $$mdi:keyboard-esc$$
