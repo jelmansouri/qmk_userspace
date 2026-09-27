@@ -78,6 +78,12 @@ static const uint8_t thumb_keys[][2] = {// Left side thumb keys
 //
 #define NUM_THUMB_KEYS (sizeof(thumb_keys) / sizeof(thumb_keys[0]))
 
+// Bottom row Ctrl/Alt key positions (row, col). Colored like normal keys, but they are not
+// part of a layer, so they don't pulse when one is locked.
+static const uint8_t bottom_mod_keys[][2] = {{1, 3}, {1, 2}, {8, 2}, {8, 3}};
+
+#define NUM_BOTTOM_MOD_KEYS (sizeof(bottom_mod_keys) / sizeof(bottom_mod_keys[0]))
+
 // ----- Types -----
 typedef enum {
     LAYER_LED_NONE     = 0,
@@ -90,9 +96,10 @@ typedef enum {
 } layer_led_type_t;
 
 typedef enum {
-    LED_ZONE_NORMAL = 0,
-    LED_ZONE_THUMB  = 1,
-    LED_ZONE_UNDER  = 2,
+    LED_ZONE_NORMAL     = 0,
+    LED_ZONE_THUMB      = 1,
+    LED_ZONE_UNDER      = 2,
+    LED_ZONE_BOTTOM_MOD = 3,
 } led_zone_t;
 
 // One byte: [layer:4 | type:4]
@@ -194,6 +201,12 @@ void keyboard_post_init_user(void) {
                         break;
                     }
                 }
+                for (uint8_t i = 0; i < NUM_BOTTOM_MOD_KEYS; i++) {
+                    if (bottom_mod_keys[i][0] == row && bottom_mod_keys[i][1] == col) {
+                        led_info[led_index].zone = LED_ZONE_BOTTOM_MOD;
+                        break;
+                    }
+                }
 
                 // Get keycodes for each layer and check for special keys
                 for (uint8_t layer = 0; layer < LAYER_COUNT; layer++) {
@@ -284,7 +297,8 @@ static rgb_t key_color(uint8_t key_type, uint8_t layer, uint8_t target_layer, bo
         case LAYER_LED_TAP:
         case LAYER_LED_MODTAP:
             if (mods_held) return mods_color;
-            return hsv_to_rgb_at(key_type == LAYER_LED_TAP ? palette[layer].primary : palette[layer].modtap, brightness);
+            return hsv_to_rgb_at(key_type == LAYER_LED_TAP ? palette[layer].primary : palette[layer].modtap,
+                                 brightness);
         case LAYER_LED_MOD:
             return hsv_to_rgb_at(mod_colors[target_layer].color, brightness);
         case LAYER_LED_MOUSE:
@@ -341,7 +355,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                     color = hsv_to_rgb_at((hsv_t){HSV_THUMB_PRIMARY}, brightness);
             }
         }
-        // ZONE: NORMAL
+        // ZONE: NORMAL and BOTTOM_MOD
         else {
             layer_led_info_t info     = led_info[i].layer_info[current_layer];
             uint8_t          key_type = layer_led_type(info);
@@ -367,7 +381,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         const layer_led_info_t base_info = led_info[i].layer_info[LAYER_BASE];
         const bool             is_locked_layer_key =
             layer_led_type(base_info) == LAYER_LED_TO_LAYER && layer_led_layer(base_info) == locked_layer;
-        if (pulsing && (led_info[i].zone == LED_ZONE_NORMAL || (led_info[i].zone == LED_ZONE_THUMB && is_locked_layer_key))) {
+        if (pulsing &&
+            (led_info[i].zone == LED_ZONE_NORMAL || (led_info[i].zone == LED_ZONE_THUMB && is_locked_layer_key))) {
             color.r = scale8(color.r, pulse);
             color.g = scale8(color.g, pulse);
             color.b = scale8(color.b, pulse);
