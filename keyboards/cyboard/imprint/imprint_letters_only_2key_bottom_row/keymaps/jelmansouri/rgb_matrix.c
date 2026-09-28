@@ -121,9 +121,20 @@ static inline uint8_t layer_led_layer(layer_led_info_t v) {
     return (v & LAYER_LED_LAYER_MASK) >> LAYER_LED_LAYER_SHIFT;
 }
 
+// While modifiers are held, a band of their color rolls over the layer color, from the
+// inner columns of each half out to the outer ones, then wraps back around to the inner ones.
+// Key positions run 0 (inner) to 255 (outer), ~51 per column, and the ring adds one more
+// column's gap so the wrap from outer to inner is as far as any other step. The band moves
+// one position every 1 << BAND_SPEED_SHIFT ms (a lap takes ~1.2s) and fades out over
+// BAND_HALF_WIDTH on either side of its center.
+#define BAND_SPEED_SHIFT 2
+#define BAND_HALF_WIDTH 64
+#define BAND_RING (255 + 51)
+
 // ----- LAYER_BASE descriptor -----
 typedef struct {
     led_zone_t       zone;                    // physical grouping
+    uint8_t          band_pos;                // distance from the inner column, 0 (inner) to 255 (outer)
     layer_led_info_t layer_info[LAYER_COUNT]; // per-layer mapping
 } led_info_t;
 
@@ -163,6 +174,12 @@ void housekeeping_task_user(void) {
         }
     }
 #endif
+}
+
+// Horizontal distance of an LED from the center of the board (x = 112 on the 0-224 grid)
+static uint8_t center_distance(uint8_t led_index) {
+    const uint8_t x = g_led_config.point[led_index].x;
+    return x > 112 ? x - 112 : 112 - x;
 }
 
 void keyboard_post_init_user(void) {
@@ -221,13 +238,17 @@ void keyboard_post_init_user(void) {
                             case KC_RALT:
                             case KC_RGUI:
                             case KC_RSFT:
+                            case CW_TOGG: {
+                                // Caps word shifts what it types, so it shares the Shift color
+                                const uint8_t mask = keycode == CW_TOGG ? MOD_MASK_SHIFT : MOD_BIT(keycode);
                                 for (uint8_t m = 0; m < ARRAY_SIZE(mod_colors); m++) {
-                                    if (mod_colors[m].mask & MOD_BIT(keycode)) {
+                                    if (mod_colors[m].mask & mask) {
                                         led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOD, m);
                                         break;
                                     }
                                 }
                                 break;
+                            }
                             case MS_BTN1 ... MS_BTN8:
                                 led_info[led_index].layer_info[layer] = layer_led_make(LAYER_LED_MOUSE, LAYER_COUNT);
                                 break;
@@ -248,6 +269,24 @@ void keyboard_post_init_user(void) {
                     }
                 }
             }
+        }
+    }
+
+    // Band positions: horizontal distance from the center of the board, rescaled so the
+    // innermost key column is 0 and the outermost is 255. Thumbs and underglow are skipped.
+    uint8_t dist_min = UINT8_MAX, dist_max = 0;
+    for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+        if (led_info[i].zone == LED_ZONE_THUMB || led_info[i].zone == LED_ZONE_UNDER) continue;
+        const uint8_t dist = center_distance(i);
+        dist_min           = MIN(dist_min, dist);
+        dist_max           = MAX(dist_max, dist);
+    }
+    for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
+        const uint8_t dist = center_distance(i);
+        if (dist_max <= dist_min || dist <= dist_min) {
+            led_info[i].band_pos = 0;
+        } else {
+            led_info[i].band_pos = MIN(dist - dist_min, dist_max - dist_min) * 255 / (dist_max - dist_min);
         }
     }
 }
@@ -286,15 +325,29 @@ static bool mods_mix_color(uint8_t mods, uint8_t brightness, rgb_t *out) {
     return true;
 }
 
-// Color of a non-thumb key of the given type on `layer`
-static rgb_t key_color(uint8_t key_type, uint8_t layer, uint8_t target_layer, bool mods_held, rgb_t mods_color,
+// How much of the modifier band covers a key at `pos`, 0 (none) to 255 (band center)
+static inline uint8_t band_weight(uint8_t pos, uint16_t center) {
+    uint16_t diff = pos > center ? pos - center : center - pos;
+    if (diff > BAND_RING / 2) diff = BAND_RING - diff; // distance around the ring
+    return diff >= BAND_HALF_WIDTH ? 0 : 255 - diff * (256 / BAND_HALF_WIDTH);
+}
+
+// Color of a non-thumb key of the given type on `layer`. `band` is how much of the
+// modifier color to blend over the layer color.
+static rgb_t key_color(uint8_t key_type, uint8_t layer, uint8_t target_layer, uint8_t band, rgb_t mods_color,
                        uint8_t brightness) {
     switch (key_type) {
         case LAYER_LED_TAP:
-        case LAYER_LED_MODTAP:
-            if (mods_held) return mods_color;
-            return hsv_to_rgb_at(key_type == LAYER_LED_TAP ? palette[layer].primary : palette[layer].modtap,
-                                 brightness);
+        case LAYER_LED_MODTAP: {
+            rgb_t color = hsv_to_rgb_at(key_type == LAYER_LED_TAP ? palette[layer].primary : palette[layer].modtap,
+                                        brightness);
+            if (band) {
+                color.r = blend8(color.r, mods_color.r, band);
+                color.g = blend8(color.g, mods_color.g, band);
+                color.b = blend8(color.b, mods_color.b, band);
+            }
+            return color;
+        }
         case LAYER_LED_MOD:
             return hsv_to_rgb_at(mod_colors[target_layer].color, brightness);
         case LAYER_LED_MOUSE:
@@ -315,6 +368,14 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     if (current_layer == LAYER_BASE && is_caps_word_on()) mods |= MOD_BIT(KC_LSFT);
     rgb_t      mods_color = {RGB_BLACK};
     const bool mods_held  = mods_mix_color(mods, brightness, &mods_color);
+
+    // Band center rolls around the ring, restarting from the inner column (BGV / JMK) whenever
+    // modifiers go from none to some. The synced timer keeps both halves in step.
+    static bool     band_active = false;
+    static uint32_t band_start  = 0;
+    if (mods_held && !band_active) band_start = sync_timer_read32();
+    band_active                = mods_held;
+    const uint16_t band_center = ((sync_timer_read32() - band_start) >> BAND_SPEED_SHIFT) % BAND_RING;
 
     // While a layer is locked, its layer key pulses between 1/4 and full brightness, about once a
     // second, and so do its keys while it is showing (not while another layer is on top of it).
@@ -357,6 +418,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         else {
             layer_led_info_t info     = led_info[i].layer_info[current_layer];
             uint8_t          key_type = layer_led_type(info);
+            const uint8_t    band     = mods_held ? band_weight(led_info[i].band_pos, band_center) : 0;
 
             if (key_type == LAYER_LED_TRANS) {
                 // Walk lower *active* layers, highest to lowest, stop at first concrete mapping
@@ -365,12 +427,12 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                     layer_led_info_t fallback_info = led_info[i].layer_info[fallback_layer];
                     uint8_t          fallback_type = layer_led_type(fallback_info);
                     if (fallback_type == LAYER_LED_TRANS) continue;
-                    color = key_color(fallback_type, fallback_layer, layer_led_layer(fallback_info), mods_held,
+                    color = key_color(fallback_type, fallback_layer, layer_led_layer(fallback_info), band,
                                       mods_color, brightness);
                     break;
                 }
             } else {
-                color = key_color(key_type, current_layer, layer_led_layer(info), mods_held, mods_color, brightness);
+                color = key_color(key_type, current_layer, layer_led_layer(info), band, mods_color, brightness);
             }
         }
 
