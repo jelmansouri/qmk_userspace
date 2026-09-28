@@ -57,32 +57,15 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 // Bit per layer whose layer key is physically held
 static layer_state_t held_layer_keys = 0;
 
-// Layer locked by a double tap, LAYER_BASE when none
-static uint8_t locked_layer = LAYER_BASE;
+// Layer locked by a double tap, LAYER_COUNT when none
+static uint8_t locked_layer = LAYER_COUNT;
 
-// Layer whose key press just unlocked it: its layer ends when that key is released
-static uint8_t unlocking_layer = LAYER_BASE;
-
-// A layer key was tapped while another one is held or locked: once its one-shot is over, that
-// one takes over again (see oneshot_layer_changed_user).
+// A layer key's layer is on top of a held or locked layer: that one comes back once it ends
+// (see oneshot_layer_changed_user).
 static bool resume_after_oneshot = false;
 
 uint8_t get_locked_layer(void) {
-    return locked_layer != LAYER_BASE ? locked_layer : LAYER_COUNT;
-}
-
-// Back to the layer underneath once a one-shot or momentary layer ends: the held layer key,
-// else the locked layer.
-static void resume_underlying_layer(void) {
-    if (held_layer_keys) {
-        set_oneshot_layer(get_highest_layer(held_layer_keys), ONESHOT_PRESSED);
-    } else if (locked_layer != LAYER_BASE) {
-        layer_on(locked_layer);
-    }
-}
-
-static bool is_tracked(uint8_t layer) {
-    return get_oneshot_layer_state() && get_oneshot_layer() == layer;
+    return locked_layer;
 }
 
 static bool process_oneshot_layer_key(uint16_t keycode, keyrecord_t *record) {
@@ -92,11 +75,6 @@ static bool process_oneshot_layer_key(uint16_t keycode, keyrecord_t *record) {
         held_layer_keys |= (layer_state_t)1 << layer;
         // A second tap briefly resets the one-shot tracking before locking: don't resume then.
         resume_after_oneshot = false;
-        // Unlock, the stock handling then keeps the layer on while the key is held.
-        if (locked_layer == layer) {
-            locked_layer    = LAYER_BASE;
-            unlocking_layer = layer;
-        }
         // Turn the previous one-shot layer (held or pending) off before the stock handling
         // starts this one and forgets about it.
         if (get_oneshot_layer_state() && get_oneshot_layer() != layer) {
@@ -104,15 +82,21 @@ static bool process_oneshot_layer_key(uint16_t keycode, keyrecord_t *record) {
             reset_oneshot_layer();
             layer_off(previous);
         }
+        // Unlock: the layer stays on while the key is held, without a one-shot.
+        if (locked_layer == layer) {
+            locked_layer = LAYER_COUNT;
+            set_oneshot_layer(layer, ONESHOT_PRESSED);
+            return false;
+        }
         // The locked layer stays locked, but is off while this one is active.
-        if (locked_layer != LAYER_BASE) layer_off(locked_layer);
+        if (locked_layer < LAYER_COUNT) layer_off(locked_layer);
         return true;
     }
 
     held_layer_keys &= ~((layer_state_t)1 << layer);
 
-    // Double tap: lock this layer, moving the lock from any other one (whose layer was turned
-    // off by the press).
+    // Double tap: lock this layer, moving the lock from any other one (turned off by the press).
+    // Reset the tracking left by the press when it was an unlock (triple tap).
     if (record->tap.count >= ONESHOT_TAP_TOGGLE) {
         reset_oneshot_layer();
         locked_layer = layer;
@@ -120,40 +104,30 @@ static bool process_oneshot_layer_key(uint16_t keycode, keyrecord_t *record) {
         return false;
     }
 
-    // The press unlocked this layer: it only lasted while held.
-    if (unlocking_layer == layer) {
-        unlocking_layer = LAYER_BASE;
-        if (is_tracked(layer)) {
-            reset_oneshot_layer();
-            layer_off(layer);
-            resume_underlying_layer();
-        }
-        return false;
-    }
-
     // Taken over by another layer key: leave the active layer alone.
-    if (!is_tracked(layer)) return false;
+    if (!get_oneshot_layer_state() || get_oneshot_layer() != layer) return false;
 
-    if (held_layer_keys || locked_layer != LAYER_BASE) {
-        // Tapped: let the stock handling start its one-shot, the layer underneath resumes after.
-        if (record->tap.count) {
-            resume_after_oneshot = true;
-            return true;
+    // On top of a held or locked layer, which comes back once this one ends: after its one-shot
+    // when tapped, right away when held.
+    if (held_layer_keys || locked_layer < LAYER_COUNT) {
+        resume_after_oneshot = true;
+        if (!record->tap.count) {
+            clear_oneshot_layer_state(ONESHOT_START);
+            return false;
         }
-        // Held: back to the layer underneath.
-        reset_oneshot_layer();
-        layer_off(layer);
-        resume_underlying_layer();
-        return false;
     }
     return true;
 }
 
-// Called with layer 0 when the one-shot layer ends: used by the next key, or timed out.
+// Called with layer 0 when the one-shot layer ends: used by the next key, timed out or released.
 void oneshot_layer_changed_user(uint8_t layer) {
     if (!layer && resume_after_oneshot) {
         resume_after_oneshot = false;
-        resume_underlying_layer();
+        if (held_layer_keys) {
+            set_oneshot_layer(get_highest_layer(held_layer_keys), ONESHOT_PRESSED);
+        } else if (locked_layer < LAYER_COUNT) {
+            layer_on(locked_layer);
+        }
     }
 }
 
