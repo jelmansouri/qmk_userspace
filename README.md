@@ -33,10 +33,17 @@ The other big design decision was how many layers to live with. I prefer a low n
 
 All three layer keys (Lower, Raise and Nav3D) are **one-shot layers**:
 - **Tap** once: the layer applies to the next key only, which is handy for a single symbol like a bracket.
-- **Tap twice**: the layer locks until tapped again (`ONESHOT_TAP_TOGGLE 2`).
+- **Tap twice**: the layer locks (`ONESHOT_TAP_TOGGLE 2`). While locked, its layer key and, when showing, its keys pulse.
 - **Hold**: works as a regular momentary layer, so the Lower -> Raise flow above still works.
 
 A one-shot tap that isn't followed by a key within 500 ms (`ONESHOT_TIMEOUT`) is dropped.
+
+Stock QMK only tracks one one-shot layer at a time, so combining layer keys could leave a layer stuck on, or a layer key held without its layer. The keymap handles the layer keys itself so that they combine predictably:
+- **Holding two layer keys**: the last one pressed wins. Releasing it goes back to the other one, still held.
+- **Tapping a layer key while holding another**: one-shot, then back to the held layer (e.g. hold Lower, tap Raise, press an arrow, keep typing numbers).
+- **A locked layer acts like a layer key held forever**: other layer keys still work on top of it (tap for a one-shot, hold for a momentary layer) and it comes back once they are done. For example, with Raise locked, tapping Lower gives a single mouse click, then Raise again.
+- **Tapping another layer key twice** moves the lock to it.
+- **Pressing the locked layer key** unlocks it. Its layer stays active until the key is released, so a tap just returns to the base layer.
 
 ![Base](assets/layout_drawings/generated/imprint_keymap_Base.svg)
 
