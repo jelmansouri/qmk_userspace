@@ -30,6 +30,9 @@ typedef enum {
 #define RAISE OSL(LAYER_RAISE)
 #define NAV_3D OSL(LAYER_NAV_3D)
 
+// Layer locked by a double tap on its layer key, LAYER_COUNT when none
+uint8_t get_locked_layer(void);
+
 #define KC_PRSC LGUI(LSFT(KC_4))
 #define KC_RCSC LGUI(LSFT(KC_5))
 
