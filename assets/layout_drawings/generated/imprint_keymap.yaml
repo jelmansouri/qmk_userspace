@@ -10,7 +10,7 @@ layers:
   - F10
   - F11
   - F12
-  - $$mdi:mouse-right-click-outline$$
+  - $$mdi:mouse-scroll-wheel$$
   - ''
   - '7'
   - '8'
@@ -34,7 +34,7 @@ layers:
   - F2
   - F3
   - F4
-  - $$mdi:mouse-scroll-wheel$$
+  - $$mdi:mouse-right-click-outline$$
   - '0'
   - '1'
   - '2'
@@ -151,14 +151,14 @@ layers:
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {t: ▽, type: trans}
+  - {type: held}
   - $$mdi:mouse-left-click-outline$$
   - $$mdi:keyboard-space$$
   - $$mdi:backspace$$
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}
-  - {type: held}
+  - {t: ▽, type: trans}
   - {t: ▽, type: trans}
   - $$mdi:mouse-right-click-outline$$
   - $$mdi:keyboard-return$$

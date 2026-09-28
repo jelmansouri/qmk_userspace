@@ -202,7 +202,7 @@ path.combo {
 </g>
 <g transform="translate(308, 42)" class="key keypos-5">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<use href="#mdi:mouse-right-click-outline" xlink:href="#mdi:mouse-right-click-outline" x="-7" y="-7" height="14" width="14.0" class="key tap glyph mdi:mouse-right-click-outline"/>
+<use href="#mdi:mouse-scroll-wheel" xlink:href="#mdi:mouse-scroll-wheel" x="-7" y="-7" height="14" width="14.0" class="key tap glyph mdi:mouse-scroll-wheel"/>
 </g>
 <g transform="translate(616, 42)" class="key keypos-6">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
@@ -294,7 +294,7 @@ path.combo {
 </g>
 <g transform="translate(308, 154)" class="key keypos-29">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
-<use href="#mdi:mouse-scroll-wheel" xlink:href="#mdi:mouse-scroll-wheel" x="-7" y="-7" height="14" width="14.0" class="key tap glyph mdi:mouse-scroll-wheel"/>
+<use href="#mdi:mouse-right-click-outline" xlink:href="#mdi:mouse-right-click-outline" x="-7" y="-7" height="14" width="14.0" class="key tap glyph mdi:mouse-right-click-outline"/>
 </g>
 <g transform="translate(616, 154)" class="key keypos-30">
 <rect rx="6" ry="6" x="-26" y="-26" width="52" height="52" class="key"/>
