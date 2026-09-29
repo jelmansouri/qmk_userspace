@@ -37,7 +37,7 @@ typedef struct layer_palette_t {
 #define HSV_MOD_SHIFT           0,  0,VDEF_MAX   // WHITE
 
 // Mouse buttons, so they stand out on the LOWER layer
-#define HSV_MOUSE             234,230,VDEF_MAX   // HOT PINK
+#define HSV_MOUSE             128,255,VDEF_MAX   // CYAN
 
 // Esc / Enter / Space / Backspace thumbs, the same on every layer
 #define HSV_THUMB_KEY          43,255,VDEF_MAX   // YELLOW
@@ -341,27 +341,30 @@ static inline uint8_t band_weight(uint8_t pos, uint16_t center) {
 // modifier color to blend over the layer color.
 static rgb_t key_color(uint8_t key_type, uint8_t layer, uint8_t target_layer, uint8_t band, rgb_t mods_color,
                        uint8_t brightness) {
+    rgb_t color;
     switch (key_type) {
         case LAYER_LED_TAP:
-        case LAYER_LED_MODTAP: {
-            rgb_t color = hsv_to_rgb_at(key_type == LAYER_LED_TAP ? palette[layer].primary : palette[layer].modtap,
-                                        brightness);
-            if (band) {
-                color.r = blend8(color.r, mods_color.r, band);
-                color.g = blend8(color.g, mods_color.g, band);
-                color.b = blend8(color.b, mods_color.b, band);
-            }
-            return color;
-        }
+            color = hsv_to_rgb_at(palette[layer].primary, brightness);
+            break;
+        case LAYER_LED_MODTAP:
+            color = hsv_to_rgb_at(palette[layer].modtap, brightness);
+            break;
+        case LAYER_LED_MOUSE:
+            color = hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
+            break;
         case LAYER_LED_MOD:
             return hsv_to_rgb_at(mod_colors[target_layer].color, brightness);
-        case LAYER_LED_MOUSE:
-            return hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
         case LAYER_LED_TO_LAYER:
             return hsv_to_rgb_at(palette[target_layer < LAYER_COUNT ? target_layer : layer].primary, brightness);
         default:
             return (rgb_t){RGB_BLACK};
     }
+    if (band) {
+        color.r = blend8(color.r, mods_color.r, band);
+        color.g = blend8(color.g, mods_color.g, band);
+        color.b = blend8(color.b, mods_color.b, band);
+    }
+    return color;
 }
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
