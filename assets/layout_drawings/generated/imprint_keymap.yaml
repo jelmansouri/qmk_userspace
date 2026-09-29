@@ -129,11 +129,11 @@ layers:
   - S
   - D
   - F
-  - LCPI 1
-  - LCPI 2
-  - LCPI 3
-  - LCPI 4
-  - LCPI 5
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
   - ''
   - ''
   - $$mdi:apple-keyboard-control$$
@@ -141,11 +141,11 @@ layers:
   - X
   - C
   - V
-  - RCPI 1
-  - RCPI 2
-  - RCPI 3
-  - RCPI 4
-  - RCPI 5
+  - ''
+  - ''
+  - ''
+  - ''
+  - ''
   - ''
   - {t: ▽, type: trans}
   - {t: ▽, type: trans}

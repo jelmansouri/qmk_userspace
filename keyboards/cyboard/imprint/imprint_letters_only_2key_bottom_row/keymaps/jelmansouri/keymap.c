@@ -31,9 +31,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 
     [LAYER_NAV_3D] = LAYOUT_let(
-      XXXXXXX,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                             RM_TOGG, RM_VALU, RM_VALD, XXXXXXX, XXXXXXX, XXXXXXX,
-      XXXXXXX, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                              LCPI_1,  LCPI_2,  LCPI_3,  LCPI_4,  LCPI_5, XXXXXXX,
-      XXXXXXX, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,                              RCPI_1,  RCPI_2,  RCPI_3,  RCPI_4,  RCPI_5, XXXXXXX,
+        XXXXXXX,  KC_TAB,    KC_Q,    KC_W,    KC_E,    KC_R,                           RM_TOGG, RM_VALU, RM_VALD, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, KC_LSFT,    KC_A,    KC_S,    KC_D,    KC_F,                           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
+        XXXXXXX, KC_LCTL,    KC_Z,    KC_X,    KC_C,    KC_V,                           XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,
                           _______, _______, _______, _______, KC_HELD,         MS_BTN1,  KC_SPC, KC_BSPC, _______, _______,
                                             _______, _______, _______,         MS_BTN2,  KC_ENT,  KC_ESC
     )
@@ -68,57 +68,6 @@ uint8_t get_locked_layer(void) {
     return locked_layer;
 }
 
-static bool process_oneshot_layer_key(uint16_t keycode, keyrecord_t *record) {
-    const uint8_t layer = QK_ONE_SHOT_LAYER_GET_LAYER(keycode);
-
-    if (record->event.pressed) {
-        held_layer_keys |= (layer_state_t)1 << layer;
-        // A second tap briefly resets the one-shot tracking before locking: don't resume then.
-        resume_after_oneshot = false;
-        // Turn the previous one-shot layer (held or pending) off before the stock handling
-        // starts this one and forgets about it.
-        if (get_oneshot_layer_state() && get_oneshot_layer() != layer) {
-            uint8_t previous = get_oneshot_layer();
-            reset_oneshot_layer();
-            layer_off(previous);
-        }
-        // Unlock: the layer stays on while the key is held, without a one-shot.
-        if (locked_layer == layer) {
-            locked_layer = LAYER_COUNT;
-            set_oneshot_layer(layer, ONESHOT_PRESSED);
-            return false;
-        }
-        // The locked layer stays locked, but is off while this one is active.
-        if (locked_layer < LAYER_COUNT) layer_off(locked_layer);
-        return true;
-    }
-
-    held_layer_keys &= ~((layer_state_t)1 << layer);
-
-    // Double tap: lock this layer, moving the lock from any other one (turned off by the press).
-    // Reset the tracking left by the press when it was an unlock (triple tap).
-    if (record->tap.count >= ONESHOT_TAP_TOGGLE) {
-        reset_oneshot_layer();
-        locked_layer = layer;
-        layer_on(layer);
-        return false;
-    }
-
-    // Taken over by another layer key: leave the active layer alone.
-    if (!get_oneshot_layer_state() || get_oneshot_layer() != layer) return false;
-
-    // On top of a held or locked layer, which comes back once this one ends: after its one-shot
-    // when tapped, right away when held.
-    if (held_layer_keys || locked_layer < LAYER_COUNT) {
-        resume_after_oneshot = true;
-        if (!record->tap.count) {
-            clear_oneshot_layer_state(ONESHOT_START);
-            return false;
-        }
-    }
-    return true;
-}
-
 // Called with layer 0 when the one-shot layer ends: used by the next key, timed out or released.
 void oneshot_layer_changed_user(uint8_t layer) {
     if (!layer && resume_after_oneshot) {
@@ -135,56 +84,56 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case LOWER:
         case RAISE:
-        case NAV_3D:
-            return process_oneshot_layer_key(keycode, record);
+        case NAV_3D: {
+            const uint8_t layer = QK_ONE_SHOT_LAYER_GET_LAYER(keycode);
 
-        case SCROLL_CPI_200 ... SCROLL_CPI_600:
             if (record->event.pressed) {
-                uint16_t cpi = 200;
-                switch (keycode) {
-                    case SCROLL_CPI_200:
-                        cpi = 200;
-                        break;
-                    case SCROLL_CPI_300:
-                        cpi = 300;
-                        break;
-                    case SCROLL_CPI_400:
-                        cpi = 400;
-                        break;
-                    case SCROLL_CPI_500:
-                        cpi = 500;
-                        break;
-                    case SCROLL_CPI_600:
-                        cpi = 600;
-                        break;
+                held_layer_keys |= (layer_state_t)1 << layer;
+                // A second tap briefly resets the one-shot tracking before locking: don't resume then.
+                resume_after_oneshot = false;
+                // Turn the previous one-shot layer (held or pending) off before the stock handling
+                // starts this one and forgets about it.
+                if (get_oneshot_layer_state() && get_oneshot_layer() != layer) {
+                    uint8_t previous = get_oneshot_layer();
+                    reset_oneshot_layer();
+                    layer_off(previous);
                 }
-                pointing_device_set_cpi_on_side(true, cpi);
+                // Unlock: the layer stays on while the key is held, without a one-shot.
+                if (locked_layer == layer) {
+                    locked_layer = LAYER_COUNT;
+                    set_oneshot_layer(layer, ONESHOT_PRESSED);
+                    return false;
+                }
+                // The locked layer stays locked, but is off while this one is active.
+                if (locked_layer < LAYER_COUNT) layer_off(locked_layer);
+                return true;
             }
-            return false;
 
-        case MOUSE_CPI_600 ... MOUSE_CPI_1600:
-            if (record->event.pressed) {
-                uint16_t cpi = 600;
-                switch (keycode) {
-                    case MOUSE_CPI_600:
-                        cpi = 600;
-                        break;
-                    case MOUSE_CPI_800:
-                        cpi = 800;
-                        break;
-                    case MOUSE_CPI_1000:
-                        cpi = 1000;
-                        break;
-                    case MOUSE_CPI_1200:
-                        cpi = 1200;
-                        break;
-                    case MOUSE_CPI_1600:
-                        cpi = 1600;
-                        break;
-                }
-                pointing_device_set_cpi_on_side(false, cpi);
+            held_layer_keys &= ~((layer_state_t)1 << layer);
+
+            // Double tap: lock this layer, moving the lock from any other one (turned off by the press).
+            // Reset the tracking left by the press when it was an unlock (triple tap).
+            if (record->tap.count >= ONESHOT_TAP_TOGGLE) {
+                reset_oneshot_layer();
+                locked_layer = layer;
+                layer_on(layer);
+                return false;
             }
-            return false;
+
+            // Taken over by another layer key: leave the active layer alone.
+            if (!get_oneshot_layer_state() || get_oneshot_layer() != layer) return false;
+
+            // On top of a held or locked layer, which comes back once this one ends: after its one-shot
+            // when tapped, right away when held.
+            if (held_layer_keys || locked_layer < LAYER_COUNT) {
+                resume_after_oneshot = true;
+                if (!record->tap.count) {
+                    clear_oneshot_layer_state(ONESHOT_START);
+                    return false;
+                }
+            }
+            return true;
+        }
     }
     return true;
 }

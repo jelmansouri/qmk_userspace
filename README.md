@@ -86,5 +86,5 @@ Stock QMK only tracks one one-shot layer at a time, so combining layer keys coul
 
 Finally, I keep a dedicated layer for 3D navigation. My day-to-day work involves sometimes testing stuff i develop in 3D editors, and most of those tools cluster navigation shortcuts on the left side, assuming the right hand is busy on the mouse. I mirrored that expectation: this layer uses a conventional layout that matches the defaults in most software, so I never have to remap anything. Switching into it feels natural, and it keeps my muscle memory aligned across all the different 3D packages I touch.
 
-The right half of this layer holds the settings: RGB toggle and brightness on the top row, left trackball (scroll) speed at 200-600 CPI on the home row, and right trackball (cursor) speed at 600-1600 CPI on the bottom row. Left and right click are on the right thumb cluster, next to Space, Backspace, Enter and Esc.
+The right half of this layer holds the RGB toggle and brightness on the top row. Trackball speeds are fixed at build time (`IMPRINT_LEFT_CPI` for scroll, `IMPRINT_RIGHT_CPI` for the cursor). Left and right click are on the right thumb cluster, next to Space, Backspace, Enter and Esc.
 
