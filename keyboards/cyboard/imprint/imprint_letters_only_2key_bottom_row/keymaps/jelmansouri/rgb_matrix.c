@@ -28,22 +28,19 @@ typedef struct layer_palette_t {
 #define HSV_NEON_GREEN_NEO     90,255,VDEF_MAX
 #define HSV_HOT_PINK_NEO      234,230,VDEF_MAX
 
-// Modifier colors (layer independent). Held modifiers are averaged in RGB space,
-// so primaries mix cleanly: Ctrl+Opt = yellow, Ctrl+Cmd = magenta, Opt+Cmd = cyan,
+// Modifier colors (layer independent). Held modifiers are averaged in RGB space:
+// Ctrl+Opt = yellow, Ctrl+Cmd = red-orange, Opt+Cmd = yellow-green,
 // and Shift (white) lightens whatever it is combined with.
 #define HSV_MOD_CTRL            0,255,VDEF_MAX   // RED
 #define HSV_MOD_ALT            85,255,VDEF_MAX   // GREEN
-#define HSV_MOD_GUI           170,255,VDEF_MAX   // BLUE
+#define HSV_MOD_GUI            21,255,VDEF_MAX   // ORANGE
 #define HSV_MOD_SHIFT           0,  0,VDEF_MAX   // WHITE
 
 // Mouse buttons, so they stand out on the LOWER layer
-#define HSV_MOUSE             128,255,VDEF_MAX   // CYAN
+#define HSV_MOUSE               4,255,VDEF_MAX   // TOMATO
 
 // Esc / Enter / Space / Backspace thumbs, the same on every layer
 #define HSV_THUMB_KEY          43,255,VDEF_MAX   // YELLOW
-
-// OS (Cmd) thumb keys. Only the keys: the band keeps HSV_MOD_GUI so modifier mixes stay distinct.
-#define HSV_OS_KEY             21,255,VDEF_MAX   // ORANGE
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}},
@@ -413,9 +410,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                     }
                     break;
                 case LAYER_LED_MOD:
-                    color = hsv_to_rgb_at(
-                        mod_colors[target_layer].mask == MOD_MASK_GUI ? (hsv_t){HSV_OS_KEY} : mod_colors[target_layer].color,
-                        brightness);
+                    color = hsv_to_rgb_at(mod_colors[target_layer].color, brightness);
                     break;
                 case LAYER_LED_MOUSE:
                     color = hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
