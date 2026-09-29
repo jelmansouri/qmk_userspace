@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <string.h>
 #include "quantum.h"
 #include "lib/lib8tion/lib8tion.h"
 #include "keymap.h"
@@ -36,10 +37,13 @@ typedef struct layer_palette_t {
 #define HSV_MOD_SHIFT           0,  0,VDEF_MAX   // WHITE
 
 // Mouse buttons, so they stand out on the LOWER layer
-#define HSV_MOUSE              32,255,VDEF_MAX   // GOLD
+#define HSV_MOUSE             234,230,VDEF_MAX   // HOT PINK
 
-// High-contrast thumbs (well away from all primaries)
-#define HSV_THUMB_PRIMARY     4,255,VDEF_MAX   // TOMATO
+// Esc / Enter / Space / Backspace thumbs, the same on every layer
+#define HSV_THUMB_KEY          43,255,VDEF_MAX   // YELLOW
+
+// OS (Cmd) thumb keys. Only the keys: the band keeps HSV_MOD_GUI so modifier mixes stay distinct.
+#define HSV_OS_KEY             21,255,VDEF_MAX   // ORANGE
 
 static const layer_palette_t palette[LAYER_COUNT] = {
     [LAYER_BASE]        = {{HSV_TEAL_NEO},          {HSV_TANGERINE_NEO}},
@@ -122,19 +126,19 @@ static inline uint8_t layer_led_layer(layer_led_info_t v) {
 }
 
 // While modifiers are held, a band of their color rolls over the layer color, from the
-// inner columns of each half out to the outer ones, then wraps back around to the inner ones.
-// Key positions run 0 (inner) to 255 (outer), ~51 per column, and the ring adds one more
-// column's gap so the wrap from outer to inner is as far as any other step. The band moves
-// one position every 1 << BAND_SPEED_SHIFT ms (a lap takes ~1.2s) and fades out over
+// top row down to the bottom one, then wraps back around to the top.
+// Key positions run 0 (top) to 255 (bottom), ~85 per row, and the ring adds one more
+// row's gap so the wrap from bottom to top is as far as any other step. The band moves
+// one position every 1 << BAND_SPEED_SHIFT ms (a lap takes ~1.4s) and fades out over
 // BAND_HALF_WIDTH on either side of its center.
 #define BAND_SPEED_SHIFT 2
-#define BAND_HALF_WIDTH 64
-#define BAND_RING (255 + 51)
+#define BAND_HALF_WIDTH 106
+#define BAND_RING (255 + 85)
 
 // ----- LAYER_BASE descriptor -----
 typedef struct {
     led_zone_t       zone;                    // physical grouping
-    uint8_t          band_pos;                // distance from the inner column, 0 (inner) to 255 (outer)
+    uint8_t          band_pos;                // distance from the top row, 0 (top) to 255 (bottom)
     layer_led_info_t layer_info[LAYER_COUNT]; // per-layer mapping
 } led_info_t;
 
@@ -148,45 +152,46 @@ _Static_assert(sizeof(layer_led_info_t) == 1, "layer_led_info_t must be 1 byte."
 // Lookup tables populated in keyboard_post_init_user
 static led_info_t led_info[RGB_MATRIX_LED_COUNT];
 
-// Layer locked by a double tap on its layer key, LAYER_COUNT when none. Layer keys are only
-// processed on the master half, so it is mirrored to the other half to pulse there too.
-static uint8_t locked_layer = LAYER_COUNT;
+// State only known on the master half, where keys are processed, mirrored to the other half
+// so both light the same: the layer locked by a double tap on its layer key (LAYER_COUNT when
+// none) and whether caps word is on (QMK doesn't sync it).
+typedef struct {
+    uint8_t locked_layer;
+    bool    caps_word;
+} user_sync_t;
+
+static user_sync_t user_sync = {.locked_layer = LAYER_COUNT};
 
 #ifdef SPLIT_KEYBOARD
-static void locked_layer_sync_handler(uint8_t in_buflen, const void *in_data, uint8_t out_buflen, void *out_data) {
-    if (in_buflen == sizeof(locked_layer)) {
-        locked_layer = *(const uint8_t *)in_data;
+static void user_sync_handler(uint8_t in_buflen, const void *in_data, uint8_t out_buflen, void *out_data) {
+    if (in_buflen == sizeof(user_sync)) {
+        memcpy(&user_sync, in_data, sizeof(user_sync));
     }
 }
 #endif
 
 void housekeeping_task_user(void) {
     if (!is_keyboard_master()) return;
-    locked_layer = get_locked_layer();
+    user_sync.locked_layer = get_locked_layer();
+    user_sync.caps_word    = is_caps_word_on();
 #ifdef SPLIT_KEYBOARD
-    static uint8_t  last_sent = LAYER_COUNT;
-    static uint32_t last_sync = 0;
+    static user_sync_t last_sent = {.locked_layer = LAYER_COUNT};
+    static uint32_t    last_sync = 0;
     // Send on change, and every 500ms in case a transfer was lost.
-    if (locked_layer != last_sent || timer_elapsed32(last_sync) > 500) {
-        if (transaction_rpc_send(RPC_ID_USER_LOCKED_LAYER, sizeof(locked_layer), &locked_layer)) {
-            last_sent = locked_layer;
+    if (memcmp(&user_sync, &last_sent, sizeof(user_sync)) != 0 || timer_elapsed32(last_sync) > 500) {
+        if (transaction_rpc_send(RPC_ID_USER_SYNC, sizeof(user_sync), &user_sync)) {
+            last_sent = user_sync;
             last_sync = timer_read32();
         }
     }
 #endif
 }
 
-// Horizontal distance of an LED from the center of the board (x = 112 on the 0-224 grid)
-static uint8_t center_distance(uint8_t led_index) {
-    const uint8_t x = g_led_config.point[led_index].x;
-    return x > 112 ? x - 112 : 112 - x;
-}
-
 void keyboard_post_init_user(void) {
     rgb_matrix_mode_noeeprom(RGB_MATRIX_SOLID_COLOR);
     rgb_matrix_sethsv_noeeprom(0, 0, MIN(rgb_matrix_get_val(), VDEF_MAX));
 #ifdef SPLIT_KEYBOARD
-    transaction_register_rpc(RPC_ID_USER_LOCKED_LAYER, locked_layer_sync_handler);
+    transaction_register_rpc(RPC_ID_USER_SYNC, user_sync_handler);
 #endif
 
     // Initialize lookup tables
@@ -272,21 +277,21 @@ void keyboard_post_init_user(void) {
         }
     }
 
-    // Band positions: horizontal distance from the center of the board, rescaled so the
-    // innermost key column is 0 and the outermost is 255. Thumbs and underglow are skipped.
-    uint8_t dist_min = UINT8_MAX, dist_max = 0;
+    // Band positions: vertical position on the board, rescaled so the top key row is 0 and
+    // the bottom one is 255. Thumbs and underglow are skipped.
+    uint8_t y_min = UINT8_MAX, y_max = 0;
     for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
         if (led_info[i].zone == LED_ZONE_THUMB || led_info[i].zone == LED_ZONE_UNDER) continue;
-        const uint8_t dist = center_distance(i);
-        dist_min           = MIN(dist_min, dist);
-        dist_max           = MAX(dist_max, dist);
+        const uint8_t y = g_led_config.point[i].y;
+        y_min           = MIN(y_min, y);
+        y_max           = MAX(y_max, y);
     }
     for (uint8_t i = 0; i < RGB_MATRIX_LED_COUNT; i++) {
-        const uint8_t dist = center_distance(i);
-        if (dist_max <= dist_min || dist <= dist_min) {
+        const uint8_t y = g_led_config.point[i].y;
+        if (y_max <= y_min || y <= y_min) {
             led_info[i].band_pos = 0;
         } else {
-            led_info[i].band_pos = MIN(dist - dist_min, dist_max - dist_min) * 255 / (dist_max - dist_min);
+            led_info[i].band_pos = MIN(y - y_min, y_max - y_min) * 255 / (y_max - y_min);
         }
     }
 }
@@ -329,7 +334,7 @@ static bool mods_mix_color(uint8_t mods, uint8_t brightness, rgb_t *out) {
 static inline uint8_t band_weight(uint8_t pos, uint16_t center) {
     uint16_t diff = pos > center ? pos - center : center - pos;
     if (diff > BAND_RING / 2) diff = BAND_RING - diff; // distance around the ring
-    return diff >= BAND_HALF_WIDTH ? 0 : 255 - diff * (256 / BAND_HALF_WIDTH);
+    return diff >= BAND_HALF_WIDTH ? 0 : 255 - diff * 255 / BAND_HALF_WIDTH;
 }
 
 // Color of a non-thumb key of the given type on `layer`. `band` is how much of the
@@ -365,11 +370,11 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     const uint8_t       brightness           = MIN(rgb_matrix_get_val(), VDEF_MAX);
 
     uint8_t mods = get_mods() | get_oneshot_mods() | get_oneshot_locked_mods();
-    if (current_layer == LAYER_BASE && is_caps_word_on()) mods |= MOD_BIT(KC_LSFT);
+    if (current_layer == LAYER_BASE && user_sync.caps_word) mods |= MOD_BIT(KC_LSFT);
     rgb_t      mods_color = {RGB_BLACK};
     const bool mods_held  = mods_mix_color(mods, brightness, &mods_color);
 
-    // Band center rolls around the ring, restarting from the inner column (BGV / JMK) whenever
+    // Band center rolls around the ring, restarting from the top row whenever
     // modifiers go from none to some. The synced timer keeps both halves in step.
     static bool     band_active = false;
     static uint32_t band_start  = 0;
@@ -379,8 +384,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 
     // While a layer is locked, its layer key pulses between 1/4 and full brightness, about once a
     // second, and so do its keys while it is showing (not while another layer is on top of it).
-    const bool    pulsing      = locked_layer < LAYER_COUNT;
-    const bool    pulsing_keys = pulsing && current_layer == locked_layer;
+    const bool    pulsing      = user_sync.locked_layer < LAYER_COUNT;
+    const bool    pulsing_keys = pulsing && current_layer == user_sync.locked_layer;
     const uint8_t pulse        = 64 + scale8(sin8((uint8_t)(timer_read() / 4)), 255 - 64);
 
     for (uint8_t i = led_min; i < led_max; i++) {
@@ -405,13 +410,15 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
                     }
                     break;
                 case LAYER_LED_MOD:
-                    color = hsv_to_rgb_at(mod_colors[target_layer].color, brightness);
+                    color = hsv_to_rgb_at(
+                        mod_colors[target_layer].mask == MOD_MASK_GUI ? (hsv_t){HSV_OS_KEY} : mod_colors[target_layer].color,
+                        brightness);
                     break;
                 case LAYER_LED_MOUSE:
                     color = hsv_to_rgb_at((hsv_t){HSV_MOUSE}, brightness);
                     break;
                 default:
-                    color = hsv_to_rgb_at((hsv_t){HSV_THUMB_PRIMARY}, brightness);
+                    color = hsv_to_rgb_at((hsv_t){HSV_THUMB_KEY}, brightness);
             }
         }
         // ZONE: NORMAL and BOTTOM_MOD
@@ -440,7 +447,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         // the base layer (transparent elsewhere), so look them up there whatever layer is showing.
         const layer_led_info_t base_info = led_info[i].layer_info[LAYER_BASE];
         const bool             is_locked_layer_key =
-            layer_led_type(base_info) == LAYER_LED_TO_LAYER && layer_led_layer(base_info) == locked_layer;
+            layer_led_type(base_info) == LAYER_LED_TO_LAYER && layer_led_layer(base_info) == user_sync.locked_layer;
         if ((pulsing_keys && led_info[i].zone == LED_ZONE_NORMAL) ||
             (pulsing && led_info[i].zone == LED_ZONE_THUMB && is_locked_layer_key)) {
             color.r = scale8(color.r, pulse);
