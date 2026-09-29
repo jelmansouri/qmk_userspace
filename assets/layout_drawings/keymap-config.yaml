@@ -145,6 +145,10 @@ parse_config:
     LSFT: $$mdi:apple-keyboard-shift$$
     LALT: $$mdi:apple-keyboard-option$$
     LCTL: $$mdi:apple-keyboard-control$$
+    RGUI: $$mdi:apple-keyboard-command$$
+    RSFT: $$mdi:apple-keyboard-shift$$
+    RALT: $$mdi:apple-keyboard-option$$
+    RCTL: $$mdi:apple-keyboard-control$$
     R_CTL: {t: R, h: $$mdi:apple-keyboard-control$$}
     S_ALT: {t: S, h: $$mdi:apple-keyboard-option$$}
     T_GUI: {t: T, h: $$mdi:apple-keyboard-command$$}
