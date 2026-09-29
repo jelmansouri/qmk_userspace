@@ -29,7 +29,7 @@ layers:
   - '6'
   - ''
   - ''
-  - {t: ▽, type: trans}
+  - $$mdi:backspace-reverse$$
   - F1
   - F2
   - F3
